@@ -8,7 +8,7 @@ const dietRoutes = require("./routes/diet");
 const bmiRoutes = require("./routes/bmi");
 const foodRoutes = require("./routes/food");
 const orderRoutes = require("./routes/order");
-
+const adminRoutes = require('./routes/admin');
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
@@ -24,7 +24,7 @@ app.use("/api/diet", dietRoutes);
 app.use("/api/bmi",bmiRoutes);
 app.use("/api/food",foodRoutes);
 app.use("/api/orders",orderRoutes);
-
+app.use('/api/admin', adminRoutes);
 
 const PORT = 3000;
 mongoose

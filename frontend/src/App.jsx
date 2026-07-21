@@ -11,20 +11,23 @@ import FoodStore from './pages/FoodStore'
 import Navbar from './components/Navbar'
 import Order from './pages/Order'
 import PrivateRoute from './components/PrivateRoute'
-
-
+import AdminPrivateRoute from './components/AdminPrivateRoute'
+import AdminNavbar from './components/AdminNavbar'
+import AdminDashboard from './admin/AdminDashboard';
 function Layout() {
   const location = useLocation();
   const hideNavbar = ['/login', '/register'].includes(location.pathname);
+   const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <>
-      {!hideNavbar && <Navbar />}
+     {!hideNavbar && (isAdminRoute ? <AdminNavbar /> : <Navbar />)}
       <Routes>
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
 
         <Route element={<PrivateRoute/>}>
+        <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
           <Route path='/dashboard' element={<Dashboard/>}/>
           <Route path='/workout' element={<Workout/>}/>
           <Route path='/diet' element={<Diet/>}/>

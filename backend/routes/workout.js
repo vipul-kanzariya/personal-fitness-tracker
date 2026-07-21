@@ -34,21 +34,29 @@ router.get('/',authMiddleware,async(req,res)=>{
    }
 
 })
-router.put('/:id',authMiddleware,async(req,res)=>{
+router.put('/:id', authMiddleware, async(req, res) => {
+  try{
+    const {id} = req.params;
+    const {exerciseName} = req.body;
 
-   try{
-        const {id} = req.params;
     
-     const workout = await Workout.findOneAndUpdate({_id:id,userId:req.user.id},req.body,{new:true});
-      if(!workout){
-      return res.status(404).json('Workout not found'); 
+    if(exerciseName !== undefined && !exerciseName.trim()){
+      return res.status(400).json('Exercise name cannot be empty');
     }
-     res.status(200).json(workout);
-   }catch(err){
-    res.status(500).json(err.message)
-   }
 
-})
+    const workout = await Workout.findOneAndUpdate(
+      {_id: id, userId: req.user.id},
+      req.body,
+      {new: true, runValidators: true}
+    );
+    if(!workout){
+      return res.status(404).json('Workout not found');
+    }
+    res.status(200).json(workout);
+  }catch(err){
+    res.status(500).json(err.message);
+  }
+});
 router.delete('/:id',authMiddleware,async(req,res)=>{
 
    try{
