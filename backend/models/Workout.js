@@ -7,6 +7,11 @@ const WorkoutSchema = Schema({
     type:mongoose.Types.ObjectId,
     ref:'User',
     required:true
+   },  
+   workoutTypeId:{
+    type:mongoose.Types.ObjectId,
+    ref:'WorkoutType',
+    required:true
    },
    exerciseName:{
     type:String,

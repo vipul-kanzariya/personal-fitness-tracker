@@ -14,6 +14,11 @@ import PrivateRoute from './components/PrivateRoute'
 import AdminPrivateRoute from './components/AdminPrivateRoute'
 import AdminNavbar from './components/AdminNavbar'
 import AdminDashboard from './admin/AdminDashboard';
+// import AdminUsers from './admin/AdminUsers';
+// import AdminOrders from './admin/AdminOrders';
+// import AdminFoodStore from './admin/AdminFoodStore';
+// import AdminWorkoutTypes from './admin/AdminWorkoutTypes';
+import NotFound from './pages/NotFound';
 function Layout() {
   const location = useLocation();
   const hideNavbar = ['/login', '/register'].includes(location.pathname);
@@ -26,8 +31,15 @@ function Layout() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
 
+        <Route element={<AdminPrivateRoute/>}>
+          <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
+          {/* <Route path='/admin/users' element={<AdminUsers/>}/>
+          <Route path='/admin/orders' element={<AdminOrders/>}/>
+          <Route path='/admin/foodstore' element={<AdminFoodStore/>}/>
+          <Route path='/admin/workouttypes' element={<AdminWorkoutTypes/>}/> */}
+        </Route>
+
         <Route element={<PrivateRoute/>}>
-        <Route path='/admin/dashboard' element={<AdminDashboard/>}/>
           <Route path='/dashboard' element={<Dashboard/>}/>
           <Route path='/workout' element={<Workout/>}/>
           <Route path='/diet' element={<Diet/>}/>
@@ -35,6 +47,8 @@ function Layout() {
           <Route path='/foodstore' element={<FoodStore/>}/>
           <Route path='/orders' element={<Order/>}/>
         </Route>
+
+        <Route path='*' element={<NotFound/>}/>
       </Routes>
     </>
   )

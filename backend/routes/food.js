@@ -1,6 +1,7 @@
 const express = require('express');
 const Food = require('../models/Food');
 const { authMiddleware } = require('../middleware/authMiddleware');
+const { adminMiddleware } = require('../middleware/adminMiddleware');
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ router.get('/:id',async(req,res)=>{
     }
     
 });
-router.post('/',authMiddleware,async(req,res)=>{
+router.post('/',authMiddleware,adminMiddleware,async(req,res)=>{
     try{
         const {name, description, price, calories, protein, carbs, fat, category, image} = req.body;
         const food = await Food.create({name, description, price, calories, protein, carbs, fat, category, image});
@@ -32,7 +33,7 @@ router.post('/',authMiddleware,async(req,res)=>{
          res.status(500).json(err.message);
     }
 });
-router.put('/:id',authMiddleware,async(req,res)=>{
+router.put('/:id',authMiddleware,adminMiddleware,async(req,res)=>{
     try{
         const {id} = req.params;
         const food = await Food.findByIdAndUpdate(id,req.body,{new:true});
@@ -41,7 +42,7 @@ router.put('/:id',authMiddleware,async(req,res)=>{
          res.status(500).json(err.message);
     }
 });
-router.delete('/:id',authMiddleware,async(req,res)=>{
+router.delete('/:id',authMiddleware,adminMiddleware,async(req,res)=>{
     try{
         const {id} = req.params;
         const food = await Food.findByIdAndDelete(id);

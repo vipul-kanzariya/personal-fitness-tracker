@@ -1,28 +1,31 @@
 import React, { useState } from "react";
-import {Meta, useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
 
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const handleSubmit = async(e) =>{
     e.preventDefault()
+    setError("");
     try{
-   
-const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {email, password});
-localStorage.setItem('token', res.data.token);
-localStorage.setItem('role', res.data.role);
-navigate('/dashboard');
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {email, password});
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('role', res.data.role);
+      navigate('/dashboard');
     }catch(err){
-      console.log(err.message);
-      
+      setError(err.response?.data || 'Login failed. Please try again.');
     }
   }
   return (
     <>
     <div className="container bg-white  p-3  rounded">
+      {error && (
+        <div className='alert alert-danger mt-3'>{error}</div>
+      )}
       <form onSubmit={handleSubmit}>
         <label htmlFor="email"
         className="flex-row m-1">Email</label>
