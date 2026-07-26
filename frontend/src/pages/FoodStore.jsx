@@ -8,8 +8,8 @@ function FoodStore() {
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [ordering, setOrdering] = useState(false);
-  const [error,setError] = useState();
-  
+  const [error, setError] = useState();
+
   useEffect(() => {
     const fetchFood = async () => {
       try {
@@ -20,7 +20,7 @@ function FoodStore() {
         );
         setFood(food.data);
       } catch (err) {
-        setError('Failed to load food items.')
+        setError("Failed to load food items.");
       } finally {
         setLoading(false);
       }
@@ -55,10 +55,10 @@ function FoodStore() {
     setTotalAmount(totalAmount - item.price);
   };
   const handleOrder = async () => {
-    if(cart.length === 0){
-    alert('Cart is empty!');
-    return;
-  }
+    if (cart.length === 0) {
+      alert("Cart is empty!");
+      return;
+    }
     try {
       setOrdering(true);
       const token = localStorage.getItem("token");
@@ -68,7 +68,7 @@ function FoodStore() {
         price: c.price,
         quantity: c.quantity,
       }));
-      
+
       await axios.post(
         `${import.meta.env.VITE_API_URL}/api/orders`,
         { items, totalAmount },
@@ -81,22 +81,18 @@ function FoodStore() {
     } catch (err) {
       console.log(err.message);
     } finally {
-
       setOrdering(false);
     }
   };
   return (
     <>
-    {error && (
-  <div className='alert alert-danger mt-3'>
-     {error}
-  </div>
-)}
+      {error && <div className="alert alert-danger mt-3">{error}</div>}
       {loading ? (
         <Spinner />
       ) : (
         <div className="container mt-4">
           <div className="row">
+            {/* Food Items */}
             {/* Food Items */}
             <div className="col-md-8">
               <h4>🛒 Food Store</h4>
@@ -104,6 +100,12 @@ function FoodStore() {
                 {food.map((f) => (
                   <div className="col-md-4 mb-3" key={f._id}>
                     <div className="card p-3">
+                      <img
+                        src={f.image || "https://via.placeholder.com/150"}
+                        alt={f.name}
+                        className="img-fluid mb-2"
+                        style={{ height: "120px", objectFit: "cover" }}
+                      />
                       <h6>{f.name}</h6>
                       <p>₹ {f.price}</p>
                       <p>{f.calories} cal</p>

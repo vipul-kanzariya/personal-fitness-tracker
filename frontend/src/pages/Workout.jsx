@@ -4,11 +4,11 @@ import Spinner from "../components/Spinner";
 
 function Workout() {
   const [workouts, setWorkouts] = useState([]);
-  const [exerciseName, setExerciseName] = useState("");
+  // const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState();
   const [reps, setReps] = useState();
   const [duration, setDuration] = useState();
-  const [caloriesBurned, setCaloriesBurned] = useState();
+  // const [caloriesBurned, setCaloriesBurned] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
   const [editId, setEditId] = useState(null);
@@ -50,10 +50,7 @@ function Workout() {
     });
   };
   const handleUpdate = async (id) => {
-    if (!editData.exerciseName.trim()) {
-      setError("Exercise name cannot be empty.");
-      return;
-    }
+  
     if (!editData.sets || editData.sets <= 0) {
       setError("Sets must be greater than 0.");
       return;
@@ -203,17 +200,7 @@ setSets(''); setReps(''); setDuration('');
                     // ✅ Edit mode
                     <>
                       <td>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editData.exerciseName}
-                          onChange={(e) =>
-                            setEditData({
-                              ...editData,
-                              exerciseName: e.target.value,
-                            })
-                          }
-                        />
+                        {w.exerciseName}
                       </td>
                       <td>
                         <input
@@ -252,19 +239,7 @@ setSets(''); setReps(''); setDuration('');
                         />
                       </td>
                       <td>
-                        <input
-                          type="number"
-                          className="form-control"
-                          min="0"
-                          value={editData.caloriesBurned}
-                          // onChange={(e) =>
-                          //   setEditData({
-                          //     ...editData,
-                          //     caloriesBurned: e.target.value,
-                          //   })
-                          // }
-                          disabled
-                        />
+                       {w.caloriesBurned}
                       </td>
                       <td>
                         <button

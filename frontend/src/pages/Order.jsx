@@ -27,6 +27,20 @@ function Order() {
     };
     fetchOrder();
   }, []);
+  const handleCancel = async (id) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.put(
+      `${import.meta.env.VITE_API_URL}/api/orders/${id}/cancel`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setOrders(orders.map(o => o._id === id ? res.data : o));
+    setError('');
+  } catch (err) {
+    setError(err.response?.data || "Failed to cancel order.");
+  }
+};
   return (
     <>
     {error && (
@@ -82,6 +96,12 @@ function Order() {
                     Date: {new Date(o.createdAt).toLocaleDateString()}
                   </span>
                 </div>
+                {o.orderStatus !== 'Delivered' && o.orderStatus !== 'Cancelled' && (
+  <button className='btn btn-outline-danger btn-sm mt-2'
+    onClick={() => handleCancel(o._id)}>
+    Cancel Order
+  </button>
+)}
               </div>
             ))
           )}

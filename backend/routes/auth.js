@@ -29,6 +29,9 @@ router.post('/login', async(req,res)=>{
     if(!checkEmail){
         return res.status(400).json('Email Not exists');
     }
+     if(checkEmail.isBlocked){
+        return res.status(403).json('Your account has been blocked. Contact admin.');
+    }
     const checkPwd = await bcryptjs.compare(password,checkEmail.password);
     if(!checkPwd){
         return res.status(400).json('Invalid password');

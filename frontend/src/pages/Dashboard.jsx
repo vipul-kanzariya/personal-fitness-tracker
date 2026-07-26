@@ -81,7 +81,7 @@ function Dashboard() {
                     {workout.reduce(
                       (sum, w) => sum + (w.caloriesBurned || 0),
                       0,
-                    )}
+                    ).toFixed(2)}
                   </strong>
                 </p>
               </div>
