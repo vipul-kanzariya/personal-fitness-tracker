@@ -33,6 +33,30 @@ function Diet() {
     };
     fetchDiet();
   }, []);
+const handleAutoFill = async () => {
+  if (!foodName.trim()) {
+    setError("Pehle food name daalo.");
+    return;
+  }
+  try {
+    const token = localStorage.getItem("token");
+    setLoading(true);
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/diet/estimate`,
+      { foodName },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setCalories(res.data.calories);
+    setProtein(res.data.protein);
+    setCarbs(res.data.carbs);
+    setFat(res.data.fat);
+    setError(null);
+  } catch (err) {
+    setError("Nutrition estimate fail ho gaya. Values manually daal do.");
+  } finally {
+    setLoading(false);
+  }
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -89,65 +113,58 @@ function Diet() {
       <div className="container mt-4">
         <form onSubmit={handleSubmit}>
           <label htmlFor="food">Food name</label>
-          <input
-            type="text"
-            value={foodName}
-            onChange={(e) => setFoodName(e.target.value)}
-            id="food"
-            placeholder="Enter Food name"
-          />
+          <div className="d-flex gap-2">
+            <input type="text" value={foodName} onChange={(e) => setFoodName(e.target.value)}
+              id="food" placeholder="e.g. 2 boiled eggs" />
+            <button type="button" className="btn btn-outline-primary btn-sm" onClick={handleAutoFill}>
+              ✨ Auto-fill
+            </button>
+          </div>
 
           <label htmlFor="calories">Calories</label>
           <input
             type="number"
-            min="0"
-            onKeyDown={(e) =>
-              ["e", "-", "+"].includes(e.key) && e.preventDefault()
-            }
+             min="0" step="0.1" 
+            step="0.1"
             value={calories}
             onChange={(e) => setCalories(e.target.value)}
             id="calories"
-            placeholder="Enter Calories"
+            placeholder="Calories"
           />
 
-          <label htmlFor="protein">Protein</label>
+          <label htmlFor="protein">Protein (g)</label>
           <input
             type="number"
-            min="0"
-            onKeyDown={(e) =>
-              ["e", "-", "+"].includes(e.key) && e.preventDefault()
-            }
+             min="0" step="0.1" 
+            step="0.1"
             value={protein}
             onChange={(e) => setProtein(e.target.value)}
             id="protein"
-            placeholder="Enter Protein"
+            placeholder="Protein"
           />
 
-          <label htmlFor="carbs">Carbs</label>
+          <label htmlFor="carbs">Carbs (g)</label>
           <input
             type="number"
-            min="0"
-            onKeyDown={(e) =>
-              ["e", "-", "+"].includes(e.key) && e.preventDefault()
-            }
+             min="0" step="0.1" 
+            step="0.1"
             value={carbs}
             onChange={(e) => setCarbs(e.target.value)}
             id="carbs"
-            placeholder="Enter Carbs"
+            placeholder="Carbs"
           />
 
-          <label htmlFor="fat">Fat</label>
+          <label htmlFor="fat">Fat (g)</label>
           <input
             type="number"
-            min="0"
-            onKeyDown={(e) =>
-              ["e", "-", "+"].includes(e.key) && e.preventDefault()
-            }
+             min="0" step="0.1" 
+            step="0.1"
             value={fat}
             onChange={(e) => setFat(e.target.value)}
             id="fat"
-            placeholder="Enter Calories"
+            placeholder="Fat"
           />
+
           <button type="submit">Submit</button>
         </form>
         {loading ? (

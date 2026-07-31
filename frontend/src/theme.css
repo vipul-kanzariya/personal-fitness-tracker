@@ -1,0 +1,185 @@
+:root {
+  --accent: #a3e635;
+  --accent-dark: #84cc16;
+  --bg-dark: #0a0a0a;
+  --bg-card: #161616;
+  --bg-card-hover: #1e1e1e;
+  --border-color: #2a2a2a;
+  --text-primary: #ffffff;
+  --text-muted: #8a8a8a;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Oswald', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--bg-dark) !important;
+  border-bottom: 1px solid var(--border-color);
+}
+.navbar .nav-link {
+  color: var(--text-muted) !important;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--accent) !important;
+}
+.navbar-brand {
+  color: var(--text-primary) !important;
+}
+
+/* Cards */
+.card {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+}
+.card:hover {
+  border-color: #3a3a3a !important;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #0a0a0a !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.btn-primary:hover {
+  background-color: var(--accent-dark) !important;
+  border-color: var(--accent-dark) !important;
+}
+.btn-success {
+  background-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #0a0a0a !important;
+}
+.btn-outline-danger {
+  color: #ff4d4d !important;
+  border-color: #ff4d4d !important;
+}
+.btn-outline-danger:hover {
+  background-color: #ff4d4d !important;
+  color: #fff !important;
+}
+
+/* Tables */
+.table {
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+.table-dark {
+  background-color: var(--bg-card) !important;
+}
+.table > :not(caption) > * > * {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Forms */
+.form-control, .form-select {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+.form-control:focus, .form-select:focus {
+  background-color: var(--bg-card) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 0.2rem rgba(163, 230, 53, 0.25) !important;
+  color: var(--text-primary) !important;
+}
+.form-control::placeholder {
+  color: var(--text-muted) !important;
+}
+label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Badges */
+.badge.bg-success {
+  background-color: var(--accent) !important;
+  color: #0a0a0a !important;
+}
+
+/* Alerts */
+.alert-danger {
+  background-color: #2a1414 !important;
+  border-color: #ff4d4d !important;
+  color: #ff8080 !important;
+}
+.alert-info {
+  background-color: #142a1e !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+/* Progress bars (BMI ke liye future use) */
+.progress {
+  background-color: var(--border-color) !important;
+}
+.progress-bar {
+  background-color: var(--accent) !important;
+}
+/* Stat Cards */
+.stat-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
+}
+.stat-card-accent {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+.stat-card-accent .stat-icon,
+.stat-card-accent .stat-value,
+.stat-card-accent .stat-label {
+  color: #0a0a0a !important;
+}
+.stat-icon {
+  font-size: 1.5rem;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: 'Oswald', sans-serif;
+  color: var(--text-primary);
+}
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+.section-title {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}

@@ -4,11 +4,9 @@ import Spinner from "../components/Spinner";
 
 function Workout() {
   const [workouts, setWorkouts] = useState([]);
-  // const [exerciseName, setExerciseName] = useState("");
   const [sets, setSets] = useState();
   const [reps, setReps] = useState();
   const [duration, setDuration] = useState();
-  // const [caloriesBurned, setCaloriesBurned] = useState();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
   const [editId, setEditId] = useState(null);
@@ -42,15 +40,17 @@ function Workout() {
   const handleEdit = (workout) => {
     setEditId(workout._id);
     setEditData({
-      exerciseName: workout.exerciseName,
+      workoutTypeId: workout.workoutTypeId?._id || workout.workoutTypeId,
       sets: workout.sets,
       reps: workout.reps,
       duration: workout.duration,
-      
     });
   };
   const handleUpdate = async (id) => {
-  
+    if (!editData.workoutTypeId) {
+      setError("Please select an exercise.");
+      return;
+    }
     if (!editData.sets || editData.sets <= 0) {
       setError("Sets must be greater than 0.");
       return;
@@ -63,7 +63,6 @@ function Workout() {
       setError("Duration must be greater than 0.");
       return;
     }
-    
 
     try {
       const token = localStorage.getItem("token");
@@ -138,7 +137,7 @@ setSets(''); setReps(''); setDuration('');
           <label htmlFor="sets">Sets</label>
           <input
             type="number"
-            min="0"
+             min="0" step="0.1" 
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -151,7 +150,7 @@ setSets(''); setReps(''); setDuration('');
           <label htmlFor="reps">Reps</label>
           <input
             type="number"
-            min="0"
+             min="0" step="0.1" 
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -164,7 +163,7 @@ setSets(''); setReps(''); setDuration('');
           <label htmlFor="duration">Duration</label>
           <input
             type="number"
-            min="0"
+             min="0" step="0.1" 
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -200,13 +199,29 @@ setSets(''); setReps(''); setDuration('');
                     // ✅ Edit mode
                     <>
                       <td>
-                        {w.exerciseName}
+                        <select
+                          className="form-select"
+                          value={editData.workoutTypeId || ""}
+                          onChange={(e) =>
+                            setEditData({
+                              ...editData,
+                              workoutTypeId: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="">Select Exercise</option>
+                          {workoutTypes.map((t) => (
+                            <option key={t._id} value={t._id}>
+                              {t.name} ({t.caloriesPerMinute} cal/min)
+                            </option>
+                          ))}
+                        </select>
                       </td>
                       <td>
                         <input
                           type="number"
                           className="form-control"
-                          min="0"
+                           min="0" step="0.1" 
                           value={editData.sets}
                           onChange={(e) =>
                             setEditData({ ...editData, sets: e.target.value })
@@ -217,7 +232,7 @@ setSets(''); setReps(''); setDuration('');
                         <input
                           type="number"
                           className="form-control"
-                          min="0"
+                           min="0" step="0.1" 
                           value={editData.reps}
                           onChange={(e) =>
                             setEditData({ ...editData, reps: e.target.value })
@@ -228,7 +243,7 @@ setSets(''); setReps(''); setDuration('');
                         <input
                           type="number"
                           className="form-control"
-                          min="0"
+                           min="0" step="0.1" 
                           value={editData.duration}
                           onChange={(e) =>
                             setEditData({
@@ -238,9 +253,7 @@ setSets(''); setReps(''); setDuration('');
                           }
                         />
                       </td>
-                      <td>
-                       {w.caloriesBurned}
-                      </td>
+                      <td>{w.caloriesBurned} <small className="text-muted">(recalculated on save)</small></td>
                       <td>
                         <button
                           className="btn btn-success btn-sm me-1"
@@ -259,7 +272,7 @@ setSets(''); setReps(''); setDuration('');
                   ) : (
                     // ✅ Normal mode
                     <>
-                      <td>{w.exerciseName}</td>
+                      <td>{w.workoutTypeId?.name}</td>
                       <td>{w.sets}</td>
                       <td>{w.reps}</td>
                       <td>{w.duration}</td>

@@ -19,7 +19,7 @@ function AdminUsers() {
         );
         setUsers(usersRes.data);
       } catch (err) {
-        setError("Failde to load Users");
+        setError("Failed to load Users");
       } finally {
         setLoading(false);
       }

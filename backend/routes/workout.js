@@ -18,27 +18,31 @@ router.post('/',authMiddleware,async(req,res)=>{
   
     const caloriesBurned =Number((workoutType.caloriesPerMinute * duration * (1 + (sets * reps) / 1000)).toFixed(2));
 
-    const workout = await Workout.create({
-      userId,
-      workoutTypeId,
-      exerciseName: workoutType.name, 
-      sets, reps, duration,
-      caloriesBurned
-    });
+   const workout = await Workout.create({
+  userId,
+  workoutTypeId,
+  exerciseName: workoutType.name, 
+  sets, reps, duration,
+  caloriesBurned
+});
 
-    res.status(201).json(workout);
+await workout.populate('workoutTypeId', 'name category caloriesPerMinute');
+
+res.status(201).json(workout);
     }catch(err){
         res.status(500).json(err.message);
     }
 
 
 })
-router.get('/',authMiddleware,async(req,res)=>{
+router.get('/', authMiddleware, async (req, res) => {
 
-   try{
-     const workout = await Workout.find({userId:req.user.id}).sort({date:-1});
+   try {
+     const workout = await Workout.find({ userId: req.user.id })
+       .populate('workoutTypeId', 'name category caloriesPerMinute')
+       .sort({ date: -1 });
      res.status(200).json(workout);
-   }catch(err){
+   } catch (err) {
     res.status(500).json(err.message)
    }
 
@@ -46,11 +50,9 @@ router.get('/',authMiddleware,async(req,res)=>{
 router.put('/:id', authMiddleware, async(req, res) => {
  try{
     const {id} = req.params;
-    const {exerciseName, sets, reps, duration} = req.body;
+    const {workoutTypeId, sets, reps, duration} = req.body;
 
-    if(exerciseName !== undefined && !exerciseName.trim()){
-      return res.status(400).json('Exercise name cannot be empty');
-    }
+  
 
     // ✅ pehle purana workout dhundo — workoutTypeId chahiye
     const existingWorkout = await Workout.findOne({_id: id, userId: req.user.id});
@@ -59,7 +61,8 @@ router.put('/:id', authMiddleware, async(req, res) => {
     }
 
     // ✅ workout type se caloriesPerMinute lo
-    const workoutType = await WorkoutType.findById(existingWorkout.workoutTypeId);
+    const newWorkoutTypeId = workoutTypeId || existingWorkout.workoutTypeId;
+const workoutType = await WorkoutType.findById(newWorkoutTypeId);
 
     // ✅ duration/sets/reps naya hai to use karo, warna purana
     const newDuration = duration !== undefined ? duration : existingWorkout.duration;
@@ -70,12 +73,12 @@ router.put('/:id', authMiddleware, async(req, res) => {
       (workoutType.caloriesPerMinute * newDuration * (1 + (newSets * newReps) / 1000)).toFixed(2)
     );
 
-    const workout = await Workout.findOneAndUpdate(
-      {_id: id, userId: req.user.id},
-      { sets: newSets, reps: newReps, duration: newDuration, caloriesBurned },
-      {new: true, runValidators: true}
-    );
-    res.status(200).json(workout);
+const workout = await Workout.findOneAndUpdate(
+  {_id: id, userId: req.user.id},
+  { workoutTypeId: newWorkoutTypeId, sets: newSets, reps: newReps, duration: newDuration, caloriesBurned },
+  {new: true, runValidators: true}
+).populate('workoutTypeId', 'name category caloriesPerMinute');
+res.status(200).json(workout);
   }catch(err){
     res.status(500).json(err.message);
   }

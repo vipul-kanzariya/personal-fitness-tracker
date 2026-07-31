@@ -76,11 +76,11 @@ function AdminFoodStore() {
             onChange={(e) => setDescription(e.target.value)} />
         </div>
         <div className="col-md-2">
-          <input type="number" min="0" className="form-control" placeholder="Price" value={price}
+          <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Price" value={price}
             onChange={(e) => setPrice(e.target.value)} required />
         </div>
         <div className="col-md-2">
-          <input type="number" min="0" className="form-control" placeholder="Calories" value={calories}
+          <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Calories" value={calories}
             onChange={(e) => setCalories(e.target.value)} />
         </div>
         <div className="col-md-2">
@@ -92,15 +92,15 @@ function AdminFoodStore() {
           </select>
         </div>
         <div className="col-md-2">
-          <input type="number" min="0" className="form-control" placeholder="Protein(g)" value={protein}
+          <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Protein(g)" value={protein}
             onChange={(e) => setProtein(e.target.value)} />
         </div>
         <div className="col-md-2">
-          <input type="number" min="0" className="form-control" placeholder="Carbs(g)" value={carbs}
+          <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Carbs(g)" value={carbs}
             onChange={(e) => setCarbs(e.target.value)} />
         </div>
         <div className="col-md-2">
-          <input type="number" min="0" className="form-control" placeholder="Fat(g)" value={fat}
+          <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Fat(g)" value={fat}
             onChange={(e) => setFat(e.target.value)} />
         </div>
         <div className="col-md-4">

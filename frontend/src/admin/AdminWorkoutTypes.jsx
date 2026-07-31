@@ -69,7 +69,7 @@ function AdminWorkoutTypes() {
             onChange={(e) => setName(e.target.value)} required />
         </div>
         <div className="col-md-3">
-          <input type="number" min="0" className="form-control" placeholder="Calories/Min" value={caloriesPerMinute}
+          <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Calories/Min" value={caloriesPerMinute}
             onChange={(e) => setCaloriesPerMinute(e.target.value)} required />
         </div>
         <div className="col-md-3">

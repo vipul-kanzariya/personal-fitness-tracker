@@ -31,7 +31,7 @@ function Bmi() {
         );
         setHistory(history.data);
       } catch (err) {
-        setError("Failde to load BMI history");
+        setError("Faild to load BMI history");
       } finally {
         setLoading(false);
       }
@@ -79,7 +79,8 @@ function Bmi() {
         <form onSubmit={handleSubmit}>
           <input
             type="number"
-            min="0"
+             min="0" step="0.1" 
+            
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -89,7 +90,8 @@ function Bmi() {
           />
           <input
             type="number"
-            min="0"
+             min="0" step="0.1" 
+            
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -100,7 +102,8 @@ function Bmi() {
 
           <input
             type="number"
-            min="0"
+             min="0" step="0.1" 
+        
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
