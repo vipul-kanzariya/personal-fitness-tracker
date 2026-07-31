@@ -15,6 +15,7 @@ function Login() {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {email, password});
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.role);
+      localStorage.setItem('name', res.data.name);
       navigate('/dashboard');
     }catch(err){
       setError(err.response?.data || 'Login failed. Please try again.');

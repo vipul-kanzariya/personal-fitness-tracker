@@ -19,6 +19,7 @@ import AdminOrders from './admin/AdminOrders';
 import AdminFoodStore from './admin/AdminFoodStore';
 import AdminWorkoutTypes from './admin/AdminWorkoutTypes';
 import NotFound from './pages/NotFound';
+import Profile from './pages/Profile'
 function Layout() {
   const location = useLocation();
   const hideNavbar = ['/login', '/register'].includes(location.pathname);
@@ -47,6 +48,8 @@ function Layout() {
           <Route path='/bmi' element={<Bmi/>}/>
           <Route path='/foodstore' element={<FoodStore/>}/>
           <Route path='/orders' element={<Order/>}/>
+          <Route path='/profile' element={<Profile/>}/>
+
         </Route>
 
         <Route path='*' element={<NotFound/>}/>

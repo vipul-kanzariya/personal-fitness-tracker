@@ -55,8 +55,18 @@ router.put('/:id',authMiddleware,async(req,res)=>{
 
    try{
         const {id} = req.params;
-    
-     const diet = await Diet.findOneAndUpdate({_id:id,userId:req.user.id},req.body,{new:true});
+        const {foodName, calories} = req.body;
+     if(foodName !== undefined && !foodName.trim()){
+          return res.status(400).json('Food name cannot be empty');
+        }
+        if(calories !== undefined && calories <= 0){
+          return res.status(400).json('Calories must be greater than 0');
+        }
+    const diet = await Diet.findOneAndUpdate(
+          {_id:id,userId:req.user.id},
+          req.body,
+          {new:true, runValidators: true}
+        );
      if(!diet){
        return res.status(404).json('Diet entry not found');
      }
