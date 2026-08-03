@@ -82,7 +82,12 @@ function Workout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+   
     try {
+        if(!workoutTypeId){ 
+    setError('Please select a workout type.');
+    return;
+  }
       const token = localStorage.getItem("token");
       setLoading(true);
      const res = await axios.post(

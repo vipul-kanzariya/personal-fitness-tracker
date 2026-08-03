@@ -1,7 +1,7 @@
 const express = require("express");
 const Bmi = require("../models/BMI");
 const { authMiddleware } = require("../middleware/authMiddleware");
-
+const WorkoutType = require("../models/WorkoutType");
 const router = express.Router();
 
 router.post("/calculate", authMiddleware, async (req, res) => {
@@ -25,7 +25,22 @@ router.post("/calculate", authMiddleware, async (req, res) => {
       bmi,
       category,
     });
-    return res.status(201).json(bmiRecord);
+     let filterCategory;
+    if (category === 'Underweight') {
+      filterCategory = ['Strength'];
+    } else if (category === 'Normal') {
+      filterCategory = ['Cardio', 'Strength'];
+    } else {
+      filterCategory = ['Cardio'];  
+    }
+     const suggestedWorkouts = await WorkoutType.find({
+      category: { $in: filterCategory }
+    }).limit(4);
+
+    return res.status(201).json({
+      ...bmiRecord.toObject(),
+      suggestedWorkouts   
+    });
   } catch (err) {
     res.status(500).json(err.message);
   }

@@ -92,7 +92,7 @@ function Dashboard() {
               <div className="card stat-card stat-card-workout" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }}>
                 <div className="stat-card-icon">🔥</div>
                 <div className="stat-card-label">Calories Burned</div>
-                <div className="stat-card-value">{totalCaloriesBurned}</div>
+                <div className="stat-card-value">{totalCaloriesBurned.toFixed(2)}</div>
               </div>
             </div>
             <div className="col-sm-6 col-lg-3">

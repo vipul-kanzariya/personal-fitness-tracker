@@ -7,8 +7,10 @@ function Bmi() {
   const [height, setHeight] = useState();
   const [feet, setFeet] = useState();
   const [inches, setInches] = useState();
+  const [suggestedWorkouts, setSuggestedWorkouts] = useState([]);
+
   const [loading, setLoading] = useState(false);
-  const [error,setError] = useState();
+  const [error, setError] = useState();
   const heightInMeters = (
     (parseInt(feet) * 12 + parseInt(inches)) *
     0.0254
@@ -60,27 +62,26 @@ function Bmi() {
         },
       );
       setBmiResult(res.data);
+      setSuggestedWorkouts(res.data.suggestedWorkouts || []);
       setHistory([res.data, ...history]);
       setWeight("");
       setFeet("");
       setInches("");
     } catch (err) {
-      console.log(err.message);
+     setError('Failed to calculate BMI.');
     } finally {
       setLoading(false);
     }
   };
   return (
     <>
-    {error && (
-  <div className='alert alert-danger mt-3'>{error}</div>
-)}
+      {error && <div className="alert alert-danger mt-3">{error}</div>}
       <div className="container mt-4">
         <form onSubmit={handleSubmit}>
           <input
             type="number"
-             min="0" step="0.1" 
-            
+            min="0"
+            step="0.1"
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -90,8 +91,8 @@ function Bmi() {
           />
           <input
             type="number"
-             min="0" step="0.1" 
-            
+            min="0"
+            step="0.1"
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -102,8 +103,8 @@ function Bmi() {
 
           <input
             type="number"
-             min="0" step="0.1" 
-        
+            min="0"
+            step="0.1"
             onKeyDown={(e) =>
               ["e", "-", "+"].includes(e.key) && e.preventDefault()
             }
@@ -126,6 +127,22 @@ function Bmi() {
             </p>
           </div>
         )}
+        {suggestedWorkouts.length > 0 && (
+  <div className="card p-3 mt-3">
+    <h5>💪 Suggested Workouts for You</h5>
+    <div className="row mt-2">
+      {suggestedWorkouts.map((w) => (
+        <div className="col-md-3 mb-2" key={w._id}>
+          <div className="card p-2 text-center">
+            <strong>{w.name}</strong>
+            <small className="text-muted">{w.category}</small>
+            <small>{w.caloriesPerMinute} cal/min</small>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
         {/* History Table */}
         {loading ? (
