@@ -48,7 +48,7 @@ router.post("/calculate", authMiddleware, async (req, res) => {
 router.get('/history',authMiddleware,async(req,res)=>{
 
    try{
-     const bmi = await Bmi.find({userId:req.user.id}).sort({date:-1});
+     const bmi = await Bmi.find({userId:req.user.id, isDeleted: false}).sort({date:-1});
      res.status(200).json(bmi);
    }catch(err){
     res.status(500).json(err.message)

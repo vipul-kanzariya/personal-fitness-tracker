@@ -16,7 +16,8 @@ function AdminFoodStore() {
   const [fat, setFat] = useState('');
   const [category, setCategory] = useState('Protein');
   const [image, setImage] = useState('');
-
+const [imageFile, setImageFile] = useState(null);
+const [uploading, setUploading] = useState(false);
   const fetchFoods = async () => {
     try {
       setLoading(true);
@@ -31,23 +32,45 @@ function AdminFoodStore() {
 
   useEffect(() => { fetchFoods(); }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/food`,
-        { name, description, price, calories, protein, carbs, fat, category, image },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setFoods([res.data, ...foods]);
-      setName(''); setDescription(''); setPrice(''); setCalories('');
-      setProtein(''); setCarbs(''); setFat(''); setImage('');
-      setError('');
-    } catch (err) {
-      setError("Failed to add food item.");
+const handleImageUpload = async () => {
+  if(!imageFile) return null;
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  const token = localStorage.getItem('token');
+  setUploading(true);
+  try {
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/food/upload-image`,
+      formData,
+      { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+    );
+    return res.data.imageUrl;
+  } finally {
+    setUploading(false);
+  }
+};
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const token = localStorage.getItem("token");
+    let imageUrl = '';
+    if(imageFile){
+      imageUrl = await handleImageUpload();  // ✅ pehle image upload karo
     }
-  };
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_URL}/api/food`,
+      { name, description, price, calories, protein, carbs, fat, category, image: imageUrl },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setFoods([res.data, ...foods]);
+    setName(''); setDescription(''); setPrice(''); setCalories('');
+setProtein(''); setCarbs(''); setFat(''); setImageFile(null);
+setError('');
+  } catch (err) {
+    setError("Failed to add food item.");
+  }
+};
 
   const handleDelete = async (id) => {
     try {
@@ -103,13 +126,15 @@ function AdminFoodStore() {
           <input type="number"  min="0" step="0.1"  className="form-control" placeholder="Fat(g)" value={fat}
             onChange={(e) => setFat(e.target.value)} />
         </div>
-        <div className="col-md-4">
-          <input className="form-control" placeholder="Image URL" value={image}
-            onChange={(e) => setImage(e.target.value)} />
-        </div>
-        <div className="col-md-2">
-          <button className="btn btn-primary w-100" type="submit">Add Food</button>
-        </div>
+       <div className="col-md-4">
+  <input type="file" accept="image/*" className="form-control"
+    onChange={(e) => setImageFile(e.target.files[0])} />
+</div>
+      <div className="col-md-2">
+  <button className="btn btn-primary w-100" type="submit" disabled={uploading}>
+    {uploading ? 'Uploading...' : 'Add Food'}
+  </button>
+</div>
       </form>
 
       {loading ? <Spinner /> : (
@@ -134,7 +159,7 @@ function AdminFoodStore() {
                 <td>{f.category}</td>
                 <td>{f.inStock ? 'Yes' : 'No'}</td>
                 <td>
-  <img src={f.image || 'https://via.placeholder.com/50'} alt={f.name} width="50" height="50" style={{objectFit: 'cover'}}/>
+  <img src={f.image || 'https://placehold.co/50x50'} alt={f.name} width="50" height="50" style={{objectFit: 'cover'}}/>
 </td>
                 <td>
                   <button className="btn btn-danger btn-sm" onClick={() => handleDelete(f._id)}>

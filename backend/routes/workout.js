@@ -38,7 +38,7 @@ res.status(201).json(workout);
 router.get('/', authMiddleware, async (req, res) => {
 
    try {
-     const workout = await Workout.find({ userId: req.user.id })
+     const workout = await Workout.find({userId:req.user.id, isDeleted: false})
        .populate('workoutTypeId', 'name category caloriesPerMinute')
        .sort({ date: -1 });
      res.status(200).json(workout);
@@ -88,7 +88,9 @@ router.delete('/:id',authMiddleware,async(req,res)=>{
    try{
         const {id} = req.params;
     
-     const workout = await Workout.findOneAndDelete({_id:id,userId:req.user.id});
+     const workout = await Workout.findOneAndUpdate({_id:id, userId:req.user.id},
+     {isDeleted: true},
+     {new: true});
       if(!workout){
       return res.status(404).json('Workout not found'); 
       }

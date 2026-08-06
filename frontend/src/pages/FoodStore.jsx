@@ -101,7 +101,7 @@ function FoodStore() {
                   <div className="col-md-4 mb-3" key={f._id}>
                     <div className="card p-3">
                       <img
-                        src={f.image || "https://via.placeholder.com/150"}
+                        src={f.image || "https://placehold.co/150x150"}
                         alt={f.name}
                         className="img-fluid mb-2"
                         style={{ height: "120px", objectFit: "cover" }}

@@ -45,7 +45,7 @@ const nutrition = JSON.parse(jsonMatch ? jsonMatch[0] : cleanText);
 router.get('/',authMiddleware,async(req,res)=>{
 
    try{
-     const diet = await Diet.find({userId:req.user.id}).sort({date:-1});
+     const diet = await Diet.find({userId:req.user.id, isDeleted: false}).sort({date:-1});
      res.status(200).json(diet);
    }catch(err){
     res.status(500).json(err.message)
@@ -81,7 +81,9 @@ router.delete('/:id',authMiddleware,async(req,res)=>{
    try{
         const {id} = req.params;
     
-     const diet = await Diet.findOneAndDelete({_id:id,userId:req.user.id});
+     const diet = await Diet.findOneAndUpdate({_id:id, userId:req.user.id},
+     {isDeleted: true},
+     {new: true});
       if(!diet){
        return res.status(404).json('Diet entry not found');
      }
