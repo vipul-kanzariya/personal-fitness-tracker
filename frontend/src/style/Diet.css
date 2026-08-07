@@ -1,0 +1,30 @@
+/* Dark Theme Cards & Inputs */
+.dark-card {
+  background-color: #121212 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark-input {
+  background-color: #1a1a1a !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+.dark-input:focus {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.dark-input::placeholder {
+  color: #8e8e93 !important;
+  opacity: 1 !important;
+}
+
+/* Typography Utilities */
+.text-subtle {
+  color: #a1a1aa !important;
+}
+
+.text-neon-green {
+  color: #ccff00 !important; /* Standard Gym/Fitness Neon Lime Green */
+}

@@ -1,3 +1,4 @@
+// src/components/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
@@ -8,10 +9,14 @@ import {
   PointElement,
   ArcElement,
   Title,
-   Filler, 
+  Filler, 
   Tooltip,
   Legend,
 } from "chart.js";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
+import axios from "axios";
+import Spinner from "../components/Spinner";
+import "../style/Dashboard.css";
 
 ChartJS.register(
   CategoryScale,
@@ -21,13 +26,10 @@ ChartJS.register(
   PointElement,
   ArcElement,
   Title,
-   Filler,  
+  Filler,  
   Tooltip,
   Legend,
 );
-import { Line, Bar, Doughnut } from "react-chartjs-2";
-import axios from "axios";
-import Spinner from "../components/Spinner";
 
 function Dashboard() {
   const [workout, setWorkout] = useState([]);
@@ -62,143 +64,235 @@ function Dashboard() {
   const totalCaloriesBurned = workout.reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
   const totalCaloriesConsumed = diet.reduce((sum, d) => sum + (d.calories || 0), 0);
   const totalDuration = workout.reduce((sum, w) => sum + (w.duration || 0), 0);
-  const netCalories = totalCaloriesConsumed - totalCaloriesBurned;
 
-  // Daily goal assumption for the ring (2000 kcal intake goal)
   const dailyGoal = 2000;
   const goalPercent = Math.min(Math.round((totalCaloriesConsumed / dailyGoal) * 100), 100);
+
+  // Capitalize exercise and food labels (e.g. pushUps -> Push Ups)
+  const formatLabel = (str) => {
+    if (!str) return "Item";
+    return str
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, (s) => s.toUpperCase())
+      .trim();
+  };
 
   const ringData = {
     labels: ['Consumed', 'Remaining'],
     datasets: [{
       data: [goalPercent, 100 - goalPercent],
-      backgroundColor: ['#4f46e5', '#e2e8f0'],
+      backgroundColor: ['#ccff00', '#1e2029'],
       borderWidth: 0,
-      cutout: '75%'
+      cutout: '80%'
     }]
   };
 
   return (
-    <div className="container page-wrapper">
-      <h2 className="page-title">Dashboard</h2>
+    <main className="main-content">
+      {/* Header */}
+      <div className="dashboard-header">
+        <div className="apex-subtitle">
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        </div>
+        <h1 className="apex-title">
+          WELCOME BACK, <span>ATHLETE.</span>
+        </h1>
+        <p className="dashboard-streak">
+          Here is your latest workout and nutrition overview.
+        </p>
+      </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
+      {error && <div className="dashboard-alert">{error}</div>}
 
-      {loading ? <div className="text-center py-5"><Spinner /></div> : (
+      {loading ? (
+        <div className="text-center py-5">
+          <Spinner />
+        </div>
+      ) : (
         <>
-          {/* Stat Cards */}
-          <div className="row g-3 mb-4">
-            <div className="col-sm-6 col-lg-3">
-              <div className="card stat-card stat-card-workout" style={{ background: 'linear-gradient(135deg,#7c3aed,#a855f7)' }}>
-                <div className="stat-card-icon">🔥</div>
-                <div className="stat-card-label">Calories Burned</div>
-                <div className="stat-card-value">{totalCaloriesBurned.toFixed(2)}</div>
+          {/* Metrics Grid */}
+          <div className="dashboard-metrics-grid">
+            <div className="apex-card-highlight dashboard-card-inner">
+              <div className="dashboard-card-icon-highlight">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                </svg>
               </div>
+              <div>
+                <div className="apex-card-val">{totalCaloriesBurned.toFixed(2)}</div>
+                <div className="apex-card-sub">Calories Burned</div>
+              </div>
+              <div className="dashboard-card-trend-highlight">Total energy expended</div>
             </div>
-            <div className="col-sm-6 col-lg-3">
-              <div className="card stat-card stat-card-workout">
-                <div className="stat-card-icon">🏋️</div>
-                <div className="stat-card-label">Workouts Logged</div>
-                <div className="stat-card-value">{workout.length}</div>
+
+            <div className="dashboard-card-inner">
+              <div className="dashboard-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccff00" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
+              <div>
+                <div className="apex-card-val">{workout.length}</div>
+                <div className="apex-card-sub">Workouts Logged</div>
+              </div>
+              <div className="dashboard-card-trend">Completed sessions</div>
             </div>
-            <div className="col-sm-6 col-lg-3">
-              <div className="card stat-card stat-card-diet" style={{ background: 'linear-gradient(135deg,#f59e0b,#ef4444)' }}>
-                <div className="stat-card-icon">⏱️</div>
-                <div className="stat-card-label">Active Time</div>
-                <div className="stat-card-value">{totalDuration}m</div>
+
+            <div className="dashboard-card-inner">
+              <div className="dashboard-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccff00" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
+              <div>
+                <div className="apex-card-val">{totalDuration}m</div>
+                <div className="apex-card-sub">Active Time</div>
+              </div>
+              <div className="dashboard-card-trend">Time spent training</div>
             </div>
-            <div className="col-sm-6 col-lg-3">
-              <div className="card stat-card stat-card-diet">
-                <div className="stat-card-icon">🍽️</div>
-                <div className="stat-card-label">Calories Consumed</div>
-                <div className="stat-card-value">{totalCaloriesConsumed}</div>
+
+            <div className="dashboard-card-inner">
+              <div className="dashboard-card-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccff00" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
               </div>
+              <div>
+                <div className="apex-card-val">{totalCaloriesConsumed}</div>
+                <div className="apex-card-sub">Calories Consumed</div>
+              </div>
+              <div className="dashboard-card-trend">Total dietary intake</div>
             </div>
           </div>
 
-          {/* Charts + Ring */}
-          <div className="row g-3">
-            <div className="col-md-4">
-              <div className="card chart-card h-100 text-center">
-                <div className="card-body">
-                  <div className="chart-title">Daily Goal</div>
-                  <div style={{ position: 'relative', maxWidth: '220px', margin: '0 auto' }}>
-                    <Doughnut data={ringData} options={{
-                      plugins: { legend: { display: false }, tooltip: { enabled: false } }
-                    }} />
-                    <div style={{
-                      position: 'absolute', top: '50%', left: '50%',
-                      transform: 'translate(-50%, -50%)', textAlign: 'center'
-                    }}>
-                      <div style={{ fontSize: '2rem', fontWeight: 700, color: '#4f46e5' }}>{goalPercent}%</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>of goal</div>
-                    </div>
-                  </div>
-                  <p className="text-muted mt-3 mb-0">{totalCaloriesConsumed} / {dailyGoal} kcal goal</p>
+          {/* Charts Grid */}
+          <div className="dashboard-charts-grid">
+            
+            {/* 1. Daily Goal Ring */}
+            <div className="dashboard-chart-card">
+              <div>
+                <div className="dashboard-chart-title">DAILY GOAL</div>
+                <div className="apex-subtitle">{totalCaloriesConsumed} / {dailyGoal} kcal goal</div>
+              </div>
+
+              <div className="dashboard-ring-container">
+                <Doughnut 
+                  data={ringData} 
+                  options={{
+                    rotation: -90,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    responsive: true,
+                    maintainAspectRatio: false
+                  }} 
+                />
+                <div className="dashboard-ring-center">
+                  <div className="dashboard-ring-val">{goalPercent}%</div>
+                  <div className="dashboard-ring-sub">OF GOAL</div>
+                </div>
+              </div>
+
+              <div className="dashboard-ring-footer">
+                <div className="dashboard-mini-metric">
+                  <div className="dashboard-mini-val">{totalCaloriesConsumed}</div>
+                  <div className="dashboard-mini-label">Kcal In</div>
+                </div>
+                <div className="dashboard-mini-metric">
+                  <div className="dashboard-mini-val">{totalCaloriesBurned.toFixed(0)}</div>
+                  <div className="dashboard-mini-label">Kcal Out</div>
                 </div>
               </div>
             </div>
 
-            <div className="col-md-4">
-              <div className="card chart-card h-100">
-                <div className="card-body">
-                  <div className="chart-title">📊 Workout Chart</div>
-                  <Bar
-                    data={{
-                      labels: workout.map((w) => w.workoutTypeId?.name),
-                      datasets: [{
-                        label: "Calories Burned",
-                        data: workout.map((w) => w.caloriesBurned || 0),
-                        backgroundColor: "rgba(79,70,229,0.7)",
-                        borderRadius: 6,
-                      }],
-                    }}
-                    options={{
-                      plugins: { legend: { display: false } },
-                      scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-                        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } }
+            {/* 2. Workout Intensity Bar Chart */}
+            <div className="dashboard-chart-card">
+              <div className="dashboard-chart-header">
+                <div className="dashboard-chart-title">WORKOUT INTENSITY</div>
+                <div className="apex-subtitle">Calories burned per exercise</div>
+              </div>
+              <div className="dashboard-chart-wrapper">
+                <Bar
+                  data={{
+                    labels: workout.map((w) => formatLabel(w.workoutTypeId?.name)),
+                    datasets: [{
+                      label: "Calories Burned",
+                      data: workout.map((w) => w.caloriesBurned || 0),
+                      backgroundColor: "#ccff00",
+                      borderRadius: 6,
+                    }],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                      x: { 
+                        offset: true,
+                        grid: { display: false }, 
+                        ticks: { color: '#8c93a8', font: { family: 'Fira Code', size: 10 } } 
+                      },
+                      y: { 
+                        grid: { color: '#1e2029' }, 
+                        ticks: { color: '#8c93a8', font: { family: 'Fira Code', size: 10 } } 
                       }
-                    }}
-                  />
-                </div>
+                    }
+                  }}
+                />
               </div>
             </div>
 
-            <div className="col-md-4">
-              <div className="card chart-card h-100">
-                <div className="card-body">
-                  <div className="chart-title">📈 Calorie Chart</div>
-                  <Line
-                    data={{
-                      labels: diet.map((d) => d.foodName),
-                      datasets: [{
-                        label: "Calories Consumed",
-                        data: diet.map((d) => d.calories || 0),
-                        borderColor: "rgba(16,185,129,1)",
-                        backgroundColor: "rgba(16,185,129,0.1)",
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                      }],
-                    }}
-                    options={{
-                      plugins: { legend: { display: false } },
-                      scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-                        y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } }
+            {/* 3. Calorie Intake Line Chart */}
+            <div className="dashboard-chart-card">
+              <div className="dashboard-chart-header">
+                <div className="dashboard-chart-title">CALORIE INTAKE</div>
+                <div className="apex-subtitle">Consumed per meal log</div>
+              </div>
+              <div className="dashboard-chart-wrapper">
+                <Line
+                  data={{
+                    labels: diet.map((d) => formatLabel(d.foodName)),
+                    datasets: [{
+                      label: "Calories Consumed",
+                      data: diet.map((d) => d.calories || 0),
+                      borderColor: "#ccff00",
+                      backgroundColor: "rgba(204, 255, 0, 0.08)",
+                      fill: true,
+                      tension: 0.4,
+                      pointRadius: 4,
+                      pointBackgroundColor: "#ccff00",
+                    }],
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                      padding: { right: 25, left: 10 }
+                    },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                      x: { 
+                        offset: true,
+                        grid: { display: false }, 
+                        ticks: { 
+                          color: '#8c93a8', 
+                          font: { family: 'Fira Code', size: 10 },
+                          maxRotation: 0,
+                          autoSkip: false
+                        } 
+                      },
+                      y: { 
+                        grid: { color: '#1e2029' }, 
+                        ticks: { color: '#8c93a8', font: { family: 'Fira Code', size: 10 } } 
                       }
-                    }}
-                  />
-                </div>
+                    }
+                  }}
+                />
               </div>
             </div>
+
           </div>
         </>
       )}
-    </div>
+    </main>
   );
 }
 

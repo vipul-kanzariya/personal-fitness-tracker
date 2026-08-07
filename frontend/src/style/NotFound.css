@@ -1,0 +1,64 @@
+/* Fullscreen background container */
+.notfound-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Dark background fallback + ambient gradient overlay */
+  background: 
+    linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.95)),
+    url("https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
+  padding: 20px;
+}
+
+/* Glassmorphism Card */
+.notfound-card {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(18, 18, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Big Glitch/Neon Text */
+.error-code {
+  font-size: 6rem;
+  font-weight: 900;
+  color: #ccff00;
+  line-height: 1;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px rgba(204, 255, 0, 0.2);
+}
+
+/* Text Subtitles */
+.text-subtle-bright {
+  color: #9ca3af !important;
+}
+
+/* Matte Neon Action Button */
+.btn-neon-action {
+  background: #ccff00;
+  color: #000;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-neon-action:hover {
+  background: #b3e600;
+  color: #000;
+  transform: translateY(-2px);
+}
+
+.btn-neon-action:active {
+  transform: translateY(0);
+}

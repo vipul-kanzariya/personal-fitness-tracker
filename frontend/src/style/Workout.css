@@ -1,0 +1,192 @@
+/* src/style/Workout.css */
+
+.apex-page-header {
+  margin-bottom: 2rem;
+}
+
+/* Form Card Styling */
+.apex-form-card {
+  background-color: #12141c;
+  border: 1px solid #1e2029;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.apex-form-card .form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8c93a8;
+  margin-bottom: 0.4rem;
+}
+
+.apex-input, 
+.apex-select {
+  background-color: #0b0c10 !important;
+  border: 1px solid #1e2029 !important;
+  color: #ffffff !important;
+  border-radius: 8px !important;
+  padding: 0.65rem 0.9rem !important;
+  font-size: 0.9rem !important;
+}
+
+.apex-input:focus, 
+.apex-select:focus {
+  border-color: #ccff00 !important;
+  box-shadow: 0 0 8px rgba(204, 255, 0, 0.25) !important;
+  outline: none !important;
+}
+
+.apex-btn-primary {
+  background-color: #ccff00 !important;
+  color: #0a0a0a !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.65rem 1rem !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.apex-btn-primary:hover {
+  background-color: #d9ff33 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(204, 255, 0, 0.35);
+}
+
+/* UNIQUE WORKOUT CARDS */
+.apex-unique-card {
+  background-color: #12141c;
+  border: 1px solid #1e2029;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Category Specific Accents */
+.apex-unique-card.cat-strength {
+  --theme-color: #ccff00;
+}
+.apex-unique-card.cat-cardio {
+  --theme-color: #00e5ff;
+}
+.apex-unique-card.cat-flexibility {
+  --theme-color: #ff9100;
+}
+.apex-unique-card.cat-default {
+  --theme-color: #b388ff;
+}
+
+.apex-unique-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--theme-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.05);
+}
+
+/* Photo Banner */
+.apex-banner-wrapper {
+  position: relative;
+  height: 150px;
+  overflow: hidden;
+}
+
+.apex-banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.apex-unique-card:hover .apex-banner-img {
+  transform: scale(1.08);
+}
+
+.apex-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, #12141c 100%);
+}
+
+.apex-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--theme-color);
+  color: var(--theme-color);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Details Section */
+.apex-card-content {
+  padding: 1.25rem;
+}
+
+.apex-title-text {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+}
+
+/* Readable Slate Metrics Text */
+.apex-metrics-text {
+  color: #a0aec0 !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.02em;
+}
+
+.apex-calorie-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--theme-color);
+}
+
+/* Action Buttons */
+.apex-btn-edit {
+  border: 1px solid rgba(245, 158, 11, 0.5) !important;
+  color: #f59e0b !important;
+  background: transparent !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.apex-btn-edit:hover {
+  background: rgba(245, 158, 11, 0.15) !important;
+}
+
+.apex-btn-delete {
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  color: #ef4444 !important;
+  background: transparent !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+}
+
+.apex-btn-delete:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+}

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
-import Spinner from '../components/Spinner'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import Spinner from '../components/Spinner';
+import '../style/Admin.css';
 
 function AdminDashboard() {
   const [summary, setSummary] = useState({});
@@ -27,40 +28,62 @@ function AdminDashboard() {
   }, []);
 
   return (
-    <div className='container mt-4'>
-      {error && <div className='alert alert-danger mt-3'>{error}</div>}
+    <div className="container py-4 text-white">
+      {/* Header */}
+      <div className="mb-4">
+        <h2 className="fw-black text-uppercase tracking-wide m-0">
+          ADMIN <span className="text-neon-accent">DASHBOARD</span>
+        </h2>
+        <p className="text-secondary small mt-1">Overview of platform performance and metrics.</p>
+      </div>
+
+      {error && (
+        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-0 rounded-4 mb-4 text-center fw-semibold">
+          {error}
+        </div>
+      )}
+
       {loading ? (
-        <Spinner />
+        <div className="text-center py-5">
+          <Spinner />
+        </div>
       ) : (
-        <div className='row'>
-          <div className='col-md-3 mb-3'>
-            <div className='card p-3 shadow text-center'>
-              <h6>👥 Total Users</h6>
-              <h3>{summary.totalUsers}</h3>
+        <div className="row g-3">
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">👥</div>
+              <span className="form-label-custom d-block">Total Users</span>
+              <h2 className="fw-bold m-0 text-white">{summary.totalUsers || 0}</h2>
             </div>
           </div>
-          <div className='col-md-3 mb-3'>
-            <div className='card p-3 shadow text-center'>
-              <h6>📦 Total Orders</h6>
-              <h3>{summary.totalOrders}</h3>
+
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">📦</div>
+              <span className="form-label-custom d-block">Total Orders</span>
+              <h2 className="fw-bold m-0 text-white">{summary.totalOrders || 0}</h2>
             </div>
           </div>
-          <div className='col-md-3 mb-3'>
-            <div className='card p-3 shadow text-center'>
-              <h6>🥗 Food Items</h6>
-              <h3>{summary.totalFoodItems}</h3>
+
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">🥗</div>
+              <span className="form-label-custom d-block">Food Items</span>
+              <h2 className="fw-bold m-0 text-white">{summary.totalFoodItems || 0}</h2>
             </div>
           </div>
-          <div className='col-md-3 mb-3'>
-            <div className='card p-3 shadow text-center'>
-              <h6>💰 Total Revenue</h6>
-              <h3>₹ {summary.totalRevenue}</h3>
+
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">💰</div>
+              <span className="form-label-custom d-block">Total Revenue</span>
+              <h2 className="fw-bold m-0 text-neon-accent">₹ {summary.totalRevenue || 0}</h2>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }
 
-export default AdminDashboard
+export default AdminDashboard;

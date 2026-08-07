@@ -1,0 +1,197 @@
+/* Card Container */
+.admin-card {
+  background: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+/* Stat Cards */
+.admin-stat-card {
+  background: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(204, 255, 0, 0.4);
+}
+
+.stat-icon {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+/* Neon Text Accent */
+.text-neon-accent {
+  color: #ccff00 !important;
+}
+
+/* Form Controls */
+.form-label-custom {
+  color: #d1d5db !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.form-control-custom,
+.form-select-custom {
+  background: #1a1a1d !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control-custom::placeholder {
+  color: #6b7280;
+}
+
+.form-control-custom:focus,
+.form-select-custom:focus {
+  border-color: #ccff00 !important;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.form-select-custom option {
+  background: #1a1a1d;
+  color: #fff;
+}
+
+/* Custom Table Styling */
+.admin-table-container {
+  background: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.admin-table {
+  color: #ffffff !important;
+  margin-bottom: 0 !important;
+  vertical-align: middle;
+}
+
+.admin-table thead {
+  background: #1a1a1d;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.admin-table th {
+  color: #9ca3af;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 700;
+  padding: 14px 16px;
+  border: none !important;
+}
+
+.admin-table td {
+  padding: 14px 16px;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e5e7eb;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Buttons */
+.btn-neon-submit {
+  background: #ccff00;
+  color: #000;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-neon-submit:hover {
+  background: #b3e600;
+  transform: translateY(-1px);
+}
+
+.btn-neon-submit:disabled {
+  background: #4b5563;
+  color: #9ca3af;
+}
+
+.btn-action-danger {
+  background: rgba(220, 53, 69, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.4);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-action-danger:hover {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn-action-warning {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-action-warning:hover {
+  background: #ffc107;
+  color: #000;
+}
+
+.btn-action-success {
+  background: rgba(40, 167, 69, 0.15);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.4);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-action-success:hover {
+  background: #28a745;
+  color: #fff;
+}
+
+/* Status Badges */
+.badge-neon-success {
+  background: rgba(204, 255, 0, 0.15);
+  color: #ccff00;
+  border: 1px solid rgba(204, 255, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.badge-neon-warning {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.badge-neon-danger {
+  background: rgba(220, 53, 69, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  padding: 6px 12px;
+  border-radius: 20px;
+}

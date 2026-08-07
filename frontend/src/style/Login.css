@@ -1,0 +1,82 @@
+/* Fullscreen background container */
+.login-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Dark background fallback + ambient gradient background */
+  background: 
+    linear-gradient(rgba(10, 10, 12, 0.82), rgba(10, 10, 12, 0.92)),
+    url("https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
+  padding: 20px;
+}
+
+/* Glassmorphism Card */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(18, 18, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Accent Highlight */
+.text-neon-accent {
+  color: #ccff00 !important;
+}
+
+/* Custom Form Labels */
+.form-label-custom {
+  color: #d1d5db !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Custom Input Control */
+.form-control-custom {
+  background: #1a1a1d !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 12px 16px !important;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control-custom::placeholder {
+  color: #6b7280;
+}
+
+.form-control-custom:focus {
+  border-color: #ccff00 !important;
+  outline: none;
+  box-shadow: none !important;
+}
+
+/* Matte Neon Button */
+.btn-neon-submit {
+  background: #ccff00;
+  color: #000;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-neon-submit:hover {
+  background: #b3e600;
+  transform: translateY(-1px);
+}
+
+.btn-neon-submit:active {
+  transform: translateY(0);
+}

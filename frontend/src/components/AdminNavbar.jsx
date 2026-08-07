@@ -1,5 +1,6 @@
-import React from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import '../style/AdminNavbar.css';
 
 function AdminNavbar() {
   const navigate = useNavigate();
@@ -8,45 +9,64 @@ function AdminNavbar() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
     navigate('/login');
-  }
+  };
 
   return (
-    <nav className='navbar navbar-expand-lg navbar-dark bg-dark px-3'>
-      <Link className='navbar-brand fw-bold' to='/admin/dashboard'>
-        Admin Panel
-      </Link>
-
-      <button className='navbar-toggler' type='button'
-        data-bs-toggle='collapse' data-bs-target='#adminNavbar'>
-        <span className='navbar-toggler-icon'></span>
-      </button>
-
-      <div className='collapse navbar-collapse' id='adminNavbar'>
-        <ul className='navbar-nav ms-auto'>
-          <li className='nav-item'>
-            <Link className='nav-link' to='/admin/dashboard'>Dashboard</Link>
-          </li>
-          <li className='nav-item'>
-            <Link className='nav-link' to='/admin/users'>Users</Link>
-          </li>
-          <li className='nav-item'>
-            <Link className='nav-link' to='/admin/orders'>Orders</Link>
-          </li>
-          <li className='nav-item'>
-            <Link className='nav-link' to='/admin/foodstore'>Food Store</Link>
-          </li>
-          <li className='nav-item'>
-            <Link className='nav-link' to='/admin/workouttypes'>Workout Types</Link>
-          </li>
-          <li className='nav-item'>
-            <button className='btn btn-danger ms-3' onClick={handleLogout}>
-              Logout
-            </button>
-          </li>
-        </ul>
+    <aside className="admin-sidebar">
+      {/* Brand Header */}
+      <div className="sidebar-brand">
+        <Link to="/admin/dashboard" className="brand-link">
+          <span className="brand-text">ADMIN</span>
+          <span className="brand-accent">PANEL</span>
+        </Link>
       </div>
-    </nav>
-  )
+
+      {/* Navigation Menu */}
+      <nav className="sidebar-nav">
+        <NavLink
+          to="/admin/dashboard"
+          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+        >
+          Dashboard
+        </NavLink>
+
+        <NavLink
+          to="/admin/users"
+          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+        >
+          Users
+        </NavLink>
+
+        <NavLink
+          to="/admin/orders"
+          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+        >
+          Orders
+        </NavLink>
+
+        <NavLink
+          to="/admin/foodstore"
+          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+        >
+          Food Store
+        </NavLink>
+
+        <NavLink
+          to="/admin/workouttypes"
+          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+        >
+          Workout Types
+        </NavLink>
+      </nav>
+
+      {/* Logout Action */}
+      <div className="sidebar-footer">
+        <button className="btn-admin-logout" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+    </aside>
+  );
 }
 
-export default AdminNavbar
+export default AdminNavbar;

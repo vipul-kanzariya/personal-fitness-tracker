@@ -1,0 +1,249 @@
+/* src/style/Dashboard.css */
+
+/* ==========================================
+   1. Dashboard Header & Greeting
+   ========================================== */
+.dashboard-header {
+  margin-bottom: 2rem;
+}
+
+.apex-subtitle {
+  font-size: 0.825rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.apex-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  margin: 0.2rem 0;
+  text-transform: uppercase;
+}
+
+.apex-title span {
+  color: #ccff00;
+}
+
+.dashboard-streak {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.dashboard-alert {
+  background-color: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* ==========================================
+   2. Top Metrics Grid & Stat Cards
+   ========================================== */
+.dashboard-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-card-inner {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.dashboard-card-inner:hover {
+  border-color: #3a3a3a;
+  transform: translateY(-2px);
+}
+
+/* Hero Highlight Card (Calories Burned) */
+.apex-card-highlight {
+  background: linear-gradient(135deg, rgba(204, 255, 0, 0.08) 0%, var(--bg-card) 70%);
+  border: 1px solid rgba(204, 255, 0, 0.25) !important;
+  box-shadow: 0 4px 20px rgba(204, 255, 0, 0.05);
+}
+
+.apex-card-highlight:hover {
+  border-color: #ccff00 !important;
+}
+
+.dashboard-card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.5rem;
+}
+
+.dashboard-card-icon-highlight {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background-color: #ccff00;
+  color: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(204, 255, 0, 0.3);
+}
+
+.apex-card-val {
+  font-family: 'Oswald', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.apex-card-sub {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+.dashboard-card-trend {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dashboard-card-trend-highlight {
+  font-size: 0.8rem;
+  color: #ccff00;
+  font-weight: 500;
+}
+
+/* ==========================================
+   3. Charts & Daily Goal Section Grid
+   ========================================== */
+.dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1.5fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.dashboard-chart-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0; /* Prevents flex/grid parent from squishing canvas bounds */
+  position: relative;
+  overflow: visible !important;
+}
+
+.dashboard-chart-wrapper {
+  position: relative;
+  height: 220px;
+  width: 100%;
+}
+
+.dashboard-chart-header {
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-chart-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================
+   4. Donut Ring & Goal Summary
+   ========================================== */
+.dashboard-ring-container {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  margin: 1.5rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-ring-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.dashboard-ring-val {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.dashboard-ring-sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ccff00;
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+.dashboard-ring-footer {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-mini-metric {
+  text-align: center;
+}
+
+.dashboard-mini-val {
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dashboard-mini-label {
+  font-size: 0.725rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

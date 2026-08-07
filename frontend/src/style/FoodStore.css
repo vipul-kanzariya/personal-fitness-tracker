@@ -1,0 +1,100 @@
+/* Card & Container Styles */
+.dark-card {
+  background-color: #121212 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.food-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(204, 255, 0, 0.3) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Typography Utilities */
+.text-subtle {
+  color: #a1a1aa !important;
+}
+
+.text-neon-green {
+  color: #ccff00 !important;
+}
+
+/* Neon Button Styling */
+.btn-neon {
+  background-color: #ccff00 !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  border: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-neon:hover:not(:disabled) {
+  background-color: #b3e600 !important;
+}
+
+.btn-neon:disabled {
+  background-color: rgba(204, 255, 0, 0.2) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
+  cursor: not-allowed;
+}
+
+/* Image Container & Image Setup */
+.food-img-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  height: 140px;
+  background-color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.food-img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain; /* Prevents stretching and seamlessly frames images */
+  border-radius: 10px;
+}
+
+/* Category Badge Positioning */
+.category-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  color: #ccff00;
+  border: 1px solid rgba(204, 255, 0, 0.3);
+  padding: 4px 10px !important;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 2;
+}
+
+.food-title {
+  min-height: 2.5rem; /* Ensures equal card heights across multi-line titles */
+  display: -webkit-box;
+  line-clamp: 2;
+  /* Standard property for multi-line truncation (where supported) */
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Cart Item Row */
+.cart-item-row {
+  background-color: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cart-item-title {
+  max-width: 55%;
+}
+
+/* Sticky Sidebar positioning */
+.cart-sidebar {
+  top: 20px;
+}

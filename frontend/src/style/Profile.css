@@ -1,0 +1,104 @@
+/* Card & Layout Styles */
+.profile-card {
+  background: #121214;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+}
+
+.avatar-box {
+  width: 70px;
+  height: 70px;
+  background: rgba(204, 255, 0, 0.15);
+  border: 2px solid #ccff00;
+  color: #ccff00;
+  font-size: 1.8rem;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Typography & Contrast Utilities */
+.text-neon-accent {
+  color: #ccff00 !important;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+}
+
+.form-label-custom {
+  color: #d1d5db !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.text-subtle-bright {
+  color: #9ca3af !important;
+}
+
+/* Form Controls */
+.form-control-custom {
+  background: #1a1a1d !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control-custom:focus {
+  border-color: #ccff00 !important;
+  outline: none;
+  box-shadow: none !important;
+}
+
+.form-control-custom:disabled {
+  background: #151517 !important;
+  color: #9ca3af !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Buttons */
+.btn-neon-submit {
+  background: #ccff00;
+  color: #000;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-neon-submit:hover {
+  background: #b3e600;
+  transform: translateY(-1px);
+  box-shadow: none !important;
+}
+
+.btn-neon-submit:active {
+  transform: translateY(0);
+}
+
+.btn-logout-custom {
+  background: rgba(220, 53, 69, 0.15);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.4);
+  border-radius: 12px;
+  padding: 10px 24px;
+  font-weight: 700;
+  transition: background-color 0.2s ease;
+}
+
+.btn-logout-custom:hover {
+  background: #dc3545;
+  color: #fff;
+  box-shadow: none !important;
+}

@@ -1,0 +1,302 @@
+/* src/style/Navbar.css */
+
+/* ==========================================
+   1. Base Sidebar Layout & Desktop Style
+   ========================================== */
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem 1rem;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Brand Header & Toggle Header Row */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 0 0.25rem;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-primary);
+  font-family: 'Oswald', sans-serif;
+  font-size: 1.4rem;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-brand:hover {
+  opacity: 0.85;
+}
+
+.sidebar-logo-icon {
+  background: var(--accent);
+  color: #0a0a0a;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 12px rgba(163, 230, 53, 0.25);
+}
+
+/* Desktop Collapse Button */
+.desktop-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.desktop-toggle-btn:hover {
+  color: var(--text-primary);
+  border-color: #3a3a3a;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Action Button */
+.sidebar .btn-accent {
+  background-color: var(--accent);
+  color: #0a0a0a;
+  border: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(163, 230, 53, 0.15);
+}
+
+.sidebar .btn-accent:hover {
+  background-color: var(--accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(163, 230, 53, 0.3);
+}
+
+/* Navigation Links */
+.sidebar .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.7rem 1rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar .nav-link svg {
+  min-width: 20px;
+}
+
+.sidebar .nav-link:hover {
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.04);
+  transform: translateX(4px);
+}
+
+.sidebar .nav-link.active {
+  color: var(--accent);
+  background-color: rgba(163, 230, 53, 0.08);
+  font-weight: 600;
+}
+
+.sidebar .nav-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 3px;
+  background-color: var(--accent);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* Sidebar Footer & Logout */
+.sidebar-footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: auto;
+}
+
+.sidebar-footer .btn-logout {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--danger);
+  padding: 0.6rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.sidebar-footer .btn-logout:hover {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* ==========================================
+   2. DESKTOP COLLAPSED STATE (Icon-Only Mode)
+   ========================================== */
+@media (min-width: 992px) {
+  .sidebar.collapsed {
+    width: 80px;
+    padding: 1.5rem 0.75rem;
+  }
+
+  /* Hide Text Labels */
+  .sidebar.collapsed .sidebar-brand span,
+  .sidebar.collapsed .btn-accent span,
+  .sidebar.collapsed .nav-link span,
+  .sidebar.collapsed .btn-logout span {
+    display: none;
+  }
+
+  /* Align Elements to Center */
+  .sidebar.collapsed .sidebar-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .sidebar.collapsed .sidebar-brand {
+    padding: 0;
+    justify-content: center;
+  }
+
+  .sidebar.collapsed .btn-accent {
+    padding: 0.7rem 0;
+    justify-content: center;
+  }
+
+  .sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 0.75rem 0;
+  }
+
+  .sidebar.collapsed .nav-link:hover {
+    transform: none;
+  }
+
+  .sidebar.collapsed .btn-logout {
+    padding: 0.6rem 0;
+    justify-content: center;
+  }
+}
+
+/* ==========================================
+   3. Mobile Responsive Viewport
+   ========================================== */
+.mobile-header {
+  display: none;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 0.85rem 1.25rem;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1040;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.mobile-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 991.98px) {
+  .mobile-header {
+    display: flex !important;
+  }
+
+  .desktop-toggle-btn {
+    display: none; /* Hide desktop collapse button on mobile */
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px !important; /* Full width drawer on mobile */
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+}

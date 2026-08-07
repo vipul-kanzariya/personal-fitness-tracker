@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
+import "../style/Admin.css";
 
 function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -10,6 +11,7 @@ function AdminUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("token");
         const usersRes = await axios.get(
           `${import.meta.env.VITE_API_URL}/api/admin/users`,
@@ -26,6 +28,7 @@ function AdminUsers() {
     };
     fetchUsers();
   }, []);
+
   const handleBlockToggle = async (id) => {
     try {
       const token = localStorage.getItem("token");
@@ -36,7 +39,7 @@ function AdminUsers() {
       );
 
       setUsers(users.map((u) => (u._id === id ? res.data : u)));
-       setError('');
+      setError('');
     } catch (err) {
       setError("Failed to update user status.");
     }
@@ -51,59 +54,77 @@ function AdminUsers() {
       );
 
       setUsers(users.filter((u) => u._id !== id));
-       setError('');
+      setError('');
     } catch (err) {
       setError("Failed to delete user.");
     }
   };
 
   return (
-    <div className="container mt-4">
-      {error && <div className="alert alert-danger mt-3">{error}</div>}
+    <div className="container py-4 text-white">
+      <div className="mb-4">
+        <h2 className="fw-black text-uppercase tracking-wide m-0">
+          USER <span className="text-neon-accent">MANAGEMENT</span>
+        </h2>
+        <p className="text-secondary small mt-1">Control accounts, roles, and status privileges.</p>
+      </div>
+
+      {error && (
+        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-0 rounded-4 mb-4 text-center fw-semibold">
+          {error}
+        </div>
+      )}
+
       {loading ? (
-        <Spinner />
+        <div className="text-center py-5">
+          <Spinner />
+        </div>
       ) : (
-        <table className="table table-bordered mt-3">
-          <thead className="table-dark">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u._id}>
-                <td>{u.name}</td>
-                <td>{u.email}</td>
-                <td>{u.role}</td>
-                <td>
-                  {u.isBlocked ? (
-                    <span className="badge bg-danger">Blocked</span>
-                  ) : (
-                    <span className="badge bg-success">Active</span>
-                  )}
-                </td>
-                <td>
-                  <button
-                    className={`btn btn-sm me-1 ${u.isBlocked ? "btn-success" : "btn-warning"}`}
-                    onClick={() => handleBlockToggle(u._id)}
-                  >
-                    {u.isBlocked ? "Unblock" : "Block"}
-                  </button>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDelete(u._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="admin-table-container">
+          <div className="table-responsive">
+            <table className="table admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th className="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u._id}>
+                    <td className="fw-semibold">{u.name}</td>
+                    <td className="text-secondary">{u.email}</td>
+                    <td>
+                      <span className="badge bg-secondary bg-opacity-25 text-white">{u.role}</span>
+                    </td>
+                    <td>
+                      <span className={u.isBlocked ? "badge-neon-danger" : "badge-neon-success"}>
+                        {u.isBlocked ? "Blocked" : "Active"}
+                      </span>
+                    </td>
+                    <td className="text-end">
+                      <button
+                        className={`btn me-2 ${u.isBlocked ? "btn-action-success" : "btn-action-warning"}`}
+                        onClick={() => handleBlockToggle(u._id)}
+                      >
+                        {u.isBlocked ? "Unblock" : "Block"}
+                      </button>
+                      <button
+                        className="btn btn-action-danger"
+                        onClick={() => handleDelete(u._id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
+import "../style/Order.css"; // External stylesheet
 
 function Order() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error,setError] = useState();
-  
+  const [error, setError] = useState();
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -16,99 +17,161 @@ function Order() {
           `${import.meta.env.VITE_API_URL}/api/orders`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          },
+          }
         );
         setOrders(order.data);
       } catch (err) {
-        setError('Failed to load orders.')
+        setError("Failed to load orders.");
       } finally {
         setLoading(false);
       }
     };
     fetchOrder();
   }, []);
+
   const handleCancel = async (id) => {
-  try {
-    const token = localStorage.getItem("token");
-    const res = await axios.put(
-      `${import.meta.env.VITE_API_URL}/api/orders/${id}/cancel`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    setOrders(orders.map(o => o._id === id ? res.data : o));
-    setError('');
-  } catch (err) {
-    setError(err.response?.data || "Failed to cancel order.");
-  }
-};
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/orders/${id}/cancel`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setOrders(orders.map((o) => (o._id === id ? res.data : o)));
+      setError("");
+    } catch (err) {
+      setError(err.response?.data || "Failed to cancel order.");
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status?.toLowerCase()) {
+      case "delivered":
+        return "badge-delivered";
+      case "cancelled":
+        return "badge-cancelled";
+      case "processing":
+      case "pending":
+        return "badge-pending";
+      default:
+        return "badge-default";
+    }
+  };
+
   return (
-    <>
-    {error && (
-  <div className='alert alert-danger mt-3'>
-     {error}
-  </div>
-)}
-    <div className="container mt-4">
+    <div className="container py-4 text-white">
+      {/* Header */}
+      <div className="text-center mb-5">
+        <h2 className="fw-black text-uppercase tracking-wide">
+          MY <span className="text-neon-green">ORDERS</span>
+        </h2>
+        <p className="text-visible-muted small fs-6">
+          Track your past orders and view purchase history.
+        </p>
+      </div>
+
+      {error && (
+        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-0 rounded-4 mb-4">
+          {error}
+        </div>
+      )}
+
       {loading ? (
-        <Spinner />
+        <div className="text-center py-5">
+          <Spinner />
+        </div>
       ) : (
-        <>
-          <h4>📦 My Orders</h4>
-          {orders.length === 0 ? (
-            <p>No orders yet!</p>
-          ) : (
-            orders.map((o) => (
-              <div className="card p-3 mb-3" key={o._id}>
-                <div className="d-flex justify-content-between">
-                  <h6>Order ID: {o._id}</h6>
-                  <span
-                    className={`badge ${o.paymentStatus === "Paid" ? "bg-success" : "bg-warning"}`}
-                  >
-                    {o.paymentStatus}
-                  </span>
-                </div>
-                <table className="table table-sm mt-2">
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {o.items.map((item, i) => (
-                      <tr key={i}>
-                        <td>{item.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>₹ {item.price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                <div className="d-flex justify-content-between">
-                  <span>
-                    Total: <strong>₹ {o.totalAmount}</strong>
-                  </span>
-                  <span>
-                    Status: <strong>{o.orderStatus}</strong>
-                  </span>
-                  <span>
-                    Date: {new Date(o.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                {o.orderStatus !== 'Delivered' && o.orderStatus !== 'Cancelled' && (
-  <button className='btn btn-outline-danger btn-sm mt-2'
-    onClick={() => handleCancel(o._id)}>
-    Cancel Order
-  </button>
-)}
+        <div className="row justify-content-center">
+          <div className="col-lg-9">
+            {orders.length === 0 ? (
+              <div className="text-center py-5 border border-dashed border-secondary border-opacity-25 rounded-4">
+                <p className="text-visible-muted mb-0">No order history found!</p>
               </div>
-            ))
-          )}
-        </>
+            ) : (
+              orders.map((o) => (
+                <div className="order-card p-4 mb-4" key={o._id}>
+                  {/* Top Bar (Date + Status Tags) */}
+                  <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
+                    <div className="text-visible-muted small fs-6">
+                      <span className="text-label me-1">ORDERED ON:</span>
+                      <strong className="text-white">
+                        {new Date(o.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </strong>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-2">
+                      <span
+                        className={`payment-tag ${
+                          o.paymentStatus === "Paid"
+                            ? "bg-success bg-opacity-25 text-success"
+                            : "bg-warning bg-opacity-25 text-warning"
+                        }`}
+                      >
+                        💳 {o.paymentStatus}
+                      </span>
+                      <span
+                        className={`status-badge ${getStatusBadge(
+                          o.orderStatus
+                        )}`}
+                      >
+                        ● {o.orderStatus}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Items List */}
+                  <div className="mb-4">
+                    <div className="text-label extra-small mb-2 items-header-label">
+                      ITEMS
+                    </div>
+                    {o.items.map((item, i) => (
+                      <div
+                        className="item-row p-3 mb-2 d-flex justify-content-between align-items-center"
+                        key={i}
+                      >
+                        <div className="d-flex align-items-center gap-2">
+                          <span className="fw-bold text-white fs-6">
+                            {item.name}
+                          </span>
+                          <span className="qty-badge">x{item.quantity}</span>
+                        </div>
+                        <span className="fw-bold fs-6 text-neon-green">
+                          ₹{item.price * item.quantity}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Order Footer Info */}
+                  <div className="d-flex flex-wrap justify-content-between align-items-center pt-2">
+                    <div>
+                      <span className="text-label me-2 small">TOTAL PAY:</span>
+                      <span className="fw-bold fs-4 text-neon-green">
+                        ₹{o.totalAmount}
+                      </span>
+                    </div>
+
+                    {o.orderStatus !== "Delivered" &&
+                      o.orderStatus !== "Cancelled" && (
+                        <button
+                          className="btn btn-cancel-custom px-3 py-2"
+                          onClick={() => handleCancel(o._id)}
+                        >
+                          Cancel Order
+                        </button>
+                      )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       )}
     </div>
-    </>
   );
 }
 
