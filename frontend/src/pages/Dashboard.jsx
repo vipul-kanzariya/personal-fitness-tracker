@@ -16,6 +16,7 @@ import {
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 import axios from "axios";
 import Spinner from "../components/Spinner";
+import { useTheme } from "../context/ThemeContext";
 import "../style/Dashboard.css";
 
 ChartJS.register(
@@ -32,6 +33,7 @@ ChartJS.register(
 );
 
 function Dashboard() {
+  const { isLight, colors } = useTheme();
   const [workout, setWorkout] = useState([]);
   const [diet, setDiet] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -77,11 +79,15 @@ function Dashboard() {
       .trim();
   };
 
+  // Theme-aware ring colors
   const ringData = {
     labels: ['Consumed', 'Remaining'],
     datasets: [{
       data: [goalPercent, 100 - goalPercent],
-      backgroundColor: ['#ccff00', '#1e2029'],
+      backgroundColor: [
+        colors.accent, 
+        isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.08)'
+      ],
       borderWidth: 0,
       cutout: '80%'
     }]
@@ -127,7 +133,7 @@ function Dashboard() {
 
             <div className="dashboard-card-inner">
               <div className="dashboard-card-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccff00" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -140,7 +146,7 @@ function Dashboard() {
 
             <div className="dashboard-card-inner">
               <div className="dashboard-card-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccff00" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -153,7 +159,7 @@ function Dashboard() {
 
             <div className="dashboard-card-inner">
               <div className="dashboard-card-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccff00" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -216,7 +222,7 @@ function Dashboard() {
                     datasets: [{
                       label: "Calories Burned",
                       data: workout.map((w) => w.caloriesBurned || 0),
-                      backgroundColor: "#ccff00",
+                      backgroundColor: colors.accent,
                       borderRadius: 6,
                     }],
                   }}
@@ -228,11 +234,11 @@ function Dashboard() {
                       x: { 
                         offset: true,
                         grid: { display: false }, 
-                        ticks: { color: '#8c93a8', font: { family: 'Fira Code', size: 10 } } 
+                        ticks: { color: colors.textMuted, font: { family: 'Fira Code', size: 10 } } 
                       },
                       y: { 
-                        grid: { color: '#1e2029' }, 
-                        ticks: { color: '#8c93a8', font: { family: 'Fira Code', size: 10 } } 
+                        grid: { color: colors.chartGrid }, 
+                        ticks: { color: colors.textMuted, font: { family: 'Fira Code', size: 10 } } 
                       }
                     }
                   }}
@@ -253,12 +259,12 @@ function Dashboard() {
                     datasets: [{
                       label: "Calories Consumed",
                       data: diet.map((d) => d.calories || 0),
-                      borderColor: "#ccff00",
-                      backgroundColor: "rgba(204, 255, 0, 0.08)",
+                      borderColor: colors.accent,
+                      backgroundColor: isLight ? "rgba(79, 70, 229, 0.1)" : "rgba(163, 230, 53, 0.08)",
                       fill: true,
                       tension: 0.4,
                       pointRadius: 4,
-                      pointBackgroundColor: "#ccff00",
+                      pointBackgroundColor: colors.accent,
                     }],
                   }}
                   options={{
@@ -273,15 +279,15 @@ function Dashboard() {
                         offset: true,
                         grid: { display: false }, 
                         ticks: { 
-                          color: '#8c93a8', 
+                          color: colors.textMuted, 
                           font: { family: 'Fira Code', size: 10 },
                           maxRotation: 0,
                           autoSkip: false
                         } 
                       },
                       y: { 
-                        grid: { color: '#1e2029' }, 
-                        ticks: { color: '#8c93a8', font: { family: 'Fira Code', size: 10 } } 
+                        grid: { color: colors.chartGrid }, 
+                        ticks: { color: colors.textMuted, font: { family: 'Fira Code', size: 10 } } 
                       }
                     }
                   }}

@@ -1,30 +1,57 @@
-/* Dark Theme Cards & Inputs */
+/* src/style/Diet.css */
+
+/* 1. Theme-aware Cards & Containers */
 .dark-card {
-  background-color: #121212 !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
+/* 2. Theme-aware Inputs & Selects */
 .dark-input {
-  background-color: #1a1a1a !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #ffffff !important;
+  background-color: var(--bg-dark, var(--bg-card)) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 .dark-input:focus {
-  border-color: #0d6efd !important;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+  border-color: var(--accent, #0d6efd) !important;
+  box-shadow: 0 0 0 0.25rem var(--focus-ring, rgba(13, 110, 253, 0.25)) !important;
 }
 
 .dark-input::placeholder {
-  color: #8e8e93 !important;
+  color: var(--text-muted, #8e8e93) !important;
   opacity: 1 !important;
 }
 
-/* Typography Utilities */
+/* 3. Progress Bar Track */
+.custom-progress {
+  background-color: var(--bg-dark, rgba(0, 0, 0, 0.05)) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+/* 4. Pure CSS Variable Based Table (Light & Dark Mode Ready) */
+.theme-table {
+  color: var(--text-primary) !important;
+}
+
+.theme-table th,
+.theme-table td {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.theme-table.table-hover tbody tr:hover td {
+  background-color: var(--bg-dark, rgba(0, 0, 0, 0.03)) !important;
+}
+
+/* 5. Typography Utilities */
 .text-subtle {
-  color: #a1a1aa !important;
+  color: var(--text-muted, #a1a1aa) !important;
 }
 
 .text-neon-green {
-  color: #ccff00 !important; /* Standard Gym/Fitness Neon Lime Green */
+  color: var(--accent, #ccff00) !important;
 }

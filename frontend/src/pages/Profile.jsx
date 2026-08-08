@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
-import "../style/Profile.css"; // External stylesheet
+import "../style/Profile.css";
+import { useTheme } from "../context/ThemeContext";
 
 function Profile() {
-  const navigate = useNavigate();
   const [user, setUser] = useState({});
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -18,6 +18,8 @@ function Profile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -82,19 +84,36 @@ function Profile() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("name");
     navigate("/login");
   };
 
   return (
-    <div className="container py-4 text-white">
-      {/* Page Header */}
-      <div className="text-center mb-4">
-        <h2 className="fw-black text-uppercase tracking-wide">
-          USER <span className="text-neon-accent">PROFILE</span>
-        </h2>
-        <p className="text-subtle-bright small">
-          Manage your fitness parameters & account settings.
-        </p>
+    <div className="container py-4">
+      {/* Page Header with Theme Toggle Switch */}
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <div>
+          <h2 className="fw-black text-uppercase tracking-wide page-title m-0">
+            USER <span style={{ color: "var(--accent)" }}>PROFILE</span>
+          </h2>
+          <p className="small mb-0" style={{ color: "var(--text-muted)" }}>
+            Manage your fitness parameters & account settings.
+          </p>
+        </div>
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
+          style={{
+            borderRadius: "10px",
+            borderColor: "var(--border-color)",
+            color: "var(--text-primary)",
+            backgroundColor: "var(--bg-card)",
+          }}
+        >
+          <span>{theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}</span>
+        </button>
       </div>
 
       {error && (
@@ -116,34 +135,46 @@ function Profile() {
         <div className="row justify-content-center g-4">
           {/* User Identity Header Card */}
           <div className="col-lg-10">
-            <div className="profile-card p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div className="card profile-card p-4 d-flex flex-row flex-wrap align-items-center justify-content-between gap-3">
               <div className="d-flex align-items-center gap-3">
                 <div className="avatar-box">
                   {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
                 <div>
-                  <h4 className="fw-bold m-0 text-white">
+                  <h4 className="fw-bold m-0" style={{ color: "var(--text-primary)" }}>
                     {user.name || "User Name"}
                   </h4>
-                  <span className="text-subtle-bright small">
+                  <span className="small" style={{ color: "var(--text-muted)" }}>
                     {user.email || "user@example.com"}
                   </span>
                 </div>
               </div>
               <div className="d-flex gap-3 text-center">
-                <div className="bg-dark p-2 px-3 rounded-3 border border-secondary border-opacity-25">
-                  <span className="text-subtle-bright extra-small d-block stat-label">
+                <div
+                  className="p-2 px-3 rounded-3 border"
+                  style={{
+                    backgroundColor: "var(--bg-dark)",
+                    borderColor: "var(--border-color)",
+                  }}
+                >
+                  <span className="extra-small d-block stat-label">
                     WEIGHT
                   </span>
-                  <span className="fw-bold text-neon-accent">
+                  <span className="fw-bold" style={{ color: "var(--accent)" }}>
                     {weight || "--"} kg
                   </span>
                 </div>
-                <div className="bg-dark p-2 px-3 rounded-3 border border-secondary border-opacity-25">
-                  <span className="text-subtle-bright extra-small d-block stat-label">
+                <div
+                  className="p-2 px-3 rounded-3 border"
+                  style={{
+                    backgroundColor: "var(--bg-dark)",
+                    borderColor: "var(--border-color)",
+                  }}
+                >
+                  <span className="extra-small d-block stat-label">
                     HEIGHT
                   </span>
-                  <span className="fw-bold text-neon-accent">
+                  <span className="fw-bold" style={{ color: "var(--accent)" }}>
                     {height || "--"} cm
                   </span>
                 </div>
@@ -153,14 +184,20 @@ function Profile() {
 
           {/* Form Card 1 — Personal Info */}
           <div className="col-lg-5 col-md-6">
-            <div className="profile-card p-4 h-100 d-flex flex-column justify-content-between">
+            <div className="card profile-card p-4 h-100 d-flex flex-column justify-content-between">
               <div>
-                <h5 className="fw-bold mb-4 pb-2 border-bottom border-secondary border-opacity-25 text-white">
+                <h5
+                  className="fw-bold mb-4 pb-2 border-bottom"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   ⚙️ Personal Details
                 </h5>
                 <form id="profileForm" onSubmit={handleUpdateProfile}>
                   <div className="mb-3">
-                    <label htmlFor="name" className="form-label-custom">
+                    <label htmlFor="name" className="form-label-custom d-block">
                       Full Name
                     </label>
                     <input
@@ -174,7 +211,7 @@ function Profile() {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label-custom">
+                    <label htmlFor="email" className="form-label-custom d-block">
                       Email Address (Read-only)
                     </label>
                     <input
@@ -188,7 +225,7 @@ function Profile() {
 
                   <div className="row g-2 mb-3">
                     <div className="col-4">
-                      <label htmlFor="age" className="form-label-custom">
+                      <label htmlFor="age" className="form-label-custom d-block">
                         Age
                       </label>
                       <input
@@ -201,7 +238,7 @@ function Profile() {
                       />
                     </div>
                     <div className="col-4">
-                      <label htmlFor="weight" className="form-label-custom">
+                      <label htmlFor="weight" className="form-label-custom d-block">
                         Weight (kg)
                       </label>
                       <input
@@ -215,7 +252,7 @@ function Profile() {
                       />
                     </div>
                     <div className="col-4">
-                      <label htmlFor="height" className="form-label-custom">
+                      <label htmlFor="height" className="form-label-custom d-block">
                         Height (cm)
                       </label>
                       <input
@@ -244,17 +281,20 @@ function Profile() {
 
           {/* Form Card 2 — Security */}
           <div className="col-lg-5 col-md-6">
-            <div className="profile-card p-4 h-100 d-flex flex-column justify-content-between">
+            <div className="card profile-card p-4 h-100 d-flex flex-column justify-content-between">
               <div>
-                <h5 className="fw-bold mb-4 pb-2 border-bottom border-secondary border-opacity-25 text-white">
+                <h5
+                  className="fw-bold mb-4 pb-2 border-bottom"
+                  style={{
+                    borderColor: "var(--border-color)",
+                    color: "var(--text-primary)",
+                  }}
+                >
                   🔒 Security & Password
                 </h5>
                 <form id="passwordForm" onSubmit={handleChangePassword}>
                   <div className="mb-3">
-                    <label
-                      htmlFor="currentPassword"
-                      className="form-label-custom"
-                    >
+                    <label htmlFor="currentPassword" className="form-label-custom d-block">
                       Current Password
                     </label>
                     <input
@@ -268,7 +308,7 @@ function Profile() {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="newPassword" className="form-label-custom">
+                    <label htmlFor="newPassword" className="form-label-custom d-block">
                       New Password
                     </label>
                     <input
@@ -298,7 +338,7 @@ function Profile() {
           <div className="col-lg-10 text-center mt-4">
             <button
               onClick={handleLogout}
-              className="btn btn-logout-custom px-4 py-2"
+              className="btn btn-logout-custom px-4 py-2 text-uppercase fw-bold"
             >
               Logout Account
             </button>

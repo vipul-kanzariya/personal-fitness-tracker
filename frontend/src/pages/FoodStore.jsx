@@ -88,13 +88,13 @@ function FoodStore() {
   };
 
   return (
-    <div className="container mt-4 text-white">
+    <div className="container mt-4">
       {/* Header Section */}
       <div className="text-center mb-4">
         <span className="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill small fw-bold text-uppercase mb-2">
           Nutrition & Meals
         </span>
-        <h2 className="fw-bold text-white mb-1">
+        <h2 className="fw-bold mb-1 apex-title">
           HEALTHY <span className="text-neon-green">FOOD STORE</span>
         </h2>
         <p className="text-subtle small">
@@ -116,7 +116,7 @@ function FoodStore() {
         <div className="row g-4">
           {/* Food Items Catalog */}
           <div className="col-lg-8">
-            <h5 className="fw-bold mb-3 d-flex align-items-center gap-2">
+            <h5 className="fw-bold mb-3 d-flex align-items-center gap-2 ">
               🛒 AVAILABLE MEALS
             </h5>
             <div className="row g-3">
@@ -134,7 +134,7 @@ function FoodStore() {
                           {f.category}
                         </span>
                       </div>
-                      <h6 className="fw-bold text-white food-title mb-1">
+                      <h6 className="fw-bold food-title mb-1">
                         {f.name}
                       </h6>
                       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -161,12 +161,12 @@ function FoodStore() {
           {/* Cart Sidebar */}
           <div className="col-lg-4">
             <div className="card dark-card p-4 sticky-top cart-sidebar">
-              <h5 className="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+              <h5 className="fw-bold mb-3 d-flex align-items-center gap-2">
                 🛍️ YOUR CART
               </h5>
 
               {cart.length === 0 ? (
-                <div className="text-center py-4 text-subtle border border-secondary border-opacity-25 rounded-3 mb-3">
+                <div className="text-center py-4 text-subtle border rounded-3 mb-3" style={{ borderColor: "var(--border-color)" }}>
                   <p className="mb-0 small">Your cart is empty.</p>
                 </div>
               ) : (
@@ -177,7 +177,7 @@ function FoodStore() {
                       className="cart-item-row p-3 mb-2 rounded-3 d-flex justify-content-between align-items-center"
                     >
                       <div className="cart-item-title">
-                        <h6 className="fw-bold text-white mb-0 text-truncate">
+                        <h6 className="fw-bold mb-0 text-truncate">
                           {c.name}
                         </h6>
                         <small className="text-subtle">
@@ -203,7 +203,7 @@ function FoodStore() {
               )}
 
               {/* Order Summary */}
-              <div className="border-top border-secondary border-opacity-25 pt-3 mb-3">
+              <div className="border-top pt-3 mb-3" style={{ borderColor: "var(--border-color)" }}>
                 <div className="d-flex justify-content-between align-items-center">
                   <span className="text-subtle fw-semibold">
                     Total Amount:

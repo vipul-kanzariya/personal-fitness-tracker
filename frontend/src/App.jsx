@@ -27,13 +27,9 @@ function Layout() {
   const isAdmin = location.pathname.startsWith('/admin');
 
   return (
-    /* Admin side ke liye 'admin-layout-wrapper' add kardiya */
     <div className={`app-layout ${isAdmin ? 'admin-layout-wrapper' : ''}`}>
-
-      {/* Navigation Bar */}
       {!hideNavbar && (isAdmin ? <AdminNavbar /> : <Navbar />)}
 
-      {/* Main Content - Full Screen on Mobile */}
       <main className={`main-content ${hideNavbar ? 'full-width' : ''}`}>
         <Routes>
           <Route path='/login' element={<Login />} />
@@ -61,10 +57,10 @@ function Layout() {
           <Route path='*' element={<NotFound />} />
         </Routes>
       </main>
-
     </div>
   )
 }
+
 function App() {
   return (
     <BrowserRouter>

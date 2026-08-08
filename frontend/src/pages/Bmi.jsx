@@ -109,18 +109,18 @@ function Bmi() {
       case "Obesity":
         return "bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50";
       default:
-        return "bg-secondary text-white";
+        return "bg-secondary text-subtle";
     }
   };
 
   return (
-    <div className="container mt-4 text-white">
+    <div className="container mt-4">
       {/* Header */}
       <div className="text-center mb-4">
         <span className="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill small fw-bold text-uppercase mb-2">
           Health Metrics
         </span>
-        <h2 className="fw-bold text-white mb-1">
+        <h2 className="fw-bold mb-1 apex-title">
           BMI ANALYTICS & <span className="text-neon-green">WORKOUTS</span>
         </h2>
         <p className="text-subtle small">
@@ -206,7 +206,7 @@ function Bmi() {
                 Calculated Result
               </span>
               <div className="d-flex align-items-baseline gap-2">
-                <h1 className="display-4 fw-bold text-white mb-0">{bmiResult.bmi}</h1>
+                <h1 className="display-4 fw-bold mb-0">{bmiResult.bmi}</h1>
                 <span className="text-subtle fw-bold fs-5">BMI</span>
               </div>
             </div>
@@ -238,14 +238,14 @@ function Bmi() {
       {/* Suggested Workouts Section */}
       {suggestedWorkouts.length > 0 && (
         <div className="card dark-card p-4 mb-4 shadow-sm">
-          <h5 className="fw-bold text-white mb-4 d-flex align-items-center gap-2">
+          <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
             🔥 SUGGESTED WORKOUTS <span className="text-neon-green">FOR YOU</span>
           </h5>
           <div className="row g-3">
             {suggestedWorkouts.map((w) => (
               <div key={w._id} className="col-6 col-md-3">
                 <div className="p-3 text-center rounded-3 workout-card">
-                  <h6 className="fw-bold text-white mb-2 text-uppercase">{w.name}</h6>
+                  <h6 className="fw-bold mb-2 text-uppercase">{w.name}</h6>
                   <span className="badge bg-secondary bg-opacity-25 text-subtle mb-3 px-2 py-1 small">
                     {w.category}
                   </span>
@@ -261,7 +261,7 @@ function Bmi() {
 
       {/* Assessment History Table */}
       <div className="card dark-card p-4 mb-4 shadow-sm">
-        <h5 className="fw-bold text-white mb-3 d-flex align-items-center gap-2">
+        <h5 className="fw-bold mb-3 d-flex align-items-center gap-2">
           📜 ASSESSMENT <span className="text-neon-green">HISTORY</span>
         </h5>
 
@@ -271,9 +271,9 @@ function Bmi() {
           </div>
         ) : (
           <div className="table-responsive">
-            <table className="table table-dark table-hover align-middle mb-0">
+            <table className="table theme-table table-hover align-middle mb-0">
               <thead>
-                <tr className="border-bottom border-secondary">
+                <tr>
                   <th className="text-subtle small text-uppercase">Weight</th>
                   <th className="text-subtle small text-uppercase">Height</th>
                   <th className="text-subtle small text-uppercase">BMI</th>
@@ -285,9 +285,9 @@ function Bmi() {
                 {history.length > 0 ? (
                   history.map((h) => (
                     <tr key={h._id}>
-                      <td className="fw-bold text-white">{h.weight} kg</td>
-                      <td className="text-white">{metersToFeet(h.height)}</td>
-                      <td className="fw-bold text-white">{h.bmi}</td>
+                      <td className="fw-bold">{h.weight} kg</td>
+                      <td>{metersToFeet(h.height)}</td>
+                      <td className="fw-bold">{h.bmi}</td>
                       <td>
                         <span className={`badge px-2 py-1 rounded-pill small ${getBadgeClass(h.category)}`}>
                           {h.category}

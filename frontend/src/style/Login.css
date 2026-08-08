@@ -1,12 +1,17 @@
+/* src/pages/Login.css */
+
 /* Fullscreen background container */
 .login-wrapper {
   min-height: 100vh;
+  width: 100vw;               /* Ensure it covers full width */
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Dark background fallback + ambient gradient background */
+  box-sizing: border-box;     /* IMPORTANT: Keeps padding inside the box */
+  
+  /* Dynamic gradient overlay based on theme + background photo */
   background: 
-    linear-gradient(rgba(10, 10, 12, 0.82), rgba(10, 10, 12, 0.92)),
+    linear-gradient(var(--overlay-bg, rgba(10, 10, 12, 0.82)), var(--overlay-bg, rgba(10, 10, 12, 0.92))),
     url("https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
   padding: 20px;
 }
@@ -15,54 +20,62 @@
 .login-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(18, 18, 20, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: var(--bg-card) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
   border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 }
 
 /* Accent Highlight */
 .text-neon-accent {
-  color: #ccff00 !important;
+  color: var(--accent, #ccff00) !important;
+}
+
+/* Custom Text Subtitle */
+.text-subtle {
+  color: var(--text-muted, #8e8e93) !important;
 }
 
 /* Custom Form Labels */
 .form-label-custom {
-  color: #d1d5db !important;
+  color: var(--text-muted, #8e8e93) !important;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
   margin-bottom: 6px;
+  display: block;
 }
 
 /* Custom Input Control */
 .form-control-custom {
-  background: #1a1a1d !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
+  background-color: var(--bg-dark, var(--bg-card)) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
   border-radius: 12px !important;
   padding: 12px 16px !important;
   font-size: 0.95rem;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-control-custom::placeholder {
-  color: #6b7280;
+  color: var(--text-muted, #6b7280);
+  opacity: 0.7;
 }
 
 .form-control-custom:focus {
-  border-color: #ccff00 !important;
+  border-color: var(--accent, #ccff00) !important;
   outline: none;
-  box-shadow: none !important;
+  box-shadow: 0 0 0 0.2rem var(--focus-ring, rgba(204, 255, 0, 0.2)) !important;
 }
 
 /* Matte Neon Button */
 .btn-neon-submit {
-  background: #ccff00;
-  color: #000;
+  background-color: var(--accent, #ccff00) !important;
+  color: #000000 !important;
   font-weight: 800;
   border: none;
   border-radius: 12px;
@@ -72,9 +85,14 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.btn-neon-submit:hover {
-  background: #b3e600;
+.btn-neon-submit:hover:not(:disabled) {
+  filter: brightness(0.9);
   transform: translateY(-1px);
+}
+
+.btn-neon-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-neon-submit:active {

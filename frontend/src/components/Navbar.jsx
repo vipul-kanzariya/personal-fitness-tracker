@@ -4,11 +4,12 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom'
 import '../style/Navbar.css'
 
 function Navbar() {
-  const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const navigate = useNavigate();
+   // ✅ hook use karo
+  
   // Auto-close mobile drawer on route change
   useEffect(() => {
     setMobileOpen(false);
@@ -157,6 +158,7 @@ function Navbar() {
                 </svg>
                 <span>Profile</span>
               </NavLink>
+              
             </li>
           </ul>
         </div>

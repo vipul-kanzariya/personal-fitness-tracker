@@ -59,10 +59,10 @@ function Order() {
   };
 
   return (
-    <div className="container py-4 text-white">
+    <div className="container py-4">
       {/* Header */}
       <div className="text-center mb-5">
-        <h2 className="fw-black text-uppercase tracking-wide">
+        <h2 className="fw-black text-uppercase tracking-wide apex-title">
           MY <span className="text-neon-green">ORDERS</span>
         </h2>
         <p className="text-visible-muted small fs-6">
@@ -84,17 +84,23 @@ function Order() {
         <div className="row justify-content-center">
           <div className="col-lg-9">
             {orders.length === 0 ? (
-              <div className="text-center py-5 border border-dashed border-secondary border-opacity-25 rounded-4">
+              <div
+                className="text-center py-5 border border-dashed rounded-4"
+                style={{ borderColor: "var(--border-color)" }}
+              >
                 <p className="text-visible-muted mb-0">No order history found!</p>
               </div>
             ) : (
               orders.map((o) => (
                 <div className="order-card p-4 mb-4" key={o._id}>
                   {/* Top Bar (Date + Status Tags) */}
-                  <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-3 mb-3 border-bottom border-secondary border-opacity-25">
+                  <div
+                    className="d-flex flex-wrap justify-content-between align-items-center gap-2 pb-3 mb-3 border-bottom"
+                    style={{ borderColor: "var(--border-color)" }}
+                  >
                     <div className="text-visible-muted small fs-6">
                       <span className="text-label me-1">ORDERED ON:</span>
-                      <strong className="text-white">
+                      <strong className="fw-bold">
                         {new Date(o.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short",
@@ -134,7 +140,7 @@ function Order() {
                         key={i}
                       >
                         <div className="d-flex align-items-center gap-2">
-                          <span className="fw-bold text-white fs-6">
+                          <span className="fw-bold fs-6">
                             {item.name}
                           </span>
                           <span className="qty-badge">x{item.quantity}</span>

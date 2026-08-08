@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
-import "../style/Diet.css"; // Imported CSS stylesheet
+import "../style/Diet.css";
 
 function Diet() {
   const [diets, setDiets] = useState([]);
@@ -179,13 +179,13 @@ function Diet() {
   };
 
   return (
-    <div className="container mt-4 text-white">
-      <h2 className="fw-bold mb-4 text-white">
+    <div className="container mt-4">
+      <h2 className="fw-bold mb-4 apex-title">
         DIET & <span className="text-neon-green">NUTRITION TRACKER</span>
       </h2>
       {error && <div className="alert alert-danger mb-4">{error}</div>}
 
-      {/* Daily Macros Summary Cards with Progress Bars */}
+      {/* Daily Macros Summary Cards */}
       <div className="row g-3 mb-4">
         {/* Calories Card */}
         <div className="col-12 col-sm-6 col-md-3">
@@ -193,16 +193,13 @@ function Diet() {
             <span className="text-subtle small fw-bold text-uppercase">
               Calories
             </span>
-            <h4 className="fw-bold my-1 text-white">
+            <h4 className="fw-bold my-1">
               {totals.calories}{" "}
               <span className="fs-6 text-subtle font-normal">
                 / {targets.calories} KCAL
               </span>
             </h4>
-            <div
-              className="progress mt-2 bg-secondary bg-opacity-25"
-              style={{ height: "8px" }}
-            >
+            <div className="progress mt-2 custom-progress" style={{ height: "8px" }}>
               <div
                 className="progress-bar bg-primary"
                 role="progressbar"
@@ -220,16 +217,13 @@ function Diet() {
             <span className="text-subtle small fw-bold text-uppercase">
               Protein
             </span>
-            <h4 className="fw-bold my-1 text-white">
+            <h4 className="fw-bold my-1">
               {totals.protein}G{" "}
               <span className="fs-6 text-subtle font-normal">
                 / {targets.protein}G
               </span>
             </h4>
-            <div
-              className="progress mt-2 bg-secondary bg-opacity-25"
-              style={{ height: "8px" }}
-            >
+            <div className="progress mt-2 custom-progress" style={{ height: "8px" }}>
               <div
                 className="progress-bar bg-danger"
                 role="progressbar"
@@ -247,16 +241,13 @@ function Diet() {
             <span className="text-subtle small fw-bold text-uppercase">
               Carbs
             </span>
-            <h4 className="fw-bold my-1 text-white">
+            <h4 className="fw-bold my-1">
               {totals.carbs}G{" "}
               <span className="fs-6 text-subtle font-normal">
                 / {targets.carbs}G
               </span>
             </h4>
-            <div
-              className="progress mt-2 bg-secondary bg-opacity-25"
-              style={{ height: "8px" }}
-            >
+            <div className="progress mt-2 custom-progress" style={{ height: "8px" }}>
               <div
                 className="progress-bar bg-warning"
                 role="progressbar"
@@ -274,16 +265,13 @@ function Diet() {
             <span className="text-subtle small fw-bold text-uppercase">
               Fat
             </span>
-            <h4 className="fw-bold my-1 text-white">
+            <h4 className="fw-bold my-1">
               {totals.fat}G{" "}
               <span className="fs-6 text-subtle font-normal">
                 / {targets.fat}G
               </span>
             </h4>
-            <div
-              className="progress mt-2 bg-secondary bg-opacity-25"
-              style={{ height: "8px" }}
-            >
+            <div className="progress mt-2 custom-progress" style={{ height: "8px" }}>
               <div
                 className="progress-bar bg-info"
                 role="progressbar"
@@ -298,10 +286,9 @@ function Diet() {
 
       {/* Form Section */}
       <div className="card dark-card shadow-sm p-4 mb-4">
-        <h5 className="fw-bold mb-3 text-white">ADD FOOD ENTRY</h5>
+        <h5 className="fw-bold mb-3">ADD FOOD ENTRY</h5>
         <form onSubmit={handleSubmit}>
           <div className="row g-3 align-items-end">
-            {/* Food Name */}
             <div className="col-12 col-md-4">
               <label
                 htmlFor="food"
@@ -342,7 +329,6 @@ function Diet() {
               </div>
             </div>
 
-            {/* Calories */}
             <div className="col-6 col-md-2">
               <label
                 htmlFor="calories"
@@ -363,7 +349,6 @@ function Diet() {
               />
             </div>
 
-            {/* Protein */}
             <div className="col-6 col-md-2">
               <label
                 htmlFor="protein"
@@ -383,7 +368,6 @@ function Diet() {
               />
             </div>
 
-            {/* Carbs */}
             <div className="col-6 col-md-2">
               <label
                 htmlFor="carbs"
@@ -403,7 +387,6 @@ function Diet() {
               />
             </div>
 
-            {/* Fat */}
             <div className="col-6 col-md-2">
               <label
                 htmlFor="fat"
@@ -423,7 +406,6 @@ function Diet() {
               />
             </div>
 
-            {/* Submit Button */}
             <div className="col-12 mt-3">
               <button
                 type="submit"
@@ -441,9 +423,9 @@ function Diet() {
         <Spinner />
       ) : (
         <div className="card dark-card shadow-sm p-3">
-          <h5 className="fw-bold mb-3 text-white">LOGGED MEALS</h5>
+          <h5 className="fw-bold mb-3">LOGGED MEALS</h5>
           <div className="table-responsive">
-            <table className="table table-dark table-hover align-middle mb-0">
+            <table className="table theme-table table-hover align-middle mb-0">
               <thead>
                 <tr>
                   <th className="text-subtle">Food Name</th>
@@ -466,9 +448,7 @@ function Diet() {
                     <tr key={d._id}>
                       {editId === d._id ? (
                         <>
-                          <td className="fw-semibold text-white">
-                            {d.foodName}
-                          </td>
+                          <td className="fw-semibold">{d.foodName}</td>
                           <td>
                             <input
                               type="number"
@@ -546,13 +526,11 @@ function Diet() {
                         </>
                       ) : (
                         <>
-                          <td className="fw-semibold text-white">
-                            {d.foodName}
-                          </td>
-                          <td className="text-white">{d.calories}</td>
-                          <td className="text-white">{d.protein || 0}</td>
-                          <td className="text-white">{d.carbs || 0}</td>
-                          <td className="text-white">{d.fat || 0}</td>
+                          <td className="fw-semibold">{d.foodName}</td>
+                          <td>{d.calories}</td>
+                          <td>{d.protein || 0}</td>
+                          <td>{d.carbs || 0}</td>
+                          <td>{d.fat || 0}</td>
                           <td>
                             <button
                               className="btn btn-warning btn-sm me-1"

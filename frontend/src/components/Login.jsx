@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";   // ✅ Link add karo
 import axios from "axios";
 import "../style/Login.css"; // External stylesheet
 
@@ -10,35 +10,42 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
- const handleSubmit = async(e) =>{
-  e.preventDefault()
-  try{
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, {email, password});
-    localStorage.setItem('token', res.data.token);
-    localStorage.setItem('role', res.data.role);
-    localStorage.setItem('name', res.data.name);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      setError("");
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        { email, password }
+      );
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("name", res.data.name);
 
-    // ✅ Role check karke redirect karo
-    if(res.data.role === 'admin'){
-      navigate('/admin/dashboard');
-    } else {
-      navigate('/dashboard');
+      if (res.data.role === "admin") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      setError(
+        err.response?.data || "Login failed. Please check your credentials."
+      );
+    } finally {
+      setLoading(false);
     }
-  }catch(err){
-    console.log(err.message);
-  }
-}
+  };
 
   return (
     <div className="login-wrapper">
-      <div className="login-card p-4 p-sm-5 text-white">
-        
+      <div className="login-card p-4 p-sm-5">
         {/* Header */}
         <div className="text-center mb-4">
           <h2 className="fw-black text-uppercase tracking-wide m-0">
             WELCOME <span className="text-neon-accent">BACK</span>
           </h2>
-          <p className="text-secondary small mt-1">
+          <p className="text-subtle small mt-1">
             Sign in to access your dashboard
           </p>
         </div>
@@ -90,7 +97,14 @@ function Login() {
             {loading ? "Signing In..." : "Login"}
           </button>
         </form>
-
+        <div className="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+  <p className="small text-secondary m-0">
+    Don't have an account?{" "}
+    <Link to="/register" className="link-neon">
+      Sign Up
+    </Link>
+  </p>
+</div>
       </div>
     </div>
   );

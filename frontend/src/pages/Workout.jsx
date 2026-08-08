@@ -328,7 +328,7 @@ function Workout() {
                         </div>
                       </div>
 
-                      <div className="d-flex gap-2 pt-2 border-top border-secondary border-opacity-25">
+                      <div className="d-flex gap-2 pt-2 apex-card-action-bar">
                         <button className="btn apex-btn-edit btn-sm flex-grow-1" onClick={() => handleEdit(w)}>Edit</button>
                         <button className="btn apex-btn-delete btn-sm flex-grow-1" onClick={() => handleDelete(w._id)}>Delete</button>
                       </div>
