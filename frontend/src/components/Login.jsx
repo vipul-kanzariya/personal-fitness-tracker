@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";   // ✅ Link add karo
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import "../style/Login.css"; // External stylesheet
+import "../style/Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -97,14 +97,15 @@ function Login() {
             {loading ? "Signing In..." : "Login"}
           </button>
         </form>
+
         <div className="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
-  <p className="small text-secondary m-0">
-    Don't have an account?{" "}
-    <Link to="/register" className="link-neon">
-      Sign Up
-    </Link>
-  </p>
-</div>
+          <p className="small text-subtle m-0">
+            Don't have an account?{" "}
+            <Link to="/register" className="link-neon">
+              Sign Up
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

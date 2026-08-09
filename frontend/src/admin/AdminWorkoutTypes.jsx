@@ -61,12 +61,12 @@ function AdminWorkoutTypes() {
   };
 
   return (
-    <div className="container py-4 text-white">
+    <div className="container py-4">
       <div className="mb-4">
         <h2 className="fw-black text-uppercase tracking-wide m-0">
           WORKOUT <span className="text-neon-accent">TYPES</span>
         </h2>
-        <p className="text-secondary small mt-1">Add and delete preset workout categories and calorie burn rates.</p>
+        <p className="text-subtle small mt-1">Add and delete preset workout categories and calorie burn rates.</p>
       </div>
 
       {error && (
@@ -129,7 +129,7 @@ function AdminWorkoutTypes() {
                     <td className="fw-semibold">{t.name}</td>
                     <td className="text-neon-accent fw-bold">{t.caloriesPerMinute} kcal</td>
                     <td>
-                      <span className="badge bg-secondary bg-opacity-25 text-white">{t.category}</span>
+                      <span className="badge bg-secondary bg-opacity-25 border border-secondary text-subtle">{t.category}</span>
                     </td>
                     <td className="text-end">
                       <button className="btn btn-action-danger" onClick={() => handleDelete(t._id)}>

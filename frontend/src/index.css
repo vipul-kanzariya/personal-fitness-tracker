@@ -1,5 +1,6 @@
-
-/* Removes default browser margins and scroll issues */
+/* ==========================================
+   RESET & BROWSER OVERRIDES
+   ========================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -14,10 +15,7 @@ html, body {
   overflow-x: hidden; /* Prevents horizontal scroll */
 }
 
-
-/* ==========================================
-   REMOVE NUMBER INPUT SPINNER ARROWS
-   ========================================== */
+/* Remove Number Input Spinner Arrows */
 input[type=number] {
   appearance: textfield;
 }
@@ -56,6 +54,14 @@ input[type=number]::-webkit-outer-spin-button {
   --focus-ring: rgba(163, 230, 53, 0.25);
   
   --chart-grid: rgba(255, 255, 255, 0.08);
+
+  /* Glassmorphism Auth Variables (Dark) */
+  --auth-bg-overlay: linear-gradient(rgba(10, 10, 12, 0.85), rgba(10, 10, 12, 0.92));
+  --glass-bg: rgba(18, 18, 20, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  --auth-input-bg: #1a1a1d;
+  --auth-input-border: rgba(255, 255, 255, 0.15);
 }
 
 /* ==========================================
@@ -85,10 +91,18 @@ input[type=number]::-webkit-outer-spin-button {
   --focus-ring: rgba(79, 70, 229, 0.2);
   
   --chart-grid: rgba(15, 23, 42, 0.08);
+
+  /* Glassmorphism Auth Variables (Light) */
+  --auth-bg-overlay: linear-gradient(rgba(240, 242, 245, 0.78), rgba(225, 229, 235, 0.88));
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  --auth-input-bg: rgba(255, 255, 255, 0.9);
+  --auth-input-border: rgba(0, 0, 0, 0.15);
 }
 
 /* ==========================================
-   BODY & GLOBAL STYLES
+   BODY & GLOBAL TYPOGRAPHY
    ========================================== */
 body {
   margin: 0;
@@ -115,14 +129,35 @@ h1, h2, h3, h4, h5, h6, .page-title {
   margin-bottom: 1.5rem;
 }
 
-/* Text Highlight Utility (Fixes Neon Yellow in Light Mode) */
+/* Text Utility Helpers */
 .text-highlight, .highlight-text {
   color: var(--text-highlight) !important;
   transition: color var(--transition);
 }
 
+.text-subtle {
+  color: var(--text-muted) !important;
+}
+
 .text-muted, .text-secondary {
   color: var(--text-muted) !important;
+}
+
+.text-neon-accent {
+  color: var(--accent) !important;
+  font-weight: 800;
+}
+
+.link-neon {
+  color: var(--text-highlight);
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.link-neon:hover {
+  text-decoration: underline;
+  opacity: 0.85;
 }
 
 /* Custom Scrollbar */
@@ -139,6 +174,60 @@ h1, h2, h3, h4, h5, h6, .page-title {
 }
 ::-webkit-scrollbar-thumb:hover { 
   background: var(--border-color-hover); 
+}
+
+/* ==========================================
+   LAYOUT STRUCTURE (MAIN & ADMIN)
+   ========================================== */
+.app-layout, .admin-layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--bg-dark);
+  transition: background-color var(--transition);
+}
+
+/* Admin Specific Main Content Area */
+.admin-main-content {
+  flex: 1;
+  min-width: 0; /* Critical: Prevents flex tables from overflowing */
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Admin Sidebar Container Rules */
+.admin-sidebar {
+  width: 260px;
+  min-width: 260px;
+  flex-shrink: 0; /* Prevents layout squishing */
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+@media (max-width: 991.98px) {
+  .app-layout, .admin-layout-wrapper {
+    flex-direction: column;
+  }
+
+  .main-content, .admin-main-content {
+    padding: 1.25rem;
+  }
+
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+  }
 }
 
 /* ==========================================
@@ -204,6 +293,25 @@ h1, h2, h3, h4, h5, h6, .page-title {
   margin-bottom: 0.35rem;
 }
 
+/* Special Auth Input & Label Custom Overrides */
+.form-label-custom {
+  color: var(--text-muted) !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-control-custom {
+  background: var(--auth-input-bg) !important;
+  border: 1px solid var(--auth-input-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 12px !important;
+  padding: 12px 14px !important;
+}
+
 /* ==========================================
    BUTTONS
    ========================================== */
@@ -236,6 +344,24 @@ h1, h2, h3, h4, h5, h6, .page-title {
   border-color: var(--border-color-hover) !important;
 }
 
+.btn-neon-submit, .btn-neon-action {
+  background: var(--accent) !important;
+  color: var(--accent-text) !important;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.btn-neon-submit:hover, .btn-neon-action:hover {
+  background: var(--accent-dark) !important;
+  transform: translateY(-1px);
+}
+
 /* ==========================================
    TABLES
    ========================================== */
@@ -265,29 +391,43 @@ h1, h2, h3, h4, h5, h6, .page-title {
 }
 
 /* ==========================================
-   LAYOUT STRUCTURE
+   GLASSMORPHISM AUTH & 404 PAGES
    ========================================== */
-.app-layout {
-  display: flex;
+.login-wrapper,
+.register-wrapper,
+.notfound-wrapper {
   min-height: 100vh;
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    var(--auth-bg-overlay),
+    url("https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80") center/cover no-repeat;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-.main-content {
-  flex: 1;
-  padding: 2rem;
+.login-card,
+.register-card,
+.notfound-card {
   width: 100%;
-  overflow-x: hidden;
-  background-color: var(--bg-dark);
-  transition: background-color var(--transition);
+  max-width: 440px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--glass-shadow);
+  color: var(--text-primary);
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
-@media (max-width: 991.98px) {
-  .app-layout {
-    flex-direction: column;
-  }
-
-  .main-content {
-    padding: 1.25rem;
-  }
+/* 404 Styling */
+.error-code {
+  font-size: 5.5rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--text-primary);
 }

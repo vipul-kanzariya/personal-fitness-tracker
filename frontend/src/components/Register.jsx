@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import "../style/Register.css"; // External stylesheet
+import "../style/Register.css";
 
 function Register() {
   const [name, setName] = useState("");
@@ -33,14 +33,14 @@ function Register() {
 
   return (
     <div className="register-wrapper">
-      <div className="register-card p-4 p-sm-5 text-white">
+      <div className="register-card p-4 p-sm-5">
         
         {/* Header */}
         <div className="text-center mb-4">
           <h2 className="fw-black text-uppercase tracking-wide m-0">
             CREATE <span className="text-neon-accent">ACCOUNT</span>
           </h2>
-          <p className="text-secondary small mt-1">
+          <p className="text-subtle small mt-1">
             Join us to start managing your profile
           </p>
         </div>
@@ -111,7 +111,7 @@ function Register() {
 
         {/* Footer Link */}
         <div className="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
-          <p className="small text-secondary m-0">
+          <p className="small text-subtle m-0">
             Already have an account?{" "}
             <Link to="/login" className="link-neon">
               Sign In

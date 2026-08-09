@@ -1,17 +1,36 @@
+/* Admin Layout Wrapper (Parent Flex Container) */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-main, #0a0a0c);
+  overflow-x: hidden;
+}
+
 /* Fixed / Sticky Sidebar Layout */
 .admin-sidebar {
   width: 260px;
   min-width: 260px;
-  height: 100vh;            /* Sidebar ki height screen jitni hi rahegi */
-  position: sticky;         /* Page scroll hone par sidebar wahin fixed rahega */
-  top: 0;                   /* Screen ke top se attach rahega */
+  flex-shrink: 0;           /* IMPORTANT: Prevents flex container from collapsing sidebar */
+  height: 100vh;            /* Sidebar height stays 100vh */
+  position: sticky;         
+  top: 0;                   
   display: flex;
   flex-direction: column;
-  background-color: var(--bg-card);
-  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-card, #121214);
+  border-right: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
   padding: 1.5rem 1rem;
   box-sizing: border-box;
   z-index: 100;
+}
+
+/* Main Content Area */
+.admin-main-content {
+  flex: 1;                  /* Takes remaining available width */
+  min-width: 0;             /* CRITICAL: Stops tables & wide elements from breaking flex layout */
+  padding: 1.5rem 2rem;
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 /* Brand Header */
@@ -29,11 +48,11 @@
 }
 
 .brand-text {
-  color: var(--text-primary);
+  color: var(--text-primary, #ffffff);
 }
 
 .brand-accent {
-  color: var(--accent);
+  color: var(--accent, #ccff00);
   margin-left: 6px;
 }
 
@@ -43,7 +62,7 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
-  overflow-y: auto; /* Agar links zyada hon toh sidebar ke andar scroll aayega */
+  overflow-y: auto;
 }
 
 /* Individual Links */
@@ -51,22 +70,22 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  color: var(--text-muted);
+  color: var(--text-muted, #9ca3af);
   text-decoration: none;
   font-weight: 500;
-  border-radius: var(--radius-lg);
-  transition: all var(--transition);
+  border-radius: var(--radius-lg, 12px);
+  transition: all 0.2s ease;
 }
 
 .sidebar-link:hover {
-  color: var(--text-primary);
-  background-color: var(--bg-card-hover);
+  color: var(--text-primary, #ffffff);
+  background-color: var(--bg-card-hover, rgba(255, 255, 255, 0.05));
 }
 
 /* Active Link Highlight */
 .sidebar-link.active {
   color: #0a0a0a !important;
-  background-color: var(--accent) !important;
+  background-color: var(--accent, #ccff00) !important;
   font-weight: 700;
 }
 
@@ -74,15 +93,53 @@
 .sidebar-footer {
   margin-top: auto;
   padding-top: 1rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
 }
 
 .btn-admin-logout {
   width: 100%;
   padding: 0.65rem;
   background-color: rgba(239, 68, 68, 0.12);
-  color: var(--danger);
+  color: #ff6b6b;
   border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-lg, 12px);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-admin-logout:hover {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+/* Mobile Screens */
+@media (max-width: 991.98px) {
+  .admin-layout {
+    flex-direction: column; /* Stack top-to-bottom on mobile */
+  }
+
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    min-width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  }
+
+  .admin-main-content {
+    padding: 1rem;
+  }
+}
+.btn-theme-toggle {
+  width: 100%;
+  padding: 0.65rem;
+  background-color: var(--bg-card-hover);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   font-weight: 600;
   text-transform: uppercase;
@@ -91,19 +148,7 @@
   transition: all var(--transition);
 }
 
-.btn-admin-logout:hover {
-  background-color: var(--danger);
-  color: #ffffff;
-}
-
-/* Mobile Screens */
-@media (max-width: 991.98px) {
-  .admin-sidebar {
-    position: relative;
-    width: 100%;
-    min-width: 100%;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
-  }
+.btn-theme-toggle:hover {
+  background-color: var(--border-color);
+  border-color: var(--border-color-hover);
 }

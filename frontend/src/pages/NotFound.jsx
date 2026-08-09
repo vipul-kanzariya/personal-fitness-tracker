@@ -8,14 +8,14 @@ function NotFound() {
 
   return (
     <div className="notfound-wrapper">
-      <div className="notfound-card p-4 p-sm-5 text-center text-white">
+      <div className="notfound-card p-4 p-sm-5 text-center">
         <div className="error-code mb-2">404</div>
 
         <h3 className="fw-black text-uppercase tracking-wide mb-2">
-          PAGE NOT <span style={{ color: '#ccff00' }}>FOUND</span>
+          PAGE <span className="text-neon-accent">NOT FOUND</span>
         </h3>
 
-        <p className="text-subtle-bright small mb-4">
+        <p className="text-subtle small mb-4">
           The page you are looking for doesn't exist, was removed, or is temporarily unavailable.
         </p>
 

@@ -87,12 +87,12 @@ function AdminFoodStore() {
   };
 
   return (
-    <div className="container py-4 text-white">
+    <div className="container py-4">
       <div className="mb-4">
         <h2 className="fw-black text-uppercase tracking-wide m-0">
           MANAGE <span className="text-neon-accent">FOOD STORE</span>
         </h2>
-        <p className="text-secondary small mt-1">Add and manage catalog inventory items.</p>
+        <p className="text-subtle small mt-1">Add and manage catalog inventory items.</p>
       </div>
 
       {error && (
@@ -193,7 +193,7 @@ function AdminFoodStore() {
                     <td className="fw-semibold">{f.name}</td>
                     <td className="text-neon-accent fw-bold">₹ {f.price}</td>
                     <td>{f.calories || '--'} kcal</td>
-                    <td><span className="badge bg-secondary bg-opacity-25 text-white">{f.category}</span></td>
+                    <td><span className="badge bg-secondary bg-opacity-25 border border-secondary text-subtle">{f.category}</span></td>
                     <td>
                       <span className={f.inStock ? "badge-neon-success" : "badge-neon-danger"}>
                         {f.inStock ? 'Yes' : 'No'}

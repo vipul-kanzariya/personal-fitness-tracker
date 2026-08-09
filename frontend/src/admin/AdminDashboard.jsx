@@ -28,13 +28,13 @@ function AdminDashboard() {
   }, []);
 
   return (
-    <div className="container py-4 text-white">
+    <div className="container py-4">
       {/* Header */}
       <div className="mb-4">
         <h2 className="fw-black text-uppercase tracking-wide m-0">
           ADMIN <span className="text-neon-accent">DASHBOARD</span>
         </h2>
-        <p className="text-secondary small mt-1">Overview of platform performance and metrics.</p>
+        <p className="text-subtle small mt-1">Overview of platform performance and metrics.</p>
       </div>
 
       {error && (
@@ -53,7 +53,7 @@ function AdminDashboard() {
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">👥</div>
               <span className="form-label-custom d-block">Total Users</span>
-              <h2 className="fw-bold m-0 text-white">{summary.totalUsers || 0}</h2>
+              <h2 className="fw-bold m-0">{summary.totalUsers || 0}</h2>
             </div>
           </div>
 
@@ -61,7 +61,7 @@ function AdminDashboard() {
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">📦</div>
               <span className="form-label-custom d-block">Total Orders</span>
-              <h2 className="fw-bold m-0 text-white">{summary.totalOrders || 0}</h2>
+              <h2 className="fw-bold m-0">{summary.totalOrders || 0}</h2>
             </div>
           </div>
 
@@ -69,7 +69,7 @@ function AdminDashboard() {
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">🥗</div>
               <span className="form-label-custom d-block">Food Items</span>
-              <h2 className="fw-bold m-0 text-white">{summary.totalFoodItems || 0}</h2>
+              <h2 className="fw-bold m-0">{summary.totalFoodItems || 0}</h2>
             </div>
           </div>
 

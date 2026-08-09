@@ -1,15 +1,15 @@
-import React from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import '../style/AdminNavbar.css';
-
+import React from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import "../style/AdminNavbar.css";
+import { useTheme } from "../context/ThemeContext";
 function AdminNavbar() {
   const navigate = useNavigate();
-
+  const { theme, toggleTheme } = useTheme();
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('name');
-    navigate('/login');
+    localStorage.removeItem("token");
+    localStorage.removeItem("role");
+    localStorage.removeItem("name");
+    navigate("/login");
   };
 
   return (
@@ -26,35 +26,45 @@ function AdminNavbar() {
       <nav className="sidebar-nav">
         <NavLink
           to="/admin/dashboard"
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           Dashboard
         </NavLink>
 
         <NavLink
           to="/admin/users"
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           Users
         </NavLink>
 
         <NavLink
           to="/admin/orders"
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           Orders
         </NavLink>
 
         <NavLink
           to="/admin/foodstore"
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           Food Store
         </NavLink>
 
         <NavLink
           to="/admin/workouttypes"
-          className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+          className={({ isActive }) =>
+            `sidebar-link ${isActive ? "active" : ""}`
+          }
         >
           Workout Types
         </NavLink>
@@ -62,6 +72,9 @@ function AdminNavbar() {
 
       {/* Logout Action */}
       <div className="sidebar-footer">
+        <button className="btn-theme-toggle mb-2" onClick={toggleTheme}>
+          {theme === "dark" ? "Light Mode" : "Dark Mode"}
+        </button>
         <button className="btn-admin-logout" onClick={handleLogout}>
           Logout
         </button>

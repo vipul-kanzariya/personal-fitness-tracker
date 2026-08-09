@@ -42,12 +42,12 @@ function AdminOrders() {
   };
 
   return (
-    <div className="container py-4 text-white">
+    <div className="container py-4">
       <div className="mb-4">
         <h2 className="fw-black text-uppercase tracking-wide m-0">
           ORDER <span className="text-neon-accent">MANAGEMENT</span>
         </h2>
-        <p className="text-secondary small mt-1">Review user orders and update fulfillments.</p>
+        <p className="text-subtle small mt-1">Review user orders and update fulfillments.</p>
       </div>
 
       {error && (
@@ -78,10 +78,10 @@ function AdminOrders() {
               <tbody>
                 {orders.map((o) => (
                   <tr key={o._id}>
-                    <td className="small font-monospace text-secondary">#{o._id.slice(-6)}</td>
+                    <td className="small font-monospace text-subtle">#{o._id.slice(-6)}</td>
                     <td>
                       <div className="fw-semibold">{o.userId?.name || 'Guest'}</div>
-                      <div className="text-secondary extra-small">{o.userId?.email}</div>
+                      <div className="text-subtle extra-small">{o.userId?.email}</div>
                     </td>
                     <td>
                       {o.items.map((item, i) => (
@@ -108,7 +108,7 @@ function AdminOrders() {
                         <option value="Cancelled">Cancelled</option>
                       </select>
                     </td>
-                    <td className="small text-secondary">
+                    <td className="small text-subtle">
                       {new Date(o.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

@@ -30,11 +30,14 @@ function Layout() {
     <div className={`app-layout ${isAdmin ? 'admin-layout-wrapper' : ''}`}>
       {!hideNavbar && (isAdmin ? <AdminNavbar /> : <Navbar />)}
 
-      <main className={`main-content ${hideNavbar ? 'full-width' : ''}`}>
+      <main 
+        className={`main-content ${hideNavbar ? 'full-width' : ''} ${isAdmin ? 'admin-main-content' : ''}`}
+      >
         <Routes>
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
 
+          {/* Admin Protected Routes */}
           <Route element={<AdminPrivateRoute />}>
             <Route path='/admin/dashboard' element={<AdminDashboard />} />
             <Route path='/admin/users' element={<AdminUsers />} />
@@ -43,6 +46,7 @@ function Layout() {
             <Route path='/admin/workouttypes' element={<AdminWorkoutTypes />} />
           </Route>
 
+          {/* User Protected Routes */}
           <Route element={<PrivateRoute />}>
             <Route path='/' element={<Dashboard />} />
             <Route path='/dashboard' element={<Dashboard />} />

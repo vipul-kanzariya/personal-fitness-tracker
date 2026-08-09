@@ -61,12 +61,12 @@ function AdminUsers() {
   };
 
   return (
-    <div className="container py-4 text-white">
+    <div className="container py-4">
       <div className="mb-4">
         <h2 className="fw-black text-uppercase tracking-wide m-0">
           USER <span className="text-neon-accent">MANAGEMENT</span>
         </h2>
-        <p className="text-secondary small mt-1">Control accounts, roles, and status privileges.</p>
+        <p className="text-subtle small mt-1">Control accounts, roles, and status privileges.</p>
       </div>
 
       {error && (
@@ -96,9 +96,9 @@ function AdminUsers() {
                 {users.map((u) => (
                   <tr key={u._id}>
                     <td className="fw-semibold">{u.name}</td>
-                    <td className="text-secondary">{u.email}</td>
+                    <td className="text-subtle">{u.email}</td>
                     <td>
-                      <span className="badge bg-secondary bg-opacity-25 text-white">{u.role}</span>
+                      <span className="badge bg-secondary bg-opacity-25 border border-secondary text-subtle">{u.role}</span>
                     </td>
                     <td>
                       <span className={u.isBlocked ? "badge-neon-danger" : "badge-neon-success"}>

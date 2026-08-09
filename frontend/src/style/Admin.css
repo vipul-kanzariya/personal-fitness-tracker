@@ -1,21 +1,25 @@
+/* src/style/Admin.css */
+
 /* Card Container */
 .admin-card {
-  background: #121214;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card, #121214);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
   border-radius: 20px;
+  color: var(--text-primary, #ffffff);
 }
 
 /* Stat Cards */
 .admin-stat-card {
-  background: #121214;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card, #121214);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
   border-radius: 16px;
   transition: transform 0.2s ease, border-color 0.2s ease;
+  color: var(--text-primary, #ffffff);
 }
 
 .admin-stat-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(204, 255, 0, 0.4);
+  border-color: var(--accent, #ccff00);
 }
 
 .stat-icon {
@@ -25,12 +29,16 @@
 
 /* Neon Text Accent */
 .text-neon-accent {
-  color: #ccff00 !important;
+  color: var(--accent, #ccff00) !important;
+}
+
+.text-subtle {
+  color: var(--text-muted, #9ca3af) !important;
 }
 
 /* Form Controls */
 .form-label-custom {
-  color: #d1d5db !important;
+  color: var(--text-muted, #d1d5db) !important;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.6px;
@@ -40,9 +48,9 @@
 
 .form-control-custom,
 .form-select-custom {
-  background: #1a1a1d !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
+  background: var(--bg-input, #1a1a1d) !important;
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15)) !important;
+  color: var(--text-primary, #ffffff) !important;
   border-radius: 12px !important;
   padding: 10px 14px !important;
   font-size: 0.9rem;
@@ -50,42 +58,42 @@
 }
 
 .form-control-custom::placeholder {
-  color: #6b7280;
+  color: var(--text-muted, #6b7280);
 }
 
 .form-control-custom:focus,
 .form-select-custom:focus {
-  border-color: #ccff00 !important;
+  border-color: var(--accent, #ccff00) !important;
   outline: none;
-  box-shadow: none !important;
+  box-shadow: 0 0 0 0.2rem var(--focus-ring, rgba(204, 255, 0, 0.2)) !important;
 }
 
 .form-select-custom option {
-  background: #1a1a1d;
-  color: #fff;
+  background: var(--bg-card, #1a1a1d);
+  color: var(--text-primary, #ffffff);
 }
 
 /* Custom Table Styling */
 .admin-table-container {
-  background: #121214;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card, #121214);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
   border-radius: 16px;
   overflow: hidden;
 }
 
 .admin-table {
-  color: #ffffff !important;
+  color: var(--text-primary, #ffffff) !important;
   margin-bottom: 0 !important;
   vertical-align: middle;
 }
 
 .admin-table thead {
-  background: #1a1a1d;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-header, #1a1a1d);
+  border-bottom: 2px solid var(--border-color, rgba(255, 255, 255, 0.12));
 }
 
 .admin-table th {
-  color: #9ca3af;
+  color: var(--text-muted, #9ca3af);
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -96,18 +104,18 @@
 
 .admin-table td {
   padding: 14px 16px;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #e5e7eb;
+  border-color: var(--border-subtle, rgba(255, 255, 255, 0.08)) !important;
+  color: var(--text-primary, #e5e7eb);
 }
 
 .admin-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--hover-bg, rgba(255, 255, 255, 0.03));
 }
 
 /* Buttons */
 .btn-neon-submit {
-  background: #ccff00;
-  color: #000;
+  background: var(--accent, #ccff00);
+  color: #000000;
   font-weight: 800;
   border: none;
   border-radius: 12px;
@@ -116,14 +124,15 @@
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
-.btn-neon-submit:hover {
-  background: #b3e600;
+.btn-neon-submit:hover:not(:disabled) {
+  filter: brightness(0.9);
   transform: translateY(-1px);
 }
 
 .btn-neon-submit:disabled {
   background: #4b5563;
   color: #9ca3af;
+  opacity: 0.6;
 }
 
 .btn-action-danger {
@@ -138,7 +147,7 @@
 
 .btn-action-danger:hover {
   background: #dc3545;
-  color: #fff;
+  color: #ffffff;
 }
 
 .btn-action-warning {
@@ -153,7 +162,7 @@
 
 .btn-action-warning:hover {
   background: #ffc107;
-  color: #000;
+  color: #000000;
 }
 
 .btn-action-success {
@@ -168,14 +177,14 @@
 
 .btn-action-success:hover {
   background: #28a745;
-  color: #fff;
+  color: #ffffff;
 }
 
 /* Status Badges */
 .badge-neon-success {
   background: rgba(204, 255, 0, 0.15);
-  color: #ccff00;
-  border: 1px solid rgba(204, 255, 0, 0.3);
+  color: var(--accent, #ccff00);
+  border: 1px solid var(--accent, rgba(204, 255, 0, 0.3));
   padding: 6px 12px;
   border-radius: 20px;
 }
