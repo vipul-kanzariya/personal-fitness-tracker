@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Workout.css";
-
+import { toast } from "react-toastify";
 const EXERCISE_IMAGES = {
   pushups: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop",
   pushup: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop",
@@ -120,8 +120,9 @@ function Workout() {
       setEditId(null);
       setEditData({});
       setError(null);
+       toast.success("Workout updated!");
     } catch (err) {
-      setError("Failed to update workout.");
+      toast.error("Failed to update workout.");
     }
   };
 
@@ -154,8 +155,9 @@ function Workout() {
       setSets('');
       setReps('');
       setDuration('');
+       toast.success("Workout logged! 💪");
     } catch (err) {
-      setError("Failed to log workout.");
+      toast.error("Failed to log workout.");
     } finally {
       setLoading(false);
     }
@@ -170,8 +172,9 @@ function Workout() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWorkouts(workouts.filter((w) => w._id !== id));
+      toast.success("Workout deleted.");
     } catch (err) {
-      setError("Failed to delete workout.");
+      toast.error("Failed to delete workout.");
     } finally {
       setLoading(false);
     }

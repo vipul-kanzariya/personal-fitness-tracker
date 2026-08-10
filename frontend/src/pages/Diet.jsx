@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Diet.css";
-
+import { toast } from "react-toastify";
 function Diet() {
   const [diets, setDiets] = useState([]);
   const [foodName, setFoodName] = useState("");
@@ -113,8 +113,9 @@ function Diet() {
       setCarbs("");
       setFat("");
       setError(null);
+      toast.success("Meal added!");
     } catch (err) {
-      setError("Failed to save entry.");
+      toast.error("Failed to save entry.");
     } finally {
       setLoading(false);
     }
@@ -128,8 +129,10 @@ function Diet() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDiets(diets.filter((d) => d._id !== id));
+       toast.success("Entry deleted.");
     } catch (err) {
       setError("Failed to delete entry.");
+      toast.error("Failed to delete entry.");
     } finally {
       setLoading(false);
     }
@@ -173,8 +176,10 @@ function Diet() {
       setEditId(null);
       setEditData({});
       setError("");
+      toast.success("Entry updated!");
+
     } catch (err) {
-      setError("Failed to update diet entry.");
+      toast.error("Failed to update diet entry.");
     }
   };
 

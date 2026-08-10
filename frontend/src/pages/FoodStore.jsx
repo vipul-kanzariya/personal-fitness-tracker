@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/FoodStore.css"; // External stylesheet
-
+import { toast } from "react-toastify";
 function FoodStore() {
   const [food, setFood] = useState([]);
   const [cart, setCart] = useState([]);
@@ -58,7 +58,7 @@ function FoodStore() {
 
   const handleOrder = async () => {
     if (cart.length === 0) {
-      alert("Cart is empty!");
+     toast.warning("Your cart is empty!");
       return;
     }
     try {
@@ -77,11 +77,11 @@ function FoodStore() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("Order placed successfully!");
+      toast.success("Order placed successfully! 🎉");
       setCart([]);
       setTotalAmount(0);
     } catch (err) {
-      console.log(err.message);
+      toast.error(err.response?.data || "Failed to place order.");
     } finally {
       setOrdering(false);
     }

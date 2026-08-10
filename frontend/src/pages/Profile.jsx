@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import "../style/Profile.css";
 import { useTheme } from "../context/ThemeContext";
-
+import { toast } from "react-toastify";
 function Profile() {
   const [user, setUser] = useState({});
   const [name, setName] = useState("");
@@ -56,9 +56,11 @@ function Profile() {
       setUser(res.data);
       setSuccess("Profile updated successfully!");
       setError("");
+       toast.success("Profile updated successfully!");
     } catch (err) {
       setError("Failed to update profile.");
       setSuccess("");
+       toast.error("Failed to update profile.");
     }
   };
 
@@ -75,9 +77,12 @@ function Profile() {
       setError("");
       setCurrentPassword("");
       setNewPassword("");
+       toast.success("Password changed successfully!");
     } catch (err) {
-      setError(err.response?.data || "Failed to change password.");
+      const msg = err.response?.data || "Failed to change password.";
+      setError(msg);
       setSuccess("");
+      toast.error(typeof msg === "string" ? msg : "Failed to change password.");
     }
   };
 
