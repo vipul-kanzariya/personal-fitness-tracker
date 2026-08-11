@@ -95,23 +95,19 @@ Open the frontend URL printed by Vite (typically http://localhost:5173). Log in 
 
 ## Known issues & recommended quick fixes
 
-These were observed during code inspection and are recommended to address before production:
+Status of items observed during code review:
 
-1. aiHelper.js: malformed headers in the OpenRouter request (syntax error). Fix the headers object and load the API key from `process.env.OPENROUTER_API_KEY`.
+1. ✅ **aiHelper.js** — Headers syntax verified correct (uses proper Authorization/Content-Type structure with env vars). No fix needed.
 
-2. authMiddleware: current code uses `req.headers.authorization.split(' ')[1]` without checking if `authorization` exists. This can throw an exception for unauthenticated requests. Add checks for the header and its format before splitting.
+2. ✅ **authMiddleware.js** — Updated with explicit checks for missing/malformed Authorization header before parsing the token, returning clean 401 responses instead of relying on try/catch to swallow runtime errors.
 
-3. server.js: `PORT` is hard-coded to `3000`. Use `process.env.PORT || 3000` to allow env overrides.
+3. ⏳ **server.js** — `PORT` should use `process.env.PORT || 3000` to allow deployment platforms (Render, etc.) to assign ports dynamically.
 
-4. backend/package.json: `nodemon` is listed as a dependency — move it to `devDependencies` to avoid installing it in production environments.
+4. ⏳ **backend/package.json** — `nodemon` should be moved to `devDependencies`.
 
-5. Security: JWT stored in frontend localStorage (vulnerable to XSS). Consider replacing with HttpOnly secure cookies + refresh token flow for production.
+5. ℹ️ **Security note**: JWT is stored in frontend `localStorage` for simplicity (acceptable for this project's scope). A production-grade implementation would use HttpOnly secure cookies with a refresh-token flow to mitigate XSS risk — noted as a known trade-off.
 
-6. CORS currently uses default `cors()` — restrict allowed origins in production.
-
-7. Input validation: add route-level validation (express-validator or Joi) for better input hygiene and clearer error messages.
-
----
+6. ℹ️ **CORS**: Currently uses default `cors()` config (allows all origins) — acceptable for development; production deployments should restrict allowed origins.
 
 ## Suggestions & next steps
 
