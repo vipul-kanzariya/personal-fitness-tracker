@@ -1,5 +1,7 @@
 // src/components/Dashboard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,7 +11,7 @@ import {
   PointElement,
   ArcElement,
   Title,
-  Filler, 
+  Filler,
   Tooltip,
   Legend,
 } from "chart.js";
@@ -27,10 +29,47 @@ ChartJS.register(
   PointElement,
   ArcElement,
   Title,
-  Filler,  
+  Filler,
   Tooltip,
   Legend,
 );
+
+function useTypewriter(text, speed = 60) {
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    setDisplayed("");
+    if (!text) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setDisplayed(text.slice(0, i));
+      if (i >= text.length) clearInterval(interval);
+    }, speed);
+    return () => clearInterval(interval);
+  }, [text, speed]);
+
+  return displayed;
+}
+
+const isToday = (dateStr) => {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  const now = new Date();
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  );
+};
+
+// ✅ Local date string (no UTC shift — fixes "1 Day" missing today's data in IST)
+const toLocalDateString = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 
 function Dashboard() {
   const { isLight, colors } = useTheme();
@@ -39,6 +78,25 @@ function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
 
+  const [range, setRange] = useState("week");
+  const [customDate, setCustomDate] = useState(new Date());
+  const [historyWorkouts, setHistoryWorkouts] = useState([]);
+  const [historyDiet, setHistoryDiet] = useState([]);
+  const [historyBmi, setHistoryBmi] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [visibleMetrics, setVisibleMetrics] = useState({
+    workout: true,
+    diet: true,
+    bmi: true,
+  });
+
+  const activeRequestId = useRef(0);
+
+  const userName = localStorage.getItem("name") || "Athlete";
+  const typedName = useTypewriter(userName.toUpperCase(), 80);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -46,16 +104,16 @@ function Dashboard() {
         setLoading(true);
         const [workoutRes, dietRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_API_URL}/api/workouts`, {
-            headers: { Authorization: `Bearer ${token}` }
+            headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(`${import.meta.env.VITE_API_URL}/api/diet`, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
         setWorkout(workoutRes.data);
         setDiet(dietRes.data);
-      } catch(err) {
-        setError('Failed to load dashboard data.');
+      } catch (err) {
+        setError("Failed to load dashboard data.");
       } finally {
         setLoading(false);
       }
@@ -63,48 +121,246 @@ function Dashboard() {
     fetchData();
   }, []);
 
-  const totalCaloriesBurned = workout.reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
-  const totalCaloriesConsumed = diet.reduce((sum, d) => sum + (d.calories || 0), 0);
-  const totalDuration = workout.reduce((sum, w) => sum + (w.duration || 0), 0);
+  // ✅ Fixed: local date, no timezone shift
+  const getDateRange = () => {
+    const to = new Date();
+    let from = new Date();
+    if (range === "day") {
+      from = new Date();
+    } else if (range === "week") {
+      from.setDate(to.getDate() - 6);
+    } else if (range === "3months") {
+      from.setMonth(to.getMonth() - 3);
+    } else if (range === "custom") {
+      from = new Date(customDate);
+      return {
+        from: toLocalDateString(from),
+        to: toLocalDateString(from),
+      };
+    }
+    return {
+      from: toLocalDateString(from),
+      to: toLocalDateString(to),
+    };
+  };
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const requestId = ++activeRequestId.current;
+      try {
+        setIsRefreshing(true);
+        setHistoryLoading(true);
+
+        const token = localStorage.getItem("token");
+        const { from, to } = getDateRange();
+
+        const [wRes, dRes, bRes] = await Promise.all([
+          axios.get(
+            `${import.meta.env.VITE_API_URL}/api/workouts?from=${from}&to=${to}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+          axios.get(
+            `${import.meta.env.VITE_API_URL}/api/diet?from=${from}&to=${to}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+          axios.get(
+            `${import.meta.env.VITE_API_URL}/api/bmi/history?from=${from}&to=${to}`,
+            { headers: { Authorization: `Bearer ${token}` } },
+          ),
+        ]);
+
+        if (requestId === activeRequestId.current) {
+          setHistoryWorkouts(wRes.data || []);
+          setHistoryDiet(dRes.data || []);
+          setHistoryBmi(bRes.data || []);
+        }
+      } catch (err) {
+        console.log(err.message);
+      } finally {
+        if (requestId === activeRequestId.current) {
+          setHistoryLoading(false);
+          setTimeout(() => {
+            setIsRefreshing(false);
+          }, 150);
+        }
+      }
+    };
+
+    fetchHistory();
+  }, [range, customDate]);
+
+  const toggleMetric = (metric) => {
+    setVisibleMetrics((prev) => ({
+      ...prev,
+      [metric]: !prev[metric],
+    }));
+  };
+
+  const getGradient = (ctx, colorHex, opacityTop = "50", opacityBottom = "00") => {
+    if (!ctx) return colorHex;
+    const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+    gradient.addColorStop(0, `${colorHex}${opacityTop}`);
+    gradient.addColorStop(1, `${colorHex}${opacityBottom}`);
+    return gradient;
+  };
+
+  const groupByDate = (items, dateField, valueField) => {
+    const map = {};
+    items.forEach((item) => {
+      const dateObj = new Date(item[dateField] || item.createdAt);
+      const d = dateObj.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+      });
+      map[d] = {
+        value: (map[d]?.value || 0) + (Number(item[valueField]) || 0),
+        rawDate: dateObj.getTime(),
+      };
+    });
+    return map;
+  };
+
+  const todayWorkouts = workout.filter((w) => isToday(w.createdAt || w.date));
+  const todayDiet = diet.filter((d) => isToday(d.createdAt || d.date));
+
+  const totalCaloriesBurned = todayWorkouts.reduce((sum, w) => sum + (w.caloriesBurned || 0), 0);
+  const totalCaloriesConsumed = todayDiet.reduce((sum, d) => sum + (d.calories || 0), 0);
+  const totalDuration = todayWorkouts.reduce((sum, w) => sum + (w.duration || 0), 0);
 
   const dailyGoal = 2000;
   const goalPercent = Math.min(Math.round((totalCaloriesConsumed / dailyGoal) * 100), 100);
 
-  // Capitalize exercise and food labels (e.g. pushUps -> Push Ups)
   const formatLabel = (str) => {
     if (!str) return "Item";
     return str
-      .replace(/([A-Z])/g, ' $1')
+      .replace(/([A-Z])/g, " $1")
       .replace(/^./, (s) => s.toUpperCase())
       .trim();
   };
 
-  // Theme-aware ring colors
   const ringData = {
-    labels: ['Consumed', 'Remaining'],
-    datasets: [{
-      data: [goalPercent, 100 - goalPercent],
-      backgroundColor: [
-        colors.accent, 
-        isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.08)'
-      ],
-      borderWidth: 0,
-      cutout: '80%'
-    }]
+    labels: ["Consumed", "Remaining"],
+    datasets: [
+      {
+        data: [goalPercent, 100 - goalPercent],
+        backgroundColor: [colors.accent, isLight ? "#e2e8f0" : "rgba(255, 255, 255, 0.08)"],
+        borderWidth: 0,
+        cutout: "80%",
+      },
+    ],
   };
+
+  const workoutMapGrouped = groupByDate(historyWorkouts, "date", "caloriesBurned");
+  const dietMapGrouped = groupByDate(historyDiet, "date", "calories");
+  const bmiMapGrouped = groupByDate(historyBmi, "createdAt", "bmi");
+
+  const dateMapEntries = new Map();
+  [workoutMapGrouped, dietMapGrouped, bmiMapGrouped].forEach((group) => {
+    Object.keys(group).forEach((label) => {
+      if (!dateMapEntries.has(label)) {
+        dateMapEntries.set(label, group[label].rawDate);
+      }
+    });
+  });
+
+  const sortedLabelsWithTime = Array.from(dateMapEntries.entries()).sort((a, b) => a[1] - b[1]);
+  const sortedDates = sortedLabelsWithTime.map((entry) => entry[0]);
+
+  const workoutMap = {};
+  Object.keys(workoutMapGrouped).forEach((k) => (workoutMap[k] = workoutMapGrouped[k].value));
+
+  const dietMap = {};
+  Object.keys(dietMapGrouped).forEach((k) => (dietMap[k] = dietMapGrouped[k].value));
+
+  const bmiMap = {};
+  Object.keys(bmiMapGrouped).forEach((k) => (bmiMap[k] = bmiMapGrouped[k].value));
+
+  const workoutColor = colors.accent || "#00c6ff";
+  const dietColor = "#ff5e7e";
+  const bmiColor = "#10b981";
+
+  const chartKey = `history-${range}-${customDate ? customDate.toISOString().slice(0, 10) : ""}`;
+
+  // ✅ Dummy fallback removed — real empty array now, "No data" message shown instead
+  const workoutDataset = {
+    label: "Workout (Calories Burned)",
+    data: sortedDates.map((d) => workoutMap[d] || 0),
+    borderColor: workoutColor,
+    backgroundColor: (context) => getGradient(context.chart.ctx, workoutColor, "30", "00"),
+    fill: true,
+    tension: 0.45,
+    cubicInterpolationMode: "monotone",
+    pointRadius: 5,
+    pointHoverRadius: 8,
+    pointBackgroundColor: workoutColor,
+    borderWidth: 3,
+    yAxisID: "y",
+  };
+
+  const dietDataset = {
+    label: "Diet (Calories Consumed)",
+    data: sortedDates.map((d) => dietMap[d] || 0),
+    borderColor: dietColor,
+    backgroundColor: (context) => getGradient(context.chart.ctx, dietColor, "25", "00"),
+    fill: true,
+    tension: 0.45,
+    cubicInterpolationMode: "monotone",
+    pointRadius: 5,
+    pointHoverRadius: 8,
+    pointBackgroundColor: dietColor,
+    borderWidth: 3,
+    yAxisID: "y",
+  };
+
+  const bmiDataset = {
+    label: "BMI",
+    data: sortedDates.map((d) => bmiMap[d] || 0),
+    borderColor: bmiColor,
+    backgroundColor: (context) => getGradient(context.chart.ctx, bmiColor, "20", "00"),
+    fill: false,
+    tension: 0.45,
+    cubicInterpolationMode: "monotone",
+    pointRadius: 5,
+    pointHoverRadius: 8,
+    pointBackgroundColor: bmiColor,
+    borderWidth: 3,
+    yAxisID: "yBmi",
+  };
+
+  const visibleHistoryDatasets = [
+    visibleMetrics.workout && workoutDataset,
+    visibleMetrics.diet && dietDataset,
+    visibleMetrics.bmi && bmiDataset,
+  ].filter(Boolean);
+
+  const multiWaveData = {
+    labels: sortedDates,
+    datasets: visibleHistoryDatasets,
+  };
+
+  const hasHistoryData = sortedDates.length > 0;
 
   return (
     <main className="main-content">
       {/* Header */}
       <div className="dashboard-header">
         <div className="apex-subtitle">
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          {new Date().toLocaleDateString("en-US", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
         </div>
         <h1 className="apex-title">
-          WELCOME BACK, <span>ATHLETE.</span>
+          WELCOME BACK,{" "}
+          <span>
+            {typedName}
+            <span className="typing-cursor">|</span>
+          </span>
         </h1>
         <p className="dashboard-streak">
-          Here is your latest workout and nutrition overview.
+          Here is your progress for today — view full history below.
         </p>
       </div>
 
@@ -138,8 +394,8 @@ function Dashboard() {
                 </svg>
               </div>
               <div>
-                <div className="apex-card-val">{workout.length}</div>
-                <div className="apex-card-sub">Workouts Logged</div>
+                <div className="apex-card-val">{todayWorkouts.length}</div>
+                <div className="apex-card-sub">Workouts Logged Today</div>
               </div>
               <div className="dashboard-card-trend">Completed sessions</div>
             </div>
@@ -173,8 +429,6 @@ function Dashboard() {
 
           {/* Charts Grid */}
           <div className="dashboard-charts-grid">
-            
-            {/* 1. Daily Goal Ring */}
             <div className="dashboard-chart-card">
               <div>
                 <div className="dashboard-chart-title">DAILY GOAL</div>
@@ -182,14 +436,14 @@ function Dashboard() {
               </div>
 
               <div className="dashboard-ring-container">
-                <Doughnut 
-                  data={ringData} 
+                <Doughnut
+                  data={ringData}
                   options={{
                     rotation: -90,
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     responsive: true,
-                    maintainAspectRatio: false
-                  }} 
+                    maintainAspectRatio: false,
+                  }}
                 />
                 <div className="dashboard-ring-center">
                   <div className="dashboard-ring-val">{goalPercent}%</div>
@@ -209,7 +463,6 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* 2. Workout Intensity Bar Chart */}
             <div className="dashboard-chart-card">
               <div className="dashboard-chart-header">
                 <div className="dashboard-chart-title">WORKOUT INTENSITY</div>
@@ -218,35 +471,36 @@ function Dashboard() {
               <div className="dashboard-chart-wrapper">
                 <Bar
                   data={{
-                    labels: workout.map((w) => formatLabel(w.workoutTypeId?.name)),
-                    datasets: [{
-                      label: "Calories Burned",
-                      data: workout.map((w) => w.caloriesBurned || 0),
-                      backgroundColor: colors.accent,
-                      borderRadius: 6,
-                    }],
+                    labels: todayWorkouts.map((w) => formatLabel(w.workoutTypeId?.name)),
+                    datasets: [
+                      {
+                        label: "Calories Burned",
+                        data: todayWorkouts.map((w) => w.caloriesBurned || 0),
+                        backgroundColor: colors.accent,
+                        borderRadius: 6,
+                      },
+                    ],
                   }}
                   options={{
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                      x: { 
+                      x: {
                         offset: true,
-                        grid: { display: false }, 
-                        ticks: { color: colors.textMuted, font: { family: 'Fira Code', size: 10 } } 
+                        grid: { display: false },
+                        ticks: { color: colors.textMuted, font: { family: "Fira Code", size: 10 } },
                       },
-                      y: { 
-                        grid: { color: colors.chartGrid }, 
-                        ticks: { color: colors.textMuted, font: { family: 'Fira Code', size: 10 } } 
-                      }
-                    }
+                      y: {
+                        grid: { color: colors.chartGrid },
+                        ticks: { color: colors.textMuted, font: { family: "Fira Code", size: 10 } },
+                      },
+                    },
                   }}
                 />
               </div>
             </div>
 
-            {/* 3. Calorie Intake Line Chart */}
             <div className="dashboard-chart-card">
               <div className="dashboard-chart-header">
                 <div className="dashboard-chart-title">CALORIE INTAKE</div>
@@ -255,46 +509,237 @@ function Dashboard() {
               <div className="dashboard-chart-wrapper">
                 <Line
                   data={{
-                    labels: diet.map((d) => formatLabel(d.foodName)),
-                    datasets: [{
-                      label: "Calories Consumed",
-                      data: diet.map((d) => d.calories || 0),
-                      borderColor: colors.accent,
-                      backgroundColor: isLight ? "rgba(79, 70, 229, 0.1)" : "rgba(163, 230, 53, 0.08)",
-                      fill: true,
-                      tension: 0.4,
-                      pointRadius: 4,
-                      pointBackgroundColor: colors.accent,
-                    }],
+                    labels: todayDiet.map((d) => formatLabel(d.foodName)),
+                    datasets: [
+                      {
+                        label: "Calories Consumed",
+                        data: todayDiet.map((d) => d.calories || 0),
+                        borderColor: colors.accent,
+                        backgroundColor: isLight ? "rgba(79, 70, 229, 0.1)" : "rgba(163, 230, 53, 0.08)",
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: colors.accent,
+                      },
+                    ],
                   }}
                   options={{
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: {
-                      padding: { right: 25, left: 10 }
-                    },
+                    layout: { padding: { right: 25, left: 10 } },
                     plugins: { legend: { display: false } },
                     scales: {
-                      x: { 
+                      x: {
                         offset: true,
-                        grid: { display: false }, 
-                        ticks: { 
-                          color: colors.textMuted, 
-                          font: { family: 'Fira Code', size: 10 },
+                        grid: { display: false },
+                        ticks: {
+                          color: colors.textMuted,
+                          font: { family: "Fira Code", size: 10 },
                           maxRotation: 0,
-                          autoSkip: false
-                        } 
+                          autoSkip: false,
+                        },
                       },
-                      y: { 
-                        grid: { color: colors.chartGrid }, 
-                        ticks: { color: colors.textMuted, font: { family: 'Fira Code', size: 10 } } 
-                      }
-                    }
+                      y: {
+                        grid: { color: colors.chartGrid },
+                        ticks: { color: colors.textMuted, font: { family: "Fira Code", size: 10 } },
+                      },
+                    },
                   }}
                 />
               </div>
             </div>
+          </div>
 
+          {/* ==========================================
+              HISTORY & PROGRESS SECTION
+              — isRefreshing class scoped here only (not whole page)
+              — Title always on its own row, controls always on their own row below
+              ========================================== */}
+          <div className={`mt-4 dashboard-refresh-container ${isRefreshing ? "dashboard-refreshing" : ""}`}>
+            <div className="dashboard-chart-card p-4">
+
+              {/* Row 1 — Title (always full width, own row) */}
+              <div className="mb-3">
+                <p
+                  className="text-uppercase fw-semibold mb-1"
+                  style={{ fontSize: "0.75rem", letterSpacing: "1px", color: colors.textMuted }}
+                >
+                  STATISTICS
+                </p>
+                <h2
+                  className="d-flex flex-wrap align-items-center gap-2 fw-bold mb-0"
+                  style={{ fontSize: "1.25rem", color: colors.textPrimary }}
+                >
+                  <span>🗓️</span>
+                  <span>HISTORY & PROGRESS</span>
+                  <span style={{ color: colors.textMuted }}>—</span>
+                  <span style={{ color: colors.textMuted, fontWeight: "normal", fontSize: "1rem" }}>
+                    WORKOUT, DIET & BMI
+                  </span>
+                </h2>
+              </div>
+
+              {/* Row 2 — Controls (ALWAYS its own row, never shares line with title) */}
+              <div className="d-flex flex-wrap align-items-center gap-2 mb-4">
+                <button
+                  className={`btn btn-sm ${range === "day" ? "btn-accent" : "btn-outline-secondary"}`}
+                  onClick={() => setRange("day")}
+                >
+                  1 Day
+                </button>
+                <button
+                  className={`btn btn-sm ${range === "week" ? "btn-accent" : "btn-outline-secondary"}`}
+                  onClick={() => setRange("week")}
+                >
+                  1 Week
+                </button>
+                <button
+                  className={`btn btn-sm ${range === "3months" ? "btn-accent" : "btn-outline-secondary"}`}
+                  onClick={() => setRange("3months")}
+                >
+                  3 Months
+                </button>
+                <DatePicker
+                  selected={customDate}
+                  onChange={(date) => {
+                    if (date) {
+                      setCustomDate(date);
+                      setRange("custom");
+                    }
+                  }}
+                  className="form-control form-control-sm"
+                  maxDate={new Date()}
+                  placeholderText="📆 Pick date"
+                />
+              </div>
+
+              {/* Chart / No-data state */}
+              <div
+                key={chartKey}
+                className="dashboard-chart-wrapper history-chart-container"
+                style={{ height: "350px", position: "relative" }}
+              >
+                {historyLoading && (
+                  <div className="history-loading-overlay">
+                    <div className="history-skeleton-shimmer"></div>
+                    <Spinner />
+                  </div>
+                )}
+
+                {!historyLoading && !hasHistoryData ? (
+                  <div className="d-flex align-items-center justify-content-center h-100 text-subtle text-center px-3">
+                    No workout, diet, or BMI records found in this date range.
+                  </div>
+                ) : (
+                  <Line
+                    data={multiWaveData}
+                    options={{
+                      responsive: true,
+                      maintainAspectRatio: false,
+                      animation: { duration: 700, easing: "easeInOutQuart" },
+                      interaction: { mode: "index", intersect: false },
+                      plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                          backgroundColor: isLight ? "rgba(255, 255, 255, 0.95)" : "rgba(22, 22, 22, 0.95)",
+                          titleColor: isLight ? "#0f172a" : "#ffffff",
+                          bodyColor: isLight ? "#475569" : "#cbd5e1",
+                          borderColor: colors.borderColor || "#2a2a2a",
+                          borderWidth: 1,
+                          padding: 12,
+                          boxPadding: 6,
+                          usePointStyle: true,
+                        },
+                      },
+                      scales: {
+                        x: {
+                          grid: { display: false },
+                          ticks: {
+                            color: colors.textMuted,
+                            font: { family: "Inter, sans-serif", size: 11, weight: "500" },
+                          },
+                        },
+                        y: {
+                          type: "linear",
+                          display: true,
+                          position: "left",
+                          title: { display: true, text: "Calories (kcal)", color: colors.textMuted },
+                          grid: { color: colors.chartGrid || "rgba(255, 255, 255, 0.05)", drawBorder: false },
+                          ticks: { color: colors.textMuted, font: { family: "Inter, sans-serif", size: 11 } },
+                        },
+                        yBmi: {
+                          type: "linear",
+                          display: visibleMetrics.bmi,
+                          position: "right",
+                          title: { display: true, text: "BMI", color: bmiColor },
+                          grid: { drawOnChartArea: false },
+                          ticks: { color: bmiColor, font: { family: "Inter, sans-serif", size: 11 } },
+                        },
+                      },
+                    }}
+                  />
+                )}
+              </div>
+
+              {/* Metric Toggle Pills */}
+              <div className="d-flex flex-wrap align-items-center justify-content-between mt-4 pt-3 border-top border-secondary border-opacity-10">
+                <div className="history-filter-buttons d-flex flex-wrap align-items-center gap-3">
+                  <button
+                    type="button"
+                    className="history-filter-btn border-0 rounded-pill px-4 py-2 text-white fw-semibold d-inline-flex align-items-center gap-2 shadow-sm"
+                    style={{
+                      backgroundColor: visibleMetrics.workout ? workoutColor : isLight ? "#cbd5e1" : "#475569",
+                      opacity: visibleMetrics.workout ? 1 : 0.75,
+                      transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                      cursor: "pointer",
+                      letterSpacing: "0.3px",
+                      boxShadow: visibleMetrics.workout ? "0 4px 12px rgba(99, 102, 241, 0.35)" : "none",
+                    }}
+                    onClick={() => toggleMetric("workout")}
+                    aria-pressed={visibleMetrics.workout}
+                  >
+                    <span style={{ width: "9px", height: "9px", borderRadius: "50%", backgroundColor: "#ffffff", display: "inline-block" }}></span>
+                    Workout
+                  </button>
+
+                  <button
+                    type="button"
+                    className="history-filter-btn border-0 rounded-pill px-4 py-2 text-white fw-semibold d-inline-flex align-items-center gap-2 shadow-sm"
+                    style={{
+                      backgroundColor: visibleMetrics.diet ? dietColor : isLight ? "#cbd5e1" : "#475569",
+                      opacity: visibleMetrics.diet ? 1 : 0.75,
+                      transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                      cursor: "pointer",
+                      letterSpacing: "0.3px",
+                      boxShadow: visibleMetrics.diet ? "0 4px 12px rgba(255, 94, 126, 0.35)" : "none",
+                    }}
+                    onClick={() => toggleMetric("diet")}
+                    aria-pressed={visibleMetrics.diet}
+                  >
+                    <span style={{ width: "9px", height: "9px", borderRadius: "50%", backgroundColor: "#ffffff", display: "inline-block" }}></span>
+                    Diet
+                  </button>
+
+                  <button
+                    type="button"
+                    className="history-filter-btn border-0 rounded-pill px-4 py-2 text-white fw-semibold d-inline-flex align-items-center gap-2 shadow-sm"
+                    style={{
+                      backgroundColor: visibleMetrics.bmi ? bmiColor : isLight ? "#cbd5e1" : "#475569",
+                      opacity: visibleMetrics.bmi ? 1 : 0.75,
+                      transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                      cursor: "pointer",
+                      letterSpacing: "0.3px",
+                      boxShadow: visibleMetrics.bmi ? "0 4px 12px rgba(16, 185, 129, 0.35)" : "none",
+                    }}
+                    onClick={() => toggleMetric("bmi")}
+                    aria-pressed={visibleMetrics.bmi}
+                  >
+                    <span style={{ width: "9px", height: "9px", borderRadius: "50%", backgroundColor: "#ffffff", display: "inline-block" }}></span>
+                    BMI
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </>
       )}

@@ -45,7 +45,18 @@ const nutrition = JSON.parse(jsonMatch ? jsonMatch[0] : cleanText);
 router.get('/',authMiddleware,async(req,res)=>{
 
    try{
-     const diet = await Diet.find({userId:req.user.id, isDeleted: false}).sort({date:-1});
+     const { from, to } = req.query;
+     const filter = { userId: req.user.id, isDeleted: false };
+     if (from || to) {
+       filter.date = {};
+       if (from) filter.date.$gte = new Date(from);
+       if (to) {
+         const toDate = new Date(to);
+         toDate.setHours(23, 59, 59, 999);
+         filter.date.$lte = toDate;
+       }
+     }
+     const diet = await Diet.find(filter).sort({date:-1});
      res.status(200).json(diet);
    }catch(err){
     res.status(500).json(err.message)

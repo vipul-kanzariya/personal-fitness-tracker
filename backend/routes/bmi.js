@@ -48,7 +48,18 @@ router.post("/calculate", authMiddleware, async (req, res) => {
 router.get('/history',authMiddleware,async(req,res)=>{
 
    try{
-     const bmi = await Bmi.find({userId:req.user.id, isDeleted: false}).sort({date:-1});
+     const { from, to } = req.query;
+     const filter = { userId: req.user.id, isDeleted: false };
+     if (from || to) {
+       filter.createdAt = {};
+       if (from) filter.createdAt.$gte = new Date(from);
+       if (to) {
+         const toDate = new Date(to);
+         toDate.setHours(23, 59, 59, 999);
+         filter.createdAt.$lte = toDate;
+       }
+     }
+     const bmi = await Bmi.find(filter).sort({createdAt:-1});
      res.status(200).json(bmi);
    }catch(err){
     res.status(500).json(err.message)

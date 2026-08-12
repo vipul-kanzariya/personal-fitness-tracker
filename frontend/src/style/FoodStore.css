@@ -102,3 +102,8 @@
 .cart-sidebar {
   top: 20px;
 }
+/* Ensure main section headings dynamically match theme text color */
+.section-heading,
+h5 {
+  color: var(--text-primary, #ffffff) !important;
+}

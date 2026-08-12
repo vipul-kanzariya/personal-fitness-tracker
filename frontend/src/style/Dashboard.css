@@ -1,5 +1,3 @@
-/* src/style/Dashboard.css */
-
 /* ==========================================
    1. Dashboard Header & Greeting
    ========================================== */
@@ -162,6 +160,7 @@
   position: relative;
   height: 220px;
   width: 100%;
+  overflow: hidden;
 }
 
 .dashboard-chart-header {
@@ -246,4 +245,145 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.typing-cursor {
+  animation: blink 0.8s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* ==========================================
+   5. Dashboard Page Refresh & Chart Transitions
+   ========================================== */
+
+.dashboard-refresh-container {
+  transition: opacity 250ms ease-in-out, transform 250ms ease-in-out;
+  will-change: opacity, transform;
+}
+
+.dashboard-refreshing {
+  opacity: 0.82;
+  transform: scale(0.996) translateY(2px);
+  pointer-events: none;
+}
+
+.history-chart-container {
+  height: 350px !important;
+  min-height: 350px;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.history-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(3px);
+  border-radius: var(--radius-lg, 12px);
+  transition: opacity 200ms ease;
+}
+
+.history-skeleton-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
+  pointer-events: none;
+  border-radius: var(--radius-lg, 12px);
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ==========================================
+   6. History & Progress Interactive Filter Buttons
+   ========================================== */
+
+.history-filter-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.history-filter-btn {
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.history-filter-btn:hover {
+  transform: translateY(-1px);
+  color: var(--text-primary);
+  border-color: var(--border-color-hover, var(--accent));
+}
+
+.history-filter-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.history-filter-btn.active {
+  background: var(--accent);
+  color: var(--accent-text, #ffffff);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px var(--focus-ring, rgba(0, 0, 0, 0.15));
+}
+
+.history-filter-btn.active span {
+  background-color: var(--accent-text, #ffffff) !important;
+}
+
+/* Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-refresh-container {
+    transition: none !important;
+  }
+  .dashboard-refreshing {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .history-skeleton-shimmer {
+    animation: none !important;
+  }
+  .history-filter-btn {
+    transition: none !important;
+  }
+  .history-filter-btn:hover {
+    transform: none !important;
+  }
 }

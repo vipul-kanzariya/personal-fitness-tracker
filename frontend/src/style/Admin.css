@@ -1,5 +1,25 @@
 /* src/style/Admin.css */
+/* Ensure all main headings and card headers use bright text in dark theme */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary, #ffffff) !important;
+}
 
+/* Specific targeted fix for header titles */
+.tracking-wide {
+  color: #ffffff !important;
+}
+
+/* Base Heading Style (Default / Light Mode) */
+.tracking-wide {
+  color: var(--text-primary, #18181b) !important; /* Dark text for light background */
+}
+
+/* Dark Mode Override (when dark mode is active on body, html, or data-attribute) */
+[data-bs-theme="dark"] .tracking-wide,
+body.dark-mode .tracking-wide,
+.dark-theme .tracking-wide {
+  color: #ffffff !important; /* White text for dark background */
+}
 /* Card Container */
 .admin-card {
   background: var(--bg-card, #121214);
