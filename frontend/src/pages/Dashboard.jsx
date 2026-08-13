@@ -208,16 +208,32 @@ function Dashboard() {
     const map = {};
     items.forEach((item) => {
       const dateObj = new Date(item[dateField] || item.createdAt);
-      const d = dateObj.toLocaleDateString("en-IN", {
-        day: "2-digit",
-        month: "short",
-      });
+      let d;
+      if (range === "day") {
+        // Hourly breakdown — e.g. "09 AM"
+        d = dateObj.toLocaleTimeString("en-IN", { hour: "2-digit", hour12: true });
+      } else if (range === "3months") {
+        // Monthly breakdown — e.g. "Aug '26"
+        d = dateObj.toLocaleDateString("en-IN", { month: "short", year: "2-digit" });
+      } else {
+        // Daily breakdown — e.g. "06 Aug" (week / custom date)
+        d = dateObj.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
+      }
       map[d] = {
         value: (map[d]?.value || 0) + (Number(item[valueField]) || 0),
         rawDate: dateObj.getTime(),
       };
     });
     return map;
+  };
+  const getMonthLabels = () => {
+    const labels = [];
+    const now = new Date();
+    for (let i = 2; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      labels.push(d.toLocaleDateString("en-IN", { month: "short", year: "2-digit" }));
+    }
+    return labels;
   };
 
   const todayWorkouts = workout.filter((w) => isToday(w.createdAt || w.date));
@@ -263,8 +279,10 @@ function Dashboard() {
     });
   });
 
-  const sortedLabelsWithTime = Array.from(dateMapEntries.entries()).sort((a, b) => a[1] - b[1]);
-  const sortedDates = sortedLabelsWithTime.map((entry) => entry[0]);
+    const sortedLabelsWithTime = Array.from(dateMapEntries.entries()).sort((a, b) => a[1] - b[1]);
+  const sortedDates = range === "3months"
+    ? getMonthLabels()
+    : sortedLabelsWithTime.map((entry) => entry[0]);
 
   const workoutMap = {};
   Object.keys(workoutMapGrouped).forEach((k) => (workoutMap[k] = workoutMapGrouped[k].value));
@@ -279,7 +297,8 @@ function Dashboard() {
   const dietColor = "#ff5e7e";
   const bmiColor = "#10b981";
 
-  const chartKey = `history-${range}-${customDate ? customDate.toISOString().slice(0, 10) : ""}`;
+ // yeh line
+const chartKey = `history-${range}-${customDate ? customDate.toISOString().slice(0, 10) : ""}`;
 
   // ✅ Dummy fallback removed — real empty array now, "No data" message shown instead
   const workoutDataset = {

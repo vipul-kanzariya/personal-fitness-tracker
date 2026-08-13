@@ -431,3 +431,105 @@ h1, h2, h3, h4, h5, h6, .page-title {
   letter-spacing: -2px;
   color: var(--text-primary);
 }
+
+
+/* Background & Layout */
+.auth-container {
+  background-color: var(--bg-dark, #0d1117);
+  color: var(--text-main, #e6edf3);
+}
+
+/* Auth Card */
+.auth-card {
+  background: var(--card-bg, #161b22);
+  border: 1px solid var(--border-color, #21262d);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Icon Container */
+.auth-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  background: rgba(79, 142, 247, 0.1);
+  border: 1px solid rgba(79, 142, 247, 0.2);
+}
+
+/* Text & Labels */
+.auth-title {
+  color: var(--text-main, #e6edf3);
+}
+
+.auth-subtitle {
+  color: var(--text-muted, #8b949e) !important;
+}
+
+.auth-label {
+  color: var(--text-muted, #8b949e);
+  font-size: 0.85rem;
+}
+
+/* Form Controls & Inputs */
+.auth-input-icon {
+  background-color: var(--bg-dark, #0d1117);
+  border: 1px solid var(--border-color, #21262d);
+  border-right: none;
+  color: var(--text-muted, #8b949e);
+}
+
+.auth-input {
+  background-color: var(--bg-dark, #0d1117) !important;
+  border: 1px solid var(--border-color, #21262d) !important;
+  color: var(--text-main, #e6edf3) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input:focus {
+  border-color: #4f8ef7 !important;
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.25) !important;
+}
+
+.auth-input::placeholder {
+  color: #484f58;
+}
+
+/* Buttons & Links */
+.auth-btn {
+  background-color: #4f8ef7;
+  border: none;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.auth-btn:hover:not(:disabled) {
+  background-color: #3b79e2;
+  transform: translateY(-1px);
+}
+
+.auth-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-link {
+  color: #4f8ef7;
+  transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+  color: #70a3f9;
+  text-decoration: underline !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 576px) {
+  .auth-card {
+    padding: 1.5rem !important;
+  }
+}
+/* Auth Icon Container adjustment */
+.auth-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  background: var(--auth-input-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}

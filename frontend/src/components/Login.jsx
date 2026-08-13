@@ -88,7 +88,11 @@ function Login() {
               required
             />
           </div>
-
+<div className='text-end mb-3'>
+  <Link to='/forgot-password' className='link-neon' style={{ fontSize: '13px' }}>
+    Forgot Password?
+  </Link>
+</div>
           <button
             type="submit"
             className="btn btn-neon-submit w-100 text-uppercase"

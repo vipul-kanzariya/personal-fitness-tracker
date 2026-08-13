@@ -20,10 +20,12 @@ import AdminFoodStore from './admin/AdminFoodStore'
 import AdminWorkoutTypes from './admin/AdminWorkoutTypes'
 import NotFound from './pages/NotFound'
 import Profile from './pages/Profile'
-
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 function Layout() {
   const location = useLocation();
-  const hideNavbar = ['/login', '/register'].includes(location.pathname);
+  const hideNavbar = ['/login', '/register', '/forgot-password'].includes(location.pathname) 
+  || location.pathname.startsWith('/reset-password');
   const isAdmin = location.pathname.startsWith('/admin');
 
   return (
@@ -36,7 +38,8 @@ function Layout() {
         <Routes>
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
-
+          <Route path='/forgot-password' element={<ForgotPassword/>}/>
+<Route path='/reset-password/:token' element={<ResetPassword/>}/>
           {/* Admin Protected Routes */}
           <Route element={<AdminPrivateRoute />}>
             <Route path='/admin/dashboard' element={<AdminDashboard />} />
