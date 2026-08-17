@@ -58,7 +58,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 .btn-primary {
   background-color: var(--accent) !important;
   border-color: var(--accent) !important;
-  color: #0a0a0a !important;
+  color: var(--accent-text) !important;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -70,7 +70,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 .btn-success {
   background-color: var(--accent) !important;
   border-color: var(--accent) !important;
-  color: #0a0a0a !important;
+  color: var(--accent-text) !important;
 }
 .btn-outline-danger {
   color: #ff4d4d !important;

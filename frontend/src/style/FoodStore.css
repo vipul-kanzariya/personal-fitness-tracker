@@ -27,7 +27,7 @@
 /* Neon Button Styling */
 .btn-neon {
   background-color: var(--accent, #ccff00) !important;
-  color: #000000 !important;
+  color: var(--accent-text, #0a0a0a) !important;
   font-weight: 700 !important;
   border: none !important;
   transition: all 0.2s ease-in-out;

@@ -75,7 +75,7 @@
 /* Matte Neon Button */
 .btn-neon-submit {
   background-color: var(--accent, #ccff00) !important;
-  color: #000000 !important;
+  color: var(--accent-text, #0a0a0a) !important;
   font-weight: 800;
   border: none;
   border-radius: 12px;
