@@ -16,15 +16,14 @@ router.get('/',async(req,res)=>{
     }
     
 });
-router.get('/:id',async(req,res)=>{
-    try{
-        const {id} = req.params;
-        const food = await Food.findById(id);
-        res.status(200).json(food);
-    }catch(err){
-         res.status(500).json(err.message);
-    }
-    
+router.get('/:id', async(req, res) => {
+  try {
+    const food = await Food.findById(req.params.id);
+    if(!food) return res.status(404).json('Food item not found'); // ✅
+    res.status(200).json(food);
+  } catch(err) {
+    res.status(500).json(err.message);
+  }
 });
 router.post('/',authMiddleware,adminMiddleware,async(req,res)=>{
     try{

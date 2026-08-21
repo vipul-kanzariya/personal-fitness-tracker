@@ -3,6 +3,7 @@ import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Diet.css";
 import { toast } from "react-toastify";
+
 function Diet() {
   const [diets, setDiets] = useState([]);
   const [foodName, setFoodName] = useState("");
@@ -10,6 +11,7 @@ function Diet() {
   const [protein, setProtein] = useState("");
   const [fat, setFat] = useState("");
   const [calories, setCalories] = useState("");
+  const [filter, setFilter] = useState("today");
 
   const [editId, setEditId] = useState(null);
   const [editData, setEditData] = useState({});
@@ -48,6 +50,23 @@ function Diet() {
     fetchDiet();
   }, []);
 
+  const filterByDate = (items, dateField) => {
+    const now = new Date();
+    return items.filter((item) => {
+      const d = new Date(item[dateField] || item.createdAt);
+      if (filter === "today") {
+        return d.toDateString() === now.toDateString();
+      } else if (filter === "week") {
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+        return d >= weekAgo;
+      } else if (filter === "month") {
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }
+      return true; // 'all'
+    });
+  };
+
   // Calculate Daily Totals
   const totals = diets.reduce(
     (acc, d) => ({
@@ -64,7 +83,7 @@ function Diet() {
 
   const handleAutoFill = async () => {
     if (!foodName.trim()) {
-      setError("Pehle food name daalo.");
+      setError("Please enter a food name first.");
       return;
     }
     try {
@@ -81,7 +100,7 @@ function Diet() {
       setFat(res.data.fat ?? "");
       setError(null);
     } catch (err) {
-      setError("Nutrition estimate fail ho gaya. Values manually daal do.");
+      setError("Failed to estimate nutrition. Please enter values manually.");
     } finally {
       setLoading(false);
     }
@@ -129,7 +148,7 @@ function Diet() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDiets(diets.filter((d) => d._id !== id));
-       toast.success("Entry deleted.");
+      toast.success("Entry deleted.");
     } catch (err) {
       setError("Failed to delete entry.");
       toast.error("Failed to delete entry.");
@@ -177,11 +196,12 @@ function Diet() {
       setEditData({});
       setError("");
       toast.success("Entry updated!");
-
     } catch (err) {
       toast.error("Failed to update diet entry.");
     }
   };
+
+  const filteredDiets = filterByDate(diets, "date");
 
   return (
     <div className="container mt-4">
@@ -192,7 +212,6 @@ function Diet() {
 
       {/* Daily Macros Summary Cards */}
       <div className="row g-3 mb-4">
-        {/* Calories Card */}
         <div className="col-12 col-sm-6 col-md-3">
           <div className="card dark-card shadow-sm p-3 h-100">
             <span className="text-subtle small fw-bold text-uppercase">
@@ -216,7 +235,6 @@ function Diet() {
           </div>
         </div>
 
-        {/* Protein Card */}
         <div className="col-12 col-sm-6 col-md-3">
           <div className="card dark-card shadow-sm p-3 h-100">
             <span className="text-subtle small fw-bold text-uppercase">
@@ -240,7 +258,6 @@ function Diet() {
           </div>
         </div>
 
-        {/* Carbs Card */}
         <div className="col-12 col-sm-6 col-md-3">
           <div className="card dark-card shadow-sm p-3 h-100">
             <span className="text-subtle small fw-bold text-uppercase">
@@ -264,7 +281,6 @@ function Diet() {
           </div>
         </div>
 
-        {/* Fat Card */}
         <div className="col-12 col-sm-6 col-md-3">
           <div className="card dark-card shadow-sm p-3 h-100">
             <span className="text-subtle small fw-bold text-uppercase">
@@ -423,12 +439,26 @@ function Diet() {
         </form>
       </div>
 
-      {/* Table Section */}
+      {/* Filter & Table Section */}
       {loading ? (
         <Spinner />
       ) : (
         <div className="card dark-card shadow-sm p-3">
           <h5 className="fw-bold mb-3">LOGGED MEALS</h5>
+
+          {/* Date Filter Buttons */}
+          <div className="d-flex gap-2 mb-3">
+            {["today", "week", "month", "all"].map((f) => (
+              <button
+                key={f}
+                className={`btn btn-sm ${filter === f ? "btn-primary" : "btn-outline-secondary"}`}
+                onClick={() => setFilter(f)}
+              >
+                {f === "today" ? "Today" : f === "week" ? "This Week" : f === "month" ? "This Month" : "All"}
+              </button>
+            ))}
+          </div>
+
           <div className="table-responsive">
             <table className="table theme-table table-hover align-middle mb-0">
               <thead>
@@ -442,14 +472,14 @@ function Diet() {
                 </tr>
               </thead>
               <tbody>
-                {diets.length === 0 ? (
+                {filteredDiets.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="text-center py-4 text-subtle">
-                      No food entries logged yet today.
+                      No food entries found for this filter.
                     </td>
                   </tr>
                 ) : (
-                  diets.map((d) => (
+                  filteredDiets.map((d) => (
                     <tr key={d._id}>
                       {editId === d._id ? (
                         <>

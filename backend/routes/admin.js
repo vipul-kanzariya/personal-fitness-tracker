@@ -44,6 +44,9 @@ router.put('/users/:id/block', authMiddleware, adminMiddleware, async(req, res) 
   try {
     const {id} = req.params;
     const user = await User.findById(id);
+    if(req.params.id === req.user.id){
+  return res.status(400).json('You cannot block your own account'); // ✅
+}
     if(!user){
       return res.status(404).json('User not found');
     }
@@ -57,10 +60,12 @@ router.put('/users/:id/block', authMiddleware, adminMiddleware, async(req, res) 
 
 // Delete user
 router.delete('/users/:id', authMiddleware, adminMiddleware, async(req, res) => {
-   try {
-    const {id} = req.params;
-    const users = await User.findByIdAndDelete(id);
-    res.status(200).json(users);
+  try {
+    if(req.params.id === req.user.id){
+      return res.status(400).json('You cannot delete your own account'); // ✅
+    }
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json('User deleted');
   } catch(err) {
     res.status(500).json(err.message);
   }

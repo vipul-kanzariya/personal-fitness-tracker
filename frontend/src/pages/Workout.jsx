@@ -4,6 +4,7 @@ import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Workout.css";
 import { toast } from "react-toastify";
+
 const EXERCISE_IMAGES = {
   pushups: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop",
   pushup: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop",
@@ -55,6 +56,7 @@ function Workout() {
   const [duration, setDuration] = useState("");
   const [workoutTypes, setWorkoutTypes] = useState([]);
   const [workoutTypeId, setWorkoutTypeId] = useState("");
+  const [filter, setFilter] = useState("today");
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -85,6 +87,23 @@ function Workout() {
     };
     fetchData();
   }, []);
+
+  const filterByDate = (items, dateField) => {
+    const now = new Date();
+    return items.filter((item) => {
+      const d = new Date(item[dateField] || item.createdAt);
+      if (filter === "today") {
+        return d.toDateString() === now.toDateString();
+      } else if (filter === "week") {
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+        return d >= weekAgo;
+      } else if (filter === "month") {
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }
+      return true; // 'all'
+    });
+  };
 
   const handleEdit = (workout) => {
     setEditId(workout._id);
@@ -120,7 +139,7 @@ function Workout() {
       setEditId(null);
       setEditData({});
       setError(null);
-       toast.success("Workout updated!");
+      toast.success("Workout updated!");
     } catch (err) {
       toast.error("Failed to update workout.");
     }
@@ -155,7 +174,7 @@ function Workout() {
       setSets('');
       setReps('');
       setDuration('');
-       toast.success("Workout logged! 💪");
+      toast.success("Workout logged! 💪");
     } catch (err) {
       toast.error("Failed to log workout.");
     } finally {
@@ -179,6 +198,8 @@ function Workout() {
       setLoading(false);
     }
   };
+
+  const filteredWorkouts = filterByDate(workouts, "date");
 
   return (
     <div className="container page-wrapper">
@@ -250,15 +271,28 @@ function Workout() {
         </form>
       </div>
 
+      {/* Date Filter Buttons */}
+      <div className="d-flex gap-2 mb-3">
+        {["today", "week", "month", "all"].map((f) => (
+          <button
+            key={f}
+            className={`btn btn-sm ${filter === f ? "btn-primary" : "btn-outline-secondary"}`}
+            onClick={() => setFilter(f)}
+          >
+            {f === "today" ? "Today" : f === "week" ? "This Week" : f === "month" ? "This Month" : "All"}
+          </button>
+        ))}
+      </div>
+
       {/* Unique Workout Cards */}
       {loading ? (
         <div className="text-center py-5"><Spinner /></div>
       ) : (
         <div className="row g-3">
-          {workouts.length === 0 && (
-            <div className="col-12 text-center text-muted py-5">No workouts logged yet. Start training!</div>
+          {filteredWorkouts.length === 0 && (
+            <div className="col-12 text-center text-muted py-5">No workouts logged for this filter. Start training!</div>
           )}
-          {workouts.map((w) => (
+          {filteredWorkouts.map((w) => (
             <div className="col-sm-6 col-lg-4" key={w._id}>
               <div className={`apex-unique-card h-100 ${getCategoryClass(w.workoutTypeId?.category)}`}>
                 

@@ -8,6 +8,7 @@ function Bmi() {
   const [feet, setFeet] = useState("");
   const [inches, setInches] = useState("");
   const [suggestedWorkouts, setSuggestedWorkouts] = useState([]);
+  const [filter, setFilter] = useState("all");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -41,6 +42,23 @@ function Bmi() {
     };
     fetchHistory();
   }, []);
+
+  const filterByDate = (items, dateField) => {
+    const now = new Date();
+    return items.filter((item) => {
+      const d = new Date(item[dateField] || item.createdAt);
+      if (filter === "today") {
+        return d.toDateString() === now.toDateString();
+      } else if (filter === "week") {
+        const weekAgo = new Date();
+        weekAgo.setDate(now.getDate() - 7);
+        return d >= weekAgo;
+      } else if (filter === "month") {
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      }
+      return true; // 'all'
+    });
+  };
 
   const metersToFeet = (meters) => {
     if (!meters) return "N/A";
@@ -85,7 +103,6 @@ function Bmi() {
     }
   };
 
-  // Slider Position Percentage
   const getSliderPosition = (bmiVal) => {
     if (!bmiVal) return 0;
     const val = Number(bmiVal);
@@ -95,7 +112,6 @@ function Bmi() {
     return Math.min(100, 75 + ((val - 30) / 10) * 25);
   };
 
-  // Badge Color Styles based on Category
   const getBadgeClass = (cat) => {
     switch (cat) {
       case "Underweight":
@@ -112,6 +128,8 @@ function Bmi() {
         return "bg-secondary text-subtle";
     }
   };
+
+  const filteredHistory = filterByDate(history, "createdAt");
 
   return (
     <div className="container mt-4">
@@ -217,7 +235,6 @@ function Bmi() {
             </div>
           </div>
 
-          {/* Visual Scale Bar */}
           <div className="mt-3 px-2">
             <div className="bmi-scale-bar">
               <div
@@ -265,6 +282,19 @@ function Bmi() {
           📜 ASSESSMENT <span className="text-neon-green">HISTORY</span>
         </h5>
 
+        {/* Date Filter Buttons */}
+        <div className="d-flex gap-2 mb-3">
+          {["today", "week", "month", "all"].map((f) => (
+            <button
+              key={f}
+              className={`btn btn-sm ${filter === f ? "btn-primary" : "btn-outline-secondary"}`}
+              onClick={() => setFilter(f)}
+            >
+              {f === "today" ? "Today" : f === "week" ? "This Week" : f === "month" ? "This Month" : "All"}
+            </button>
+          ))}
+        </div>
+
         {loading && history.length === 0 ? (
           <div className="text-center py-4">
             <Spinner />
@@ -282,8 +312,8 @@ function Bmi() {
                 </tr>
               </thead>
               <tbody>
-                {history.length > 0 ? (
-                  history.map((h) => (
+                {filteredHistory.length > 0 ? (
+                  filteredHistory.map((h) => (
                     <tr key={h._id}>
                       <td className="fw-bold">{h.weight} kg</td>
                       <td>{metersToFeet(h.height)}</td>
@@ -305,7 +335,7 @@ function Bmi() {
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center text-subtle py-4">
-                      No assessment history found.
+                      No assessment history found for this filter.
                     </td>
                   </tr>
                 )}

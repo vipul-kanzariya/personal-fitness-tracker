@@ -47,7 +47,7 @@ router.post('/login', async(req,res)=>{
         return res.status(400).json('Invalid password');
 
     }
-   const token = jsonwebtoken.sign({id: checkEmail._id}, process.env.JWT_SECRET);
+   const token = jsonwebtoken.sign({id: checkEmail._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 return res.status(200).json({ 
   token,
   role: checkEmail.role,

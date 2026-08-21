@@ -25,8 +25,12 @@ router.get("/", authMiddleware, async (req, res) => {
 router.get("/:id", authMiddleware, async (req, res) => {
   try {
     const {id}= req.params;
-    const food = await Order.findById(id).populate('items.foodId');
-    res.status(200).json(food);
+    const order = await Order.findOne({
+  _id: req.params.id,
+  userId: req.user.id  // ✅ ownership check
+}).populate('items.foodId');
+if(!order) return res.status(404).json('Order not found');
+    res.status(200).json(order);
   } catch (err) {
     res.status(500).json(err.message);
   }
