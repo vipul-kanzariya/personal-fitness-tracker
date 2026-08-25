@@ -16,12 +16,12 @@ router.get('/', authMiddleware, async(req, res) => {
 
 
 router.post('/', authMiddleware, adminMiddleware, async(req, res) => {
- try{
- const {name, caloriesPerMinute, category} = req.body;
-const type = await WorkoutType.create({name, caloriesPerMinute, category});
-res.status(201).json(type);
+  try{
+    const {name, caloriesPerMinute, category, trackingType} = req.body;
+    const type = await WorkoutType.create({name, caloriesPerMinute, category, trackingType}); 
+    res.status(201).json(type);
   }catch(err){
-     res.status(500).json(err.message);
+    res.status(500).json(err.message);
   }
 });
 

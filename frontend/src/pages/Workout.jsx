@@ -56,6 +56,8 @@ function Workout() {
   const [duration, setDuration] = useState("");
   const [workoutTypes, setWorkoutTypes] = useState([]);
   const [workoutTypeId, setWorkoutTypeId] = useState("");
+  const selectedType = workoutTypes.find(t => t._id === workoutTypeId);
+const trackingType = selectedType?.trackingType || 'both';
   const [filter, setFilter] = useState("today");
   
   const [loading, setLoading] = useState(false);
@@ -116,11 +118,15 @@ function Workout() {
   };
 
   const handleUpdate = async (id) => {
-    if (!editData.workoutTypeId) return setError("Please select an exercise.");
-    if (!editData.sets || Number(editData.sets) <= 0) return setError("Sets must be greater than 0.");
-    if (!editData.reps || Number(editData.reps) <= 0) return setError("Reps must be greater than 0.");
-    if (!editData.duration || Number(editData.duration) <= 0) return setError("Duration must be greater than 0.");
+ const editSelectedType = workoutTypes.find(t => t._id === editData.workoutTypeId);
+const editTrackingType = editSelectedType?.trackingType || 'both';
 
+if((editTrackingType === 'sets_reps' || editTrackingType === 'both') && (!editData.sets || Number(editData.sets) <= 0))
+  return setError('Sets must be greater than 0.');
+if((editTrackingType === 'sets_reps' || editTrackingType === 'both') && (!editData.reps || Number(editData.reps) <= 0))
+  return setError('Reps must be greater than 0.');
+if((editTrackingType === 'duration_only' || editTrackingType === 'both') && (!editData.duration || Number(editData.duration) <= 0))
+  return setError('Duration must be greater than 0.');
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
@@ -150,9 +156,17 @@ function Workout() {
     setError(null);
 
     if (!workoutTypeId) return setError('Please select an exercise.');
-    if (!sets || Number(sets) <= 0) return setError('Please enter valid sets (> 0).');
-    if (!reps || Number(reps) <= 0) return setError('Please enter valid reps (> 0).');
-    if (!duration || Number(duration) <= 0) return setError('Please enter a valid duration (> 0).');
+
+const selType = workoutTypes.find(t => t._id === workoutTypeId);
+const tType = selType?.trackingType || 'both';
+
+if((tType === 'sets_reps' || tType === 'both') && (!sets || Number(sets) <= 0))
+  return setError('Please enter valid sets.');
+if((tType === 'sets_reps' || tType === 'both') && (!reps || Number(reps) <= 0))
+  return setError('Please enter valid reps.');
+if((tType === 'duration_only' || tType === 'both') && (!duration || Number(duration) <= 0))
+  return setError('Please enter a valid duration.');
+  
 
     try {
       const token = localStorage.getItem("token");
@@ -232,35 +246,40 @@ function Workout() {
               </select>
             </div>
 
-            <div className="col-md-2">
-              <label className="form-label" htmlFor="sets">Sets</label>
-              <input
-                type="number" className="form-control apex-input" min="0" step="0.1"
-                onKeyDown={(e) => ["e", "-", "+"].includes(e.key) && e.preventDefault()}
-                value={sets} onChange={(e) => setSets(e.target.value)}
-                id="sets" placeholder="Sets"
-              />
-            </div>
+     
 
-            <div className="col-md-2">
-              <label className="form-label" htmlFor="reps">Reps</label>
-              <input
-                type="number" className="form-control apex-input" min="0" step="0.1"
-                onKeyDown={(e) => ["e", "-", "+"].includes(e.key) && e.preventDefault()}
-                value={reps} onChange={(e) => setReps(e.target.value)}
-                id="reps" placeholder="Reps"
-              />
-            </div>
+{/* Sets — sirf sets_reps ya both */}
+{(trackingType === 'sets_reps' || trackingType === 'both') && (
+  <div className="col-md-2">
+    <label className="form-label" htmlFor="sets">Sets</label>
+    <input type="number" className="form-control apex-input" min="0" step="0.1"
+      onKeyDown={(e) => ["e","-","+"].includes(e.key) && e.preventDefault()}
+      value={sets} onChange={(e) => setSets(e.target.value)}
+      id="sets" placeholder="Sets"/>
+  </div>
+)}
 
-            <div className="col-md-2">
-              <label className="form-label" htmlFor="duration">Duration (min)</label>
-              <input
-                type="number" className="form-control apex-input" min="0" step="0.1"
-                onKeyDown={(e) => ["e", "-", "+"].includes(e.key) && e.preventDefault()}
-                value={duration} onChange={(e) => setDuration(e.target.value)}
-                id="duration" placeholder="Mins"
-              />
-            </div>
+{/* Reps — sirf sets_reps ya both */}
+{(trackingType === 'sets_reps' || trackingType === 'both') && (
+  <div className="col-md-2">
+    <label className="form-label" htmlFor="reps">Reps</label>
+    <input type="number" className="form-control apex-input" min="0" step="0.1"
+      onKeyDown={(e) => ["e","-","+"].includes(e.key) && e.preventDefault()}
+      value={reps} onChange={(e) => setReps(e.target.value)}
+      id="reps" placeholder="Reps"/>
+  </div>
+)}
+
+{/* Duration — sirf duration_only ya both */}
+{(trackingType === 'duration_only' || trackingType === 'both') && (
+  <div className="col-md-2">
+    <label className="form-label" htmlFor="duration">Duration (min)</label>
+    <input type="number" className="form-control apex-input" min="0" step="0.1"
+      onKeyDown={(e) => ["e","-","+"].includes(e.key) && e.preventDefault()}
+      value={duration} onChange={(e) => setDuration(e.target.value)}
+      id="duration" placeholder="Mins"/>
+  </div>
+)}
 
             <div className="col-md-2 d-flex align-items-end">
               <button className="btn apex-btn-primary w-100" type="submit">
@@ -328,20 +347,38 @@ function Workout() {
                           <option key={t._id} value={t._id}>{t.name}</option>
                         ))}
                       </select>
-                      <div className="row g-2 mb-3">
-                        <div className="col-4">
-                          <input type="number" className="form-control apex-input" placeholder="Sets"
-                            value={editData.sets} onChange={(e) => setEditData({ ...editData, sets: e.target.value })} />
-                        </div>
-                        <div className="col-4">
-                          <input type="number" className="form-control apex-input" placeholder="Reps"
-                            value={editData.reps} onChange={(e) => setEditData({ ...editData, reps: e.target.value })} />
-                        </div>
-                        <div className="col-4">
-                          <input type="number" className="form-control apex-input" placeholder="Duration"
-                            value={editData.duration} onChange={(e) => setEditData({ ...editData, duration: e.target.value })} />
-                        </div>
-                      </div>
+                     <div className="row g-2 mb-3">
+  {/* Edit Sets */}
+  {(() => {
+    const eType = workoutTypes.find(t => t._id === editData.workoutTypeId);
+    const et = eType?.trackingType || 'both';
+    return (
+      <>
+        {(et === 'sets_reps' || et === 'both') && (
+          <div className="col-4">
+            <input type="number" className="form-control apex-input" placeholder="Sets"
+              value={editData.sets}
+              onChange={(e) => setEditData({...editData, sets: e.target.value})}/>
+          </div>
+        )}
+        {(et === 'sets_reps' || et === 'both') && (
+          <div className="col-4">
+            <input type="number" className="form-control apex-input" placeholder="Reps"
+              value={editData.reps}
+              onChange={(e) => setEditData({...editData, reps: e.target.value})}/>
+          </div>
+        )}
+        {(et === 'duration_only' || et === 'both') && (
+          <div className="col-4">
+            <input type="number" className="form-control apex-input" placeholder="Duration"
+              value={editData.duration}
+              onChange={(e) => setEditData({...editData, duration: e.target.value})}/>
+          </div>
+        )}
+      </>
+    );
+  })()}
+</div>
                       <div className="d-flex gap-2">
                         <button className="btn btn-success btn-sm flex-grow-1" onClick={() => handleUpdate(w._id)}>Save</button>
                         <button className="btn btn-secondary btn-sm flex-grow-1" onClick={() => setEditId(null)}>Cancel</button>

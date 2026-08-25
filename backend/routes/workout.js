@@ -14,27 +14,25 @@ router.post("/", authMiddleware, async (req, res) => {
       return res.status(404).json("Workout type not found");
     }
 
-    const caloriesBurned = Number(
-      (
-        workoutType.caloriesPerMinute *
-        duration *
-        (1 + (sets * reps) / 1000)
-      ).toFixed(2),
-    );
+    let caloriesBurned = 0;
+    if(workoutType.trackingType === 'duration_only'){
+      caloriesBurned = Number((workoutType.caloriesPerMinute * (duration || 0)).toFixed(2));
+    } else if(workoutType.trackingType === 'sets_reps'){
+      caloriesBurned = Number((workoutType.caloriesPerMinute * ((sets || 0) * (reps || 0) * 0.5)).toFixed(2));
+    } else {
+      caloriesBurned = Number((workoutType.caloriesPerMinute * (duration || 0) * (1 + ((sets || 0) * (reps || 0)) / 1000)).toFixed(2));
+    }
 
+    // ✅ yeh missing tha!
     const workout = await Workout.create({
-      userId,
-      workoutTypeId,
+      userId, workoutTypeId,
       exerciseName: workoutType.name,
-      sets,
-      reps,
-      duration,
-      caloriesBurned,
+      sets: sets || 0, reps: reps || 0,
+      duration: duration || 0, caloriesBurned,
     });
-
-    await workout.populate("workoutTypeId", "name category caloriesPerMinute");
-
+    await workout.populate("workoutTypeId", "name category caloriesPerMinute trackingType");
     res.status(201).json(workout);
+
   } catch (err) {
     res.status(500).json(err.message);
   }
@@ -84,13 +82,14 @@ router.put("/:id", authMiddleware, async (req, res) => {
     const newSets = sets !== undefined ? sets : existingWorkout.sets;
     const newReps = reps !== undefined ? reps : existingWorkout.reps;
 
-    const caloriesBurned = Number(
-      (
-        workoutType.caloriesPerMinute *
-        newDuration *
-        (1 + (newSets * newReps) / 1000)
-      ).toFixed(2),
-    );
+  let caloriesBurned = 0;
+if(workoutType.trackingType === 'duration_only'){
+  caloriesBurned = Number((workoutType.caloriesPerMinute * newDuration).toFixed(2));
+} else if(workoutType.trackingType === 'sets_reps'){
+  caloriesBurned = Number((workoutType.caloriesPerMinute * (newSets * newReps * 0.5)).toFixed(2));
+} else {
+  caloriesBurned = Number((workoutType.caloriesPerMinute * newDuration * (1 + (newSets * newReps) / 1000)).toFixed(2));
+}
 
     const workout = await Workout.findOneAndUpdate(
       { _id: id, userId: req.user.id },

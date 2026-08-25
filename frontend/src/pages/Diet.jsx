@@ -68,7 +68,10 @@ function Diet() {
   };
 
   // Calculate Daily Totals
-  const totals = diets.reduce(
+ const filteredDiets = filterByDate(diets, "date");
+
+  // Calculate Totals (respects selected filter — Today/Week/Month/All)
+  const totals = filteredDiets.reduce(
     (acc, d) => ({
       calories: acc.calories + (Number(d.calories) || 0),
       protein: acc.protein + (Number(d.protein) || 0),
@@ -201,7 +204,7 @@ function Diet() {
     }
   };
 
-  const filteredDiets = filterByDate(diets, "date");
+
 
   return (
     <div className="container mt-4">
