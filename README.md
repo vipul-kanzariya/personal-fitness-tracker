@@ -42,6 +42,10 @@ CLOUDINARY_API_SECRET=...
 # AI helpers (optional) - used by diet/estimate
 GEMINI_API_KEY=...              # if using Google Gemini
 OPENROUTER_API_KEY=...         # fallback provider
+
+# Razorpay test mode
+RAZORPAY_KEY_ID=rzp_test_...
+RAZORPAY_KEY_SECRET=...
 ```
 
 Frontend needs a Vite environment variable to point to the backend API. Create `.env` in `frontend/` or set in your environment:
@@ -51,6 +55,9 @@ VITE_API_URL=http://localhost:3000
 ```
 
 Note: Vite requires `VITE_` prefix for env vars used in the client.
+
+Keep `RAZORPAY_KEY_SECRET` in `backend/.env` only. It must never be exposed
+through frontend environment variables or committed to the repository.
 
 ---
 

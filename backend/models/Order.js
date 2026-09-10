@@ -34,6 +34,11 @@ const OrderSchema = Schema(
     paymentId: {
       type: String,
     },
+    razorpayOrderId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
   },
   { timestamps: true },
 );

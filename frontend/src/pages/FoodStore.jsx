@@ -4,15 +4,20 @@ import Spinner from "../components/Spinner";
 import "../style/FoodStore.css"; // External stylesheet
 import { toast } from "react-toastify";
 import { useTheme } from "../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 function FoodStore() {
   const { colors } = useTheme();
+  const navigate = useNavigate();
   const [food, setFood] = useState([]);
-  const [cart, setCart] = useState([]);
-  const [totalAmount, setTotalAmount] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [ordering, setOrdering] = useState(false);
   const [error, setError] = useState();
+
+  const syncCartCount = () => {
+    const savedCart = JSON.parse(localStorage.getItem("foodCart") || "[]");
+    setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
+  };
 
   useEffect(() => {
     const fetchFood = async () => {
@@ -29,65 +34,23 @@ function FoodStore() {
       }
     };
     fetchFood();
+    syncCartCount();
   }, []);
 
   const addToCart = (item) => {
-    const exists = cart.find((c) => c._id === item._id);
-    if (exists) {
-      setCart(
-        cart.map((c) =>
-          c._id === item._id ? { ...c, quantity: c.quantity + 1 } : c
+    const savedCart = JSON.parse(localStorage.getItem("foodCart") || "[]");
+    const existingItem = savedCart.find((cartItem) => cartItem._id === item._id);
+    const updatedCart = existingItem
+      ? savedCart.map((cartItem) =>
+          cartItem._id === item._id
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem
         )
-      );
-    } else {
-      setCart([...cart, { ...item, quantity: 1 }]);
-    }
-    setTotalAmount(totalAmount + item.price);
-  };
+      : [...savedCart, { ...item, quantity: 1 }];
 
-  const removeFromCart = (id) => {
-    const item = cart.find((c) => c._id === id);
-    if (item.quantity > 1) {
-      setCart(
-        cart.map((c) =>
-          c._id === id ? { ...c, quantity: c.quantity - 1 } : c
-        )
-      );
-    } else {
-      setCart(cart.filter((c) => c._id !== id));
-    }
-    setTotalAmount(totalAmount - item.price);
-  };
-
-  const handleOrder = async () => {
-    if (cart.length === 0) {
-      toast.warning("Your cart is empty!");
-      return;
-    }
-    try {
-      setOrdering(true);
-      const token = localStorage.getItem("token");
-      const items = cart.map((c) => ({
-        foodId: c._id,
-        name: c.name,
-        price: c.price,
-        quantity: c.quantity,
-      }));
-
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/orders`,
-        { items, totalAmount },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      toast.success("Order placed successfully! 🎉");
-      setCart([]);
-      setTotalAmount(0);
-    } catch (err) {
-      toast.error(err.response?.data || "Failed to place order.");
-    } finally {
-      setOrdering(false);
-    }
+    localStorage.setItem("foodCart", JSON.stringify(updatedCart));
+    syncCartCount();
+    toast.success(`${item.name} added to cart`);
   };
 
   return (
@@ -164,7 +127,7 @@ function FoodStore() {
             </div>
           </div>
 
-          {/* Cart Sidebar */}
+          {/* Cart Summary */}
           <div className="col-lg-4">
             <div className="card dark-card p-4 sticky-top cart-sidebar">
               <h5
@@ -174,67 +137,17 @@ function FoodStore() {
                 🛍️ YOUR CART
               </h5>
 
-              {cart.length === 0 ? (
-                <div
-                  className="text-center py-4 text-subtle border rounded-3 mb-3"
-                  style={{ borderColor: "var(--border-color)" }}
-                >
-                  <p className="mb-0 small">Your cart is empty.</p>
-                </div>
-              ) : (
-                <div className="cart-items-container mb-3">
-                  {cart.map((c) => (
-                    <div
-                      key={c._id}
-                      className="cart-item-row p-3 mb-2 rounded-3 d-flex justify-content-between align-items-center"
-                    >
-                      <div className="cart-item-title">
-                        <h6 className="fw-bold mb-0 text-truncate">
-                          {c.name}
-                        </h6>
-                        <small className="text-subtle">
-                          ₹{c.price} × {c.quantity}
-                        </small>
-                      </div>
-
-                      <div className="d-flex align-items-center gap-2">
-                        <span className="text-neon-green fw-bold">
-                          ₹{c.price * c.quantity}
-                        </span>
-                        <button
-                          className="btn btn-outline-danger btn-sm px-2 py-0 border-0"
-                          onClick={() => removeFromCart(c._id)}
-                          title="Remove one"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Order Summary */}
-              <div
-                className="border-top pt-3 mb-3"
-                style={{ borderColor: "var(--border-color)" }}
-              >
-                <div className="d-flex justify-content-between align-items-center">
-                  <span className="text-subtle fw-semibold">
-                    Total Amount:
-                  </span>
-                  <span className="text-neon-green fw-bold fs-4">
-                    ₹{totalAmount}
-                  </span>
-                </div>
+              <div className="text-center py-3 text-subtle border rounded-3 mb-3" style={{ borderColor: "var(--border-color)" }}>
+                <div className="display-6 mb-2">🛍️</div>
+                <p className="mb-1 fw-semibold">{cartCount ? `${cartCount} item${cartCount > 1 ? "s" : ""} ready` : "Your cart is empty"}</p>
+                <small>Review your items and complete payment on the Orders page.</small>
               </div>
-
               <button
                 className="btn btn-neon w-100 py-2.5 text-uppercase"
-                onClick={handleOrder}
-                disabled={ordering || cart.length === 0}
+                onClick={() => navigate("/orders")}
+                disabled={cartCount === 0}
               >
-                {ordering ? "Placing Order..." : "Place Order"}
+                Review Cart & Checkout
               </button>
             </div>
           </div>
