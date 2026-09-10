@@ -297,9 +297,9 @@ function Diet() {
       {/* Form Section */}
       <div className="card dark-card shadow-sm p-4 mb-4">
         <h5 className="fw-bold mb-3">ADD FOOD ENTRY</h5>
-        <form onSubmit={handleSubmit}>
-          <div className="row g-3 align-items-end">
-            <div className="col-12 col-md-4">
+        <form onSubmit={handleSubmit} className="diet-entry-form">
+          <div className="diet-entry-grid">
+            <div className="diet-entry-field diet-entry-food">
               <label
                 htmlFor="food"
                 className="form-label text-subtle fw-bold small text-uppercase"
@@ -342,7 +342,7 @@ function Diet() {
               </div>
             </div>
 
-            <div className="col-12 col-md-2">
+            <div className="diet-entry-field diet-entry-date">
               <label
                 htmlFor="date"
                 className="form-label text-subtle fw-bold small text-uppercase"
@@ -368,7 +368,7 @@ function Diet() {
               placeholder="kcal"
               min={0}
               required
-              className="col-6 col-md-2"
+              className="diet-entry-field"
             />
 
             <NumberInput
@@ -378,7 +378,7 @@ function Diet() {
               onChange={(e) => setProtein(e.target.value)}
               placeholder="Protein"
               min={0}
-              className="col-6 col-md-2"
+              className="diet-entry-field"
             />
 
             <NumberInput
@@ -388,7 +388,7 @@ function Diet() {
               onChange={(e) => setCarbs(e.target.value)}
               placeholder="Carbs"
               min={0}
-              className="col-6 col-md-2"
+              className="diet-entry-field"
             />
 
             <NumberInput
@@ -398,10 +398,10 @@ function Diet() {
               onChange={(e) => setFat(e.target.value)}
               placeholder="Fat"
               min={0}
-              className="col-6 col-md-2"
+              className="diet-entry-field"
             />
 
-            <div className="col-12 mt-3">
+            <div className="diet-entry-actions">
               <button
                 type="submit"
                 className="btn btn-success text-dark fw-bold px-4"

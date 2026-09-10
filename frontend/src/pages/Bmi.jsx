@@ -115,8 +115,8 @@ function Bmi() {
       {/* Form Input Card */}
       <div className="card dark-card p-4 mb-4 shadow-sm">
         <form onSubmit={handleSubmit}>
-          <div className="row g-3 align-items-end">
-            <div className="col-12 col-md-3">
+          <div className="bmi-input-grid">
+            <div className="bmi-input-field">
               <NumberInput
                 name="weight"
                 label="Weight (KG)"
@@ -129,7 +129,7 @@ function Bmi() {
               />
             </div>
 
-            <div className="col-6 col-md-3">
+            <div className="bmi-input-field">
               <NumberInput
                 name="feet"
                 label="Height (Feet)"
@@ -142,7 +142,7 @@ function Bmi() {
               />
             </div>
 
-            <div className="col-6 col-md-3">
+            <div className="bmi-input-field">
               <NumberInput
                 name="inches"
                 label="Height (Inches)"
@@ -154,15 +154,11 @@ function Bmi() {
               />
             </div>
 
-            <div className="col-12 col-md-3">
-              <div className="mb-0">
-                <label className="form-label text-subtle fw-bold small text-uppercase" style={{ visibility: 'hidden' }}>
-                  Action
-                </label>
-                <button type="submit" className="btn btn-neon w-100 py-2 text-uppercase" disabled={loading}>
-                  {loading ? "Calculating..." : "Calculate"}
-                </button>
-              </div>
+            <div className="bmi-input-field bmi-input-action">
+              <span className="bmi-input-label-spacer" aria-hidden="true" />
+              <button type="submit" className="btn btn-neon w-100 text-uppercase" disabled={loading}>
+                {loading ? "Calculating..." : "Calculate"}
+              </button>
             </div>
           </div>
         </form>

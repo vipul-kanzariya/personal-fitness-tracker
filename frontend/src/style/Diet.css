@@ -55,3 +55,78 @@
 .text-neon-green {
   color: var(--accent, #ccff00) !important;
 }
+
+.diet-entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.diet-entry-field {
+  min-width: 0;
+  margin-bottom: 0 !important;
+}
+
+.diet-entry-field .form-label {
+  display: block;
+  min-height: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.diet-entry-field .form-control,
+.diet-entry-field .input-group {
+  height: 52px;
+}
+
+.diet-entry-field .input-group > * {
+  height: 52px;
+}
+
+.diet-entry-field .input-group .form-control {
+  min-width: 0;
+}
+
+.diet-entry-field .input-group .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.diet-entry-date .react-datepicker-wrapper {
+  display: block;
+}
+
+.diet-entry-actions {
+  grid-column: 1 / -1;
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 1199.98px) {
+  .diet-entry-grid {
+    grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr));
+  }
+
+  .diet-entry-date {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .diet-entry-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .diet-entry-food,
+  .diet-entry-date,
+  .diet-entry-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .diet-entry-grid {
+    grid-template-columns: 1fr;
+  }
+}

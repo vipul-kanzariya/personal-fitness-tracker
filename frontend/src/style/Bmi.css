@@ -25,6 +25,41 @@
   opacity: 1 !important;
 }
 
+.bmi-input-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.bmi-input-field {
+  min-width: 0;
+}
+
+.bmi-input-field .form-label,
+.bmi-input-label-spacer {
+  display: block;
+  min-height: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bmi-input-field .form-control,
+.bmi-input-action .btn {
+  width: 100%;
+  height: 66px;
+}
+
+@media (max-width: 991.98px) {
+  .bmi-input-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575.98px) {
+  .bmi-input-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 3. Workout Cards */
 .workout-card {
   background-color: var(--bg-dark, var(--bg-card)) !important;
