@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
+import { FiCheckCircle, FiLock } from 'react-icons/fi';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -33,7 +34,7 @@ function ForgotPassword() {
         {/* Header Icon & Branding */}
         <div className="text-center mb-4">
           <div className="auth-icon-wrapper mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle">
-            <span className="fs-3">🔒</span>
+            <FiLock className="fs-3" aria-hidden="true" />
           </div>
           <h2 className="fw-black text-uppercase tracking-wide m-0">
             Forgot <span className="text-neon-accent">Password</span>
@@ -45,7 +46,7 @@ function ForgotPassword() {
 
         {sent ? (
           <div className="alert alert-success bg-success bg-opacity-25 text-success border-0 rounded-4 p-3 text-center">
-            <p className="mb-2 fw-medium">✅ Reset link sent! Check your inbox.</p>
+            <p className="mb-2 fw-medium"><FiCheckCircle aria-hidden="true" /> Reset link sent! Check your inbox.</p>
             <Link to="/login" className="link-neon fw-semibold">
               ← Back to Login
             </Link>

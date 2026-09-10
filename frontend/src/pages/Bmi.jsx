@@ -7,6 +7,7 @@ import { useDateFilter } from "../hooks/useDateFilter";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { metersToFeet } from "../hooks/useDateFilter";
 import "../style/Bmi.css";
+import { FiActivity, FiZap } from "react-icons/fi";
 
 function Bmi() {
   const [weight, setWeight] = useState("");
@@ -204,7 +205,7 @@ function Bmi() {
       {suggestedWorkouts.length > 0 && (
         <div className="card dark-card p-4 mb-4 shadow-sm">
           <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
-            🔥 SUGGESTED WORKOUTS <span className="text-neon-green">FOR YOU</span>
+            <FiActivity aria-hidden="true" /> SUGGESTED WORKOUTS <span className="text-neon-green">FOR YOU</span>
           </h5>
           <div className="row g-3">
             {suggestedWorkouts.map((w) => (
@@ -215,7 +216,7 @@ function Bmi() {
                     {w.category}
                   </span>
                   <div className="text-neon-green fw-bold small d-flex align-items-center justify-content-center gap-1">
-                    ⚡ {w.caloriesPerMinute || 0} cal / min
+                    <FiZap aria-hidden="true" /> {w.caloriesPerMinute || 0} cal / min
                   </div>
                 </div>
               </div>

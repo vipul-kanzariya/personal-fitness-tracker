@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Spinner from '../components/Spinner';
 import '../style/Admin.css';
+import { FiDollarSign, FiPackage, FiUsers } from 'react-icons/fi';
+import { GiMeal } from 'react-icons/gi';
 
 function AdminDashboard() {
   const [summary, setSummary] = useState({});
@@ -51,7 +53,7 @@ function AdminDashboard() {
         <div className="row g-3">
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
-              <div className="stat-icon">👥</div>
+              <div className="stat-icon"><FiUsers aria-hidden="true" /></div>
               <span className="form-label-custom d-block">Total Users</span>
               <h2 className="fw-bold m-0">{summary.totalUsers || 0}</h2>
             </div>
@@ -59,7 +61,7 @@ function AdminDashboard() {
 
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
-              <div className="stat-icon">📦</div>
+              <div className="stat-icon"><FiPackage aria-hidden="true" /></div>
               <span className="form-label-custom d-block">Total Orders</span>
               <h2 className="fw-bold m-0">{summary.totalOrders || 0}</h2>
             </div>
@@ -67,7 +69,7 @@ function AdminDashboard() {
 
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
-              <div className="stat-icon">🥗</div>
+              <div className="stat-icon"><GiMeal aria-hidden="true" /></div>
               <span className="form-label-custom d-block">Food Items</span>
               <h2 className="fw-bold m-0">{summary.totalFoodItems || 0}</h2>
             </div>
@@ -75,7 +77,7 @@ function AdminDashboard() {
 
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon"><FiDollarSign aria-hidden="true" /></div>
               <span className="form-label-custom d-block">Total Revenue</span>
               <h2 className="fw-bold m-0 text-neon-accent">₹ {summary.totalRevenue || 0}</h2>
             </div>

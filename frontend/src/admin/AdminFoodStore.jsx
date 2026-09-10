@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Admin.css";
+import { FiPlus } from "react-icons/fi";
 
 function AdminFoodStore() {
   const [foods, setFoods] = useState([]);
@@ -104,7 +105,7 @@ function AdminFoodStore() {
       {/* Add Item Card */}
       <div className="admin-card p-4 mb-4">
         <h5 className="fw-bold mb-3 border-bottom border-secondary border-opacity-25 pb-2">
-          ➕ Add New Item
+          <FiPlus aria-hidden="true" /> Add New Item
         </h5>
         <form onSubmit={handleSubmit} className="row g-3">
           <div className="col-md-3">

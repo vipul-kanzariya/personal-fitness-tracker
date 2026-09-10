@@ -8,6 +8,7 @@ import { useAuthFetch } from "../hooks/useAuthFetch";
 import { API_BASE_URL } from "../utils/api";
 import "../style/Workout.css";
 import { toast } from "react-toastify";
+import { FiZap } from "react-icons/fi";
 
 const EXERCISE_IMAGES = {
   pushups: "https://images.unsplash.com/photo-1598971639058-fab3c3109a00?q=80&w=800&auto=format&fit=crop",
@@ -403,7 +404,7 @@ function Workout() {
                         </div>
 
                         <div className="apex-calorie-pill mb-3">
-                          🔥 {w.caloriesBurned} <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>KCAL</span>
+                          <FiZap aria-hidden="true" /> {w.caloriesBurned} <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>KCAL</span>
                         </div>
                       </div>
 

@@ -7,6 +7,7 @@ import { API_BASE_URL, getAuthConfig } from "../utils/api";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import "../style/Order.css";
 import { toast } from "react-toastify";
+import { FiCheckCircle, FiPackage, FiShield } from "react-icons/fi";
 
 function Order() {
   const [orders, setOrders] = useState([]);
@@ -202,7 +203,7 @@ function Order() {
           </div>
 
           <div className="checkout-footer">
-            <span className="secure-payment-note">🔒 Secure payment powered by Razorpay</span>
+            <span className="secure-payment-note"><FiShield aria-hidden="true" /> Secure payment powered by Razorpay</span>
             <button className="btn btn-neon checkout-button" onClick={handleCheckout} disabled={ordering}>
               {ordering ? "Opening secure checkout..." : "Proceed to secure payment"}
             </button>
@@ -228,7 +229,7 @@ function Order() {
         <div className="text-center py-5"><Spinner /></div>
       ) : orders.length === 0 ? (
         <div className="empty-orders">
-          <div className="empty-orders-icon">📦</div>
+          <FiPackage className="empty-orders-icon" aria-hidden="true" />
           <h3>No orders yet</h3>
           <p className="text-visible-muted mb-0">Your completed purchases will appear here.</p>
         </div>

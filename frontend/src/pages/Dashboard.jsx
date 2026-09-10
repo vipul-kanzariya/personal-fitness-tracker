@@ -22,6 +22,7 @@ import { useAuthFetch } from "../hooks/useAuthFetch";
 import { getUserName } from "../utils/api";
 import { toLocalDateString, isToday } from "../hooks/useDateFilter";
 import "../style/Dashboard.css";
+import { FiCalendar } from "react-icons/fi";
 
 ChartJS.register(
   CategoryScale,
@@ -655,7 +656,7 @@ function Dashboard() {
                   className="d-flex flex-wrap align-items-center gap-2 fw-bold mb-0"
                   style={{ fontSize: "1.25rem", color: colors.textPrimary }}
                 >
-                  <span aria-hidden="true">🗓️</span>
+                  <FiCalendar aria-hidden="true" />
                   <span>HISTORY & PROGRESS</span>
                   <span style={{ color: colors.textMuted }}>—</span>
                   <span style={{ color: colors.textMuted, fontWeight: "normal", fontSize: "1rem" }}>

@@ -25,10 +25,11 @@ import NotFound from './pages/NotFound'
 import Profile from './pages/Profile'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import Home from './pages/Home'
 
 function Layout() {
   const location = useLocation();
-  const hideNavbar = ['/login', '/register', '/forgot-password'].includes(location.pathname)
+  const hideNavbar = ['/', '/login', '/register', '/forgot-password'].includes(location.pathname)
     || location.pathname.startsWith('/reset-password');
   const isAdmin = location.pathname.startsWith('/admin');
 
@@ -41,6 +42,7 @@ function Layout() {
       >
         <ErrorBoundary>
           <Routes>
+            <Route path='/' element={<Home />} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             <Route path='/forgot-password' element={<ForgotPassword />} />
@@ -77,11 +79,6 @@ function Layout() {
 
             {/* User Protected Routes */}
             <Route element={<PrivateRoute />}>
-              <Route path='/' element={
-                <ErrorBoundary>
-                  <Dashboard />
-                </ErrorBoundary>
-              } />
               <Route path='/dashboard' element={
                 <ErrorBoundary>
                   <Dashboard />

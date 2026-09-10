@@ -4,6 +4,7 @@ import Spinner from "../components/Spinner";
 import NumberInput from "../components/NumberInput";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { useTheme } from "../context/ThemeContext";
+import { FiLock, FiMoon, FiSettings, FiSun } from "react-icons/fi";
 import { clearAuthData } from "../utils/api";
 import "../style/Profile.css";
 import { toast } from "react-toastify";
@@ -128,7 +129,7 @@ function Profile() {
           }}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         >
-          <span>{theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}</span>
+          <span>{theme === "dark" ? <><FiSun aria-hidden="true" /> Light Mode</> : <><FiMoon aria-hidden="true" /> Dark Mode</>}</span>
         </button>
       </div>
 
@@ -204,7 +205,7 @@ function Profile() {
                     color: "var(--text-primary)",
                   }}
                 >
-                  ⚙️ Personal Details
+                  <FiSettings aria-hidden="true" /> Personal Details
                 </h5>
                 <form id="profileForm" onSubmit={handleUpdateProfile}>
                   <div className="mb-3">
@@ -290,7 +291,7 @@ function Profile() {
                     color: "var(--text-primary)",
                   }}
                 >
-                  🔒 Security & Password
+                  <FiLock aria-hidden="true" /> Security & Password
                 </h5>
 
                 {passwordError && (

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Admin.css";
+import { FiPlus } from "react-icons/fi";
 
 function AdminWorkoutTypes() {
   const [types, setTypes] = useState([]);
@@ -87,7 +88,7 @@ function AdminWorkoutTypes() {
       {/* Add Workout Form */}
       <div className="admin-card p-4 mb-4">
         <h5 className="fw-bold mb-3 border-bottom border-secondary border-opacity-25 pb-2">
-          ➕ Add Exercise Preset
+          <FiPlus aria-hidden="true" /> Add Exercise Preset
         </h5>
         <form onSubmit={handleSubmit} className="row g-3">
           <div className="col-md-4">

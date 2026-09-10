@@ -5,6 +5,7 @@ import "../style/FoodStore.css"; // External stylesheet
 import { toast } from "react-toastify";
 import { useTheme } from "../context/ThemeContext";
 import { useNavigate } from "react-router-dom";
+import { FiShoppingBag, FiShoppingCart, FiActivity } from "react-icons/fi";
 
 function FoodStore() {
   const { colors } = useTheme();
@@ -86,7 +87,7 @@ function FoodStore() {
               className="fw-bold mb-3 d-flex align-items-center gap-2"
               style={{ color: colors?.textPrimary || "var(--text-primary, #ffffff)" }}
             >
-              🛒 AVAILABLE MEALS
+              <FiShoppingCart aria-hidden="true" /> AVAILABLE MEALS
             </h5>
             <div className="row g-3">
               {food.map((f) => (
@@ -111,7 +112,7 @@ function FoodStore() {
                           ₹{f.price}
                         </span>
                         <span className="text-subtle small">
-                          🔥 {f.calories} cal
+                          <FiActivity aria-hidden="true" /> {f.calories} cal
                         </span>
                       </div>
                     </div>
@@ -134,11 +135,11 @@ function FoodStore() {
                 className="fw-bold mb-3 d-flex align-items-center gap-2"
                 style={{ color: colors?.textPrimary || "var(--text-primary, #ffffff)" }}
               >
-                🛍️ YOUR CART
+                <FiShoppingBag aria-hidden="true" /> YOUR CART
               </h5>
 
               <div className="text-center py-3 text-subtle border rounded-3 mb-3" style={{ borderColor: "var(--border-color)" }}>
-                <div className="display-6 mb-2">🛍️</div>
+                <FiShoppingBag className="display-6 mb-2" aria-hidden="true" />
                 <p className="mb-1 fw-semibold">{cartCount ? `${cartCount} item${cartCount > 1 ? "s" : ""} ready` : "Your cart is empty"}</p>
                 <small>Review your items and complete payment on the Orders page.</small>
               </div>

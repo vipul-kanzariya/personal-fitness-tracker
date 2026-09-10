@@ -200,6 +200,10 @@ h1, h2, h3, h4, h5, h6, .page-title {
   transition: background-color var(--transition);
 }
 
+.main-content.full-width {
+  padding: 0;
+}
+
 /* Admin Specific Main Content Area */
 .admin-main-content {
   flex: 1;
