@@ -63,8 +63,8 @@
 
 .admin-sidebar .desktop-toggle-btn:hover {
   color: var(--text-primary);
-  border-color: #3a3a3a;
-  background-color: rgba(255, 255, 255, 0.05);
+  border-color: var(--nav-toggle-hover-border);
+  background-color: var(--nav-hover-bg);
 }
 
 /* Navigation Link Items (Horizontal Row Layout) */
@@ -104,13 +104,13 @@
 
 .admin-sidebar .nav-link:hover {
   color: var(--text-primary);
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--nav-hover-bg);
   transform: translateX(4px);
 }
 
 .admin-sidebar .nav-link.active {
   color: var(--accent);
-  background-color: rgba(163, 230, 53, 0.08);
+  background-color: var(--nav-active-bg);
   font-weight: 600;
 }
 
@@ -161,7 +161,7 @@
 }
 
 .admin-sidebar .btn-theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--nav-hover-bg);
 }
 
 .admin-sidebar .btn-logout:hover {

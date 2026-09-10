@@ -32,11 +32,11 @@ export function ThemeProvider({ children }) {
   const colors = {
     accent: isLight ? '#4f46e5' : '#a3e635',
     accentDark: isLight ? '#4338ca' : '#84cc16',
-    bgMain: isLight ? '#f8fafc' : '#0a0a0a',
-    bgCard: isLight ? '#ffffff' : '#161616',
-    textPrimary: isLight ? '#0f172a' : '#ffffff',
-    textMuted: isLight ? '#64748b' : '#9ca3af',
-    border: isLight ? '#e2e8f0' : '#2a2a2a',
+    bgMain: isLight ? '#e9eef5' : '#0a0a0a',
+    bgCard: isLight ? '#f8fafc' : '#161616',
+    textPrimary: isLight ? '#172033' : '#ffffff',
+    textMuted: isLight ? '#52627a' : '#9ca3af',
+    border: isLight ? '#cbd5e1' : '#2a2a2a',
     chartGrid: isLight ? 'rgba(15, 23, 42, 0.08)' : 'rgba(255, 255, 255, 0.08)'
   };
 
