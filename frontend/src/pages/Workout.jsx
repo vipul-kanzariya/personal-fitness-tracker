@@ -1,7 +1,11 @@
-// src/pages/Workout.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
+import NumberInput from "../components/NumberInput";
+import FilterButtons from "../components/FilterButtons";
+import { useDateFilter } from "../hooks/useDateFilter";
+import { useAuthFetch } from "../hooks/useAuthFetch";
+import { API_BASE_URL } from "../utils/api";
 import "../style/Workout.css";
 import { toast } from "react-toastify";
 
@@ -56,55 +60,54 @@ function Workout() {
   const [duration, setDuration] = useState("");
   const [workoutTypes, setWorkoutTypes] = useState([]);
   const [workoutTypeId, setWorkoutTypeId] = useState("");
-  const selectedType = workoutTypes.find(t => t._id === workoutTypeId);
-const trackingType = selectedType?.trackingType || 'both';
-  const [filter, setFilter] = useState("today");
-  
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+
   const [editId, setEditId] = useState(null);
   const [editData, setEditData] = useState({});
 
+  const { loading, error, execute, setError } = useAuthFetch();
+  const { filter, setFilter, filteredItems: filteredWorkouts } = useDateFilter(workouts, "date");
+
+  // Memoize selected type to prevent unnecessary re-renders
+  const selectedType = useMemo(
+    () => workoutTypes.find(t => t._id === workoutTypeId),
+    [workoutTypeId, workoutTypes]
+  );
+
+  const trackingType = selectedType?.trackingType || 'both';
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        setLoading(true);
-        setError(null);
-        const [workoutRes, typesRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/workouts`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(`${import.meta.env.VITE_API_URL}/api/workout-types`, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-        setWorkouts(workoutRes.data);
-        setWorkoutTypes(typesRes.data);
-      } catch (err) {
-        setError("Failed to load workouts.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
-  const filterByDate = (items, dateField) => {
-    const now = new Date();
-    return items.filter((item) => {
-      const d = new Date(item[dateField] || item.createdAt);
-      if (filter === "today") {
-        return d.toDateString() === now.toDateString();
-      } else if (filter === "week") {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        return d >= weekAgo;
-      } else if (filter === "month") {
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      }
-      return true; // 'all'
-    });
+  const fetchData = async () => {
+    try {
+      const [workoutRes, typesRes] = await Promise.all([
+        execute({ method: 'GET', url: '/api/workouts' }),
+        execute({ method: 'GET', url: '/api/workout-types' }),
+      ]);
+      setWorkouts(workoutRes);
+      setWorkoutTypes(typesRes);
+    } catch (err) {
+      toast.error("Failed to load workouts.");
+    }
+  };
+
+  const validateWorkout = (data, type) => {
+    const trackType = type?.trackingType || 'both';
+
+    if ((trackType === 'sets_reps' || trackType === 'both') && (!data.sets || Number(data.sets) <= 0)) {
+      setError('Sets must be greater than 0.');
+      return false;
+    }
+    if ((trackType === 'sets_reps' || trackType === 'both') && (!data.reps || Number(data.reps) <= 0)) {
+      setError('Reps must be greater than 0.');
+      return false;
+    }
+    if ((trackType === 'duration_only' || trackType === 'both') && (!data.duration || Number(data.duration) <= 0)) {
+      setError('Duration must be greater than 0.');
+      return false;
+    }
+    return true;
   };
 
   const handleEdit = (workout) => {
@@ -118,27 +121,23 @@ const trackingType = selectedType?.trackingType || 'both';
   };
 
   const handleUpdate = async (id) => {
- const editSelectedType = workoutTypes.find(t => t._id === editData.workoutTypeId);
-const editTrackingType = editSelectedType?.trackingType || 'both';
+    const editSelectedType = workoutTypes.find(t => t._id === editData.workoutTypeId);
 
-if((editTrackingType === 'sets_reps' || editTrackingType === 'both') && (!editData.sets || Number(editData.sets) <= 0))
-  return setError('Sets must be greater than 0.');
-if((editTrackingType === 'sets_reps' || editTrackingType === 'both') && (!editData.reps || Number(editData.reps) <= 0))
-  return setError('Reps must be greater than 0.');
-if((editTrackingType === 'duration_only' || editTrackingType === 'both') && (!editData.duration || Number(editData.duration) <= 0))
-  return setError('Duration must be greater than 0.');
+    if (!validateWorkout(editData, editSelectedType)) {
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/workouts/${id}`,
-        editData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const data = await execute({
+        method: 'PUT',
+        url: `/api/workouts/${id}`,
+        data: editData,
+      });
 
       const selectedType = workoutTypes.find((t) => t._id === editData.workoutTypeId);
       const updatedWorkout = {
-        ...res.data,
-        workoutTypeId: res.data.workoutTypeId?.name ? res.data.workoutTypeId : selectedType
+        ...data,
+        workoutTypeId: data.workoutTypeId?.name ? data.workoutTypeId : selectedType
       };
 
       setWorkouts(workouts.map((w) => (w._id === id ? updatedWorkout : w)));
@@ -155,32 +154,26 @@ if((editTrackingType === 'duration_only' || editTrackingType === 'both') && (!ed
     e.preventDefault();
     setError(null);
 
-    if (!workoutTypeId) return setError('Please select an exercise.');
+    if (!workoutTypeId) {
+      setError('Please select an exercise.');
+      return;
+    }
 
-const selType = workoutTypes.find(t => t._id === workoutTypeId);
-const tType = selType?.trackingType || 'both';
-
-if((tType === 'sets_reps' || tType === 'both') && (!sets || Number(sets) <= 0))
-  return setError('Please enter valid sets.');
-if((tType === 'sets_reps' || tType === 'both') && (!reps || Number(reps) <= 0))
-  return setError('Please enter valid reps.');
-if((tType === 'duration_only' || tType === 'both') && (!duration || Number(duration) <= 0))
-  return setError('Please enter a valid duration.');
-  
+    if (!validateWorkout({ sets, reps, duration }, selectedType)) {
+      return;
+    }
 
     try {
-      const token = localStorage.getItem("token");
-      setLoading(true);
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/workouts`,
-        { workoutTypeId, sets, reps, duration },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const data = await execute({
+        method: 'POST',
+        url: '/api/workouts',
+        data: { workoutTypeId, sets, reps, duration },
+      });
 
       const selectedType = workoutTypes.find((t) => t._id === workoutTypeId);
       const newWorkout = {
-        ...res.data,
-        workoutTypeId: res.data.workoutTypeId?.name ? res.data.workoutTypeId : selectedType
+        ...data,
+        workoutTypeId: data.workoutTypeId?.name ? data.workoutTypeId : selectedType
       };
 
       setWorkouts([newWorkout, ...workouts]);
@@ -191,29 +184,21 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
       toast.success("Workout logged! 💪");
     } catch (err) {
       toast.error("Failed to log workout.");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      setLoading(true);
-      setError(null);
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/workouts/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      await execute({
+        method: 'DELETE',
+        url: `/api/workouts/${id}`,
       });
       setWorkouts(workouts.filter((w) => w._id !== id));
       toast.success("Workout deleted.");
     } catch (err) {
       toast.error("Failed to delete workout.");
-    } finally {
-      setLoading(false);
     }
   };
-
-  const filteredWorkouts = filterByDate(workouts, "date");
 
   return (
     <div className="container page-wrapper">
@@ -223,7 +208,7 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
         <h1 className="apex-title">LOG <span>WORKOUT</span></h1>
       </div>
 
-      {error && <div className="dashboard-alert mb-4">{error}</div>}
+      {error && <div className="dashboard-alert mb-4" role="alert">{error}</div>}
 
       {/* Log Form */}
       <div className="apex-form-card mb-4">
@@ -236,6 +221,8 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
                 className="form-select apex-select"
                 value={workoutTypeId}
                 onChange={(e) => setWorkoutTypeId(e.target.value)}
+                required
+                aria-required="true"
               >
                 <option value="">Select Exercise</option>
                 {workoutTypes.map((t) => (
@@ -246,44 +233,48 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
               </select>
             </div>
 
-     
+            {/* Sets — only show for sets_reps or both */}
+            {(trackingType === 'sets_reps' || trackingType === 'both') && (
+              <NumberInput
+                name="sets"
+                label="Sets"
+                value={sets}
+                onChange={(e) => setSets(e.target.value)}
+                placeholder="Sets"
+                min={0}
+                className="col-md-2"
+              />
+            )}
 
-{/* Sets — sirf sets_reps ya both */}
-{(trackingType === 'sets_reps' || trackingType === 'both') && (
-  <div className="col-md-2">
-    <label className="form-label" htmlFor="sets">Sets</label>
-    <input type="number" className="form-control apex-input" min="0" step="0.1"
-      onKeyDown={(e) => ["e","-","+"].includes(e.key) && e.preventDefault()}
-      value={sets} onChange={(e) => setSets(e.target.value)}
-      id="sets" placeholder="Sets"/>
-  </div>
-)}
+            {/* Reps — only show for sets_reps or both */}
+            {(trackingType === 'sets_reps' || trackingType === 'both') && (
+              <NumberInput
+                name="reps"
+                label="Reps"
+                value={reps}
+                onChange={(e) => setReps(e.target.value)}
+                placeholder="Reps"
+                min={0}
+                className="col-md-2"
+              />
+            )}
 
-{/* Reps — sirf sets_reps ya both */}
-{(trackingType === 'sets_reps' || trackingType === 'both') && (
-  <div className="col-md-2">
-    <label className="form-label" htmlFor="reps">Reps</label>
-    <input type="number" className="form-control apex-input" min="0" step="0.1"
-      onKeyDown={(e) => ["e","-","+"].includes(e.key) && e.preventDefault()}
-      value={reps} onChange={(e) => setReps(e.target.value)}
-      id="reps" placeholder="Reps"/>
-  </div>
-)}
-
-{/* Duration — sirf duration_only ya both */}
-{(trackingType === 'duration_only' || trackingType === 'both') && (
-  <div className="col-md-2">
-    <label className="form-label" htmlFor="duration">Duration (min)</label>
-    <input type="number" className="form-control apex-input" min="0" step="0.1"
-      onKeyDown={(e) => ["e","-","+"].includes(e.key) && e.preventDefault()}
-      value={duration} onChange={(e) => setDuration(e.target.value)}
-      id="duration" placeholder="Mins"/>
-  </div>
-)}
+            {/* Duration — only show for duration_only or both */}
+            {(trackingType === 'duration_only' || trackingType === 'both') && (
+              <NumberInput
+                name="duration"
+                label="Duration (min)"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
+                placeholder="Mins"
+                min={0}
+                className="col-md-2"
+              />
+            )}
 
             <div className="col-md-2 d-flex align-items-end">
-              <button className="btn apex-btn-primary w-100" type="submit">
-                LOG WORKOUT
+              <button className="btn apex-btn-primary w-100" type="submit" disabled={loading}>
+                {loading ? "Logging..." : "LOG WORKOUT"}
               </button>
             </div>
           </div>
@@ -291,30 +282,22 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
       </div>
 
       {/* Date Filter Buttons */}
-      <div className="d-flex gap-2 mb-3">
-        {["today", "week", "month", "all"].map((f) => (
-          <button
-            key={f}
-            className={`btn btn-sm ${filter === f ? "btn-primary" : "btn-outline-secondary"}`}
-            onClick={() => setFilter(f)}
-          >
-            {f === "today" ? "Today" : f === "week" ? "This Week" : f === "month" ? "This Month" : "All"}
-          </button>
-        ))}
-      </div>
+      <FilterButtons filter={filter} setFilter={setFilter} />
 
-      {/* Unique Workout Cards */}
-      {loading ? (
+      {/* Workout Cards */}
+      {loading && workouts.length === 0 ? (
         <div className="text-center py-5"><Spinner /></div>
       ) : (
         <div className="row g-3">
           {filteredWorkouts.length === 0 && (
-            <div className="col-12 text-center text-muted py-5">No workouts logged for this filter. Start training!</div>
+            <div className="col-12 text-center text-muted py-5">
+              No workouts logged for this filter. Start training!
+            </div>
           )}
           {filteredWorkouts.map((w) => (
             <div className="col-sm-6 col-lg-4" key={w._id}>
               <div className={`apex-unique-card h-100 ${getCategoryClass(w.workoutTypeId?.category)}`}>
-                
+
                 {/* Image Banner */}
                 <div className="apex-banner-wrapper">
                   <img
@@ -341,47 +324,69 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
                         className="form-select apex-select mb-2"
                         value={editData.workoutTypeId || ""}
                         onChange={(e) => setEditData({ ...editData, workoutTypeId: e.target.value })}
+                        aria-label="Select exercise to edit"
                       >
                         <option value="">Select Exercise</option>
                         {workoutTypes.map((t) => (
                           <option key={t._id} value={t._id}>{t.name}</option>
                         ))}
                       </select>
-                     <div className="row g-2 mb-3">
-  {/* Edit Sets */}
-  {(() => {
-    const eType = workoutTypes.find(t => t._id === editData.workoutTypeId);
-    const et = eType?.trackingType || 'both';
-    return (
-      <>
-        {(et === 'sets_reps' || et === 'both') && (
-          <div className="col-4">
-            <input type="number" className="form-control apex-input" placeholder="Sets"
-              value={editData.sets}
-              onChange={(e) => setEditData({...editData, sets: e.target.value})}/>
-          </div>
-        )}
-        {(et === 'sets_reps' || et === 'both') && (
-          <div className="col-4">
-            <input type="number" className="form-control apex-input" placeholder="Reps"
-              value={editData.reps}
-              onChange={(e) => setEditData({...editData, reps: e.target.value})}/>
-          </div>
-        )}
-        {(et === 'duration_only' || et === 'both') && (
-          <div className="col-4">
-            <input type="number" className="form-control apex-input" placeholder="Duration"
-              value={editData.duration}
-              onChange={(e) => setEditData({...editData, duration: e.target.value})}/>
-          </div>
-        )}
-      </>
-    );
-  })()}
-</div>
+                      <div className="row g-2 mb-3">
+                        {(() => {
+                          const eType = workoutTypes.find(t => t._id === editData.workoutTypeId);
+                          const et = eType?.trackingType || 'both';
+                          return (
+                            <>
+                              {(et === 'sets_reps' || et === 'both') && (
+                                <div className="col-4">
+                                  <input
+                                    type="number"
+                                    className="form-control apex-input"
+                                    placeholder="Sets"
+                                    min={0}
+                                    value={editData.sets}
+                                    onChange={(e) => setEditData({...editData, sets: e.target.value})}
+                                    aria-label="Edit sets"
+                                  />
+                                </div>
+                              )}
+                              {(et === 'sets_reps' || et === 'both') && (
+                                <div className="col-4">
+                                  <input
+                                    type="number"
+                                    className="form-control apex-input"
+                                    placeholder="Reps"
+                                    min={0}
+                                    value={editData.reps}
+                                    onChange={(e) => setEditData({...editData, reps: e.target.value})}
+                                    aria-label="Edit reps"
+                                  />
+                                </div>
+                              )}
+                              {(et === 'duration_only' || et === 'both') && (
+                                <div className="col-4">
+                                  <input
+                                    type="number"
+                                    className="form-control apex-input"
+                                    placeholder="Duration"
+                                    min={0}
+                                    value={editData.duration}
+                                    onChange={(e) => setEditData({...editData, duration: e.target.value})}
+                                    aria-label="Edit duration"
+                                  />
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
                       <div className="d-flex gap-2">
-                        <button className="btn btn-success btn-sm flex-grow-1" onClick={() => handleUpdate(w._id)}>Save</button>
-                        <button className="btn btn-secondary btn-sm flex-grow-1" onClick={() => setEditId(null)}>Cancel</button>
+                        <button className="btn btn-success btn-sm flex-grow-1" onClick={() => handleUpdate(w._id)} aria-label="Save changes">
+                          Save
+                        </button>
+                        <button className="btn btn-secondary btn-sm flex-grow-1" onClick={() => setEditId(null)} aria-label="Cancel editing">
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -389,7 +394,7 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
                     <>
                       <div>
                         <h3 className="apex-title-text">{w.workoutTypeId?.name || "Exercise"}</h3>
-                        
+
                         {/* Readable Metrics Line */}
                         <div className="apex-metrics-text">
                           {Number(w.sets) > 0 ? `${w.sets} sets × ` : ""}
@@ -403,8 +408,12 @@ if((tType === 'duration_only' || tType === 'both') && (!duration || Number(durat
                       </div>
 
                       <div className="d-flex gap-2 pt-2 apex-card-action-bar">
-                        <button className="btn apex-btn-edit btn-sm flex-grow-1" onClick={() => handleEdit(w)}>Edit</button>
-                        <button className="btn apex-btn-delete btn-sm flex-grow-1" onClick={() => handleDelete(w._id)}>Delete</button>
+                        <button className="btn apex-btn-edit btn-sm flex-grow-1" onClick={() => handleEdit(w)} aria-label={`Edit ${w.workoutTypeId?.name}`}>
+                          Edit
+                        </button>
+                        <button className="btn apex-btn-delete btn-sm flex-grow-1" onClick={() => handleDelete(w._id)} aria-label={`Delete ${w.workoutTypeId?.name}`}>
+                          Delete
+                        </button>
                       </div>
                     </>
                   )}

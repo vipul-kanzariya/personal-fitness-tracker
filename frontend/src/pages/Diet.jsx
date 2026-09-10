@@ -1,23 +1,31 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import Spinner from "../components/Spinner";
+import NumberInput from "../components/NumberInput";
+import FilterButtons from "../components/FilterButtons";
+import { useDateFilter } from "../hooks/useDateFilter";
+import { useAuthFetch } from "../hooks/useAuthFetch";
+import { API_BASE_URL, getAuthConfig } from "../utils/api";
+import { getProgressPercent } from "../utils/formatters";
 import "../style/Diet.css";
 import { toast } from "react-toastify";
 
 function Diet() {
   const [diets, setDiets] = useState([]);
   const [foodName, setFoodName] = useState("");
-  const [carbs, setCarbs] = useState("");
-  const [protein, setProtein] = useState("");
-  const [fat, setFat] = useState("");
   const [calories, setCalories] = useState("");
-  const [filter, setFilter] = useState("today");
+  const [protein, setProtein] = useState("");
+  const [carbs, setCarbs] = useState("");
+  const [fat, setFat] = useState("");
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [editId, setEditId] = useState(null);
   const [editData, setEditData] = useState({});
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { loading, error, execute, setError } = useAuthFetch();
+  const { filter, setFilter, filteredItems: filteredDiets } = useDateFilter(diets, "date");
 
   // Default daily target goals
   const [targets] = useState({
@@ -28,49 +36,22 @@ function Diet() {
   });
 
   useEffect(() => {
-    const fetchDiet = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        setLoading(true);
-        const dietsRes = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/diet`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setDiets(dietsRes.data);
-      } catch (err) {
-        setError("Failed to load diet entries.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchDiet();
   }, []);
 
-  const filterByDate = (items, dateField) => {
-    const now = new Date();
-    return items.filter((item) => {
-      const d = new Date(item[dateField] || item.createdAt);
-      if (filter === "today") {
-        return d.toDateString() === now.toDateString();
-      } else if (filter === "week") {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        return d >= weekAgo;
-      } else if (filter === "month") {
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      }
-      return true; // 'all'
-    });
+  const fetchDiet = async () => {
+    try {
+      const data = await execute({
+        method: 'GET',
+        url: '/api/diet',
+      });
+      setDiets(data);
+    } catch (err) {
+      toast.error("Failed to load diet entries.");
+    }
   };
 
-  // Calculate Daily Totals
- const filteredDiets = filterByDate(diets, "date");
-
-  // Calculate Totals (respects selected filter — Today/Week/Month/All)
+  // Calculate Totals
   const totals = filteredDiets.reduce(
     (acc, d) => ({
       calories: acc.calories + (Number(d.calories) || 0),
@@ -81,82 +62,76 @@ function Diet() {
     { calories: 0, protein: 0, carbs: 0, fat: 0 }
   );
 
-  const getProgressPct = (current, target) =>
-    Math.min(100, Math.round(((current || 0) / target) * 100));
-
   const handleAutoFill = async () => {
     if (!foodName.trim()) {
       setError("Please enter a food name first.");
       return;
     }
     try {
-      const token = localStorage.getItem("token");
-      setLoading(true);
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/diet/estimate`,
-        { foodName },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setCalories(res.data.calories ?? "");
-      setProtein(res.data.protein ?? "");
-      setCarbs(res.data.carbs ?? "");
-      setFat(res.data.fat ?? "");
+      const data = await execute({
+        method: 'POST',
+        url: '/api/diet/estimate',
+        data: { foodName },
+      });
+      setCalories(data.calories ?? "");
+      setProtein(data.protein ?? "");
+      setCarbs(data.carbs ?? "");
+      setFat(data.fat ?? "");
       setError(null);
+      toast.success("Nutrition estimated!");
     } catch (err) {
-      setError("Failed to estimate nutrition. Please enter values manually.");
-    } finally {
-      setLoading(false);
+      toast.error("Failed to estimate nutrition. Please enter values manually.");
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validation
+    if (!calories || Number(calories) <= 0) {
+      setError("Calories must be greater than 0");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
-      setLoading(true);
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/diet`,
-        {
+      const data = await execute({
+        method: 'POST',
+        url: '/api/diet',
+        data: {
           foodName,
           calories,
-          protein,
-          carbs,
-          fat,
+          protein: protein || 0,
+          carbs: carbs || 0,
+          fat: fat || 0,
+          date: selectedDate.toISOString(),
         },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setDiets([res.data, ...diets]);
+      });
+      setDiets([data, ...diets]);
 
+      // Reset form
       setFoodName("");
       setCalories("");
       setProtein("");
       setCarbs("");
       setFat("");
+      setSelectedDate(new Date());
       setError(null);
       toast.success("Meal added!");
     } catch (err) {
       toast.error("Failed to save entry.");
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      setLoading(true);
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/diet/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      await execute({
+        method: 'DELETE',
+        url: `/api/diet/${id}`,
       });
       setDiets(diets.filter((d) => d._id !== id));
       toast.success("Entry deleted.");
     } catch (err) {
-      setError("Failed to delete entry.");
       toast.error("Failed to delete entry.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -171,6 +146,7 @@ function Diet() {
   };
 
   const handleUpdate = async (id) => {
+    // Validation
     if (!editData.calories || editData.calories <= 0) {
       setError("Calories must be greater than 0.");
       return;
@@ -187,14 +163,14 @@ function Diet() {
       setError("Fat cannot be negative.");
       return;
     }
+
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/diet/${id}`,
-        editData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setDiets(diets.map((d) => (d._id === id ? res.data : d)));
+      const data = await execute({
+        method: 'PUT',
+        url: `/api/diet/${id}`,
+        data: editData,
+      });
+      setDiets(diets.map((d) => (d._id === id ? data : d)));
       setEditId(null);
       setEditData({});
       setError("");
@@ -204,14 +180,12 @@ function Diet() {
     }
   };
 
-
-
   return (
     <div className="container mt-4">
       <h2 className="fw-bold mb-4 apex-title">
         DIET & <span className="text-neon-green">NUTRITION TRACKER</span>
       </h2>
-      {error && <div className="alert alert-danger mb-4">{error}</div>}
+      {error && <div className="alert alert-danger mb-4" role="alert">{error}</div>}
 
       {/* Daily Macros Summary Cards */}
       <div className="row g-3 mb-4">
@@ -230,8 +204,11 @@ function Diet() {
               <div
                 className="progress-bar bg-primary"
                 role="progressbar"
+                aria-valuenow={totals.calories}
+                aria-valuemin="0"
+                aria-valuemax={targets.calories}
                 style={{
-                  width: `${getProgressPct(totals.calories, targets.calories)}%`,
+                  width: `${getProgressPercent(totals.calories, targets.calories)}%`,
                 }}
               ></div>
             </div>
@@ -253,8 +230,11 @@ function Diet() {
               <div
                 className="progress-bar bg-danger"
                 role="progressbar"
+                aria-valuenow={totals.protein}
+                aria-valuemin="0"
+                aria-valuemax={targets.protein}
                 style={{
-                  width: `${getProgressPct(totals.protein, targets.protein)}%`,
+                  width: `${getProgressPercent(totals.protein, targets.protein)}%`,
                 }}
               ></div>
             </div>
@@ -276,8 +256,11 @@ function Diet() {
               <div
                 className="progress-bar bg-warning"
                 role="progressbar"
+                aria-valuenow={totals.carbs}
+                aria-valuemin="0"
+                aria-valuemax={targets.carbs}
                 style={{
-                  width: `${getProgressPct(totals.carbs, targets.carbs)}%`,
+                  width: `${getProgressPercent(totals.carbs, targets.carbs)}%`,
                 }}
               ></div>
             </div>
@@ -299,8 +282,11 @@ function Diet() {
               <div
                 className="progress-bar bg-info"
                 role="progressbar"
+                aria-valuenow={totals.fat}
+                aria-valuemin="0"
+                aria-valuemax={targets.fat}
                 style={{
-                  width: `${getProgressPct(totals.fat, targets.fat)}%`,
+                  width: `${getProgressPercent(totals.fat, targets.fat)}%`,
                 }}
               ></div>
             </div>
@@ -329,12 +315,14 @@ function Diet() {
                   id="food"
                   placeholder="e.g. 2 boiled eggs"
                   required
+                  aria-required="true"
                 />
                 <button
                   type="button"
                   className="btn btn-outline-primary d-inline-flex align-items-center gap-2 fw-medium"
                   onClick={handleAutoFill}
-                  title="Quickly estimate nutrition"
+                  title="Quickly estimate nutrition using AI"
+                  disabled={loading}
                 >
                   <svg
                     width="15"
@@ -345,6 +333,7 @@ function Diet() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    aria-hidden="true"
                   >
                     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                   </svg>
@@ -353,89 +342,72 @@ function Diet() {
               </div>
             </div>
 
-            <div className="col-6 col-md-2">
+            <div className="col-12 col-md-2">
               <label
-                htmlFor="calories"
+                htmlFor="date"
                 className="form-label text-subtle fw-bold small text-uppercase"
               >
-                Calories
+                Date
               </label>
-              <input
-                type="number"
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date || new Date())}
                 className="form-control dark-input"
-                min="0"
-                step="0.1"
-                value={calories}
-                onChange={(e) => setCalories(e.target.value)}
-                id="calories"
-                placeholder="kcal"
-                required
+                dateFormat="dd/MM/yyyy"
+                maxDate={new Date()}
+                id="date"
+                aria-label="Select date"
               />
             </div>
 
-            <div className="col-6 col-md-2">
-              <label
-                htmlFor="protein"
-                className="form-label text-subtle fw-bold small text-uppercase"
-              >
-                Protein (g)
-              </label>
-              <input
-                type="number"
-                className="form-control dark-input"
-                min="0"
-                step="0.1"
-                value={protein}
-                onChange={(e) => setProtein(e.target.value)}
-                id="protein"
-                placeholder="Protein"
-              />
-            </div>
+            <NumberInput
+              name="calories"
+              label="Calories"
+              value={calories}
+              onChange={(e) => setCalories(e.target.value)}
+              placeholder="kcal"
+              min={0}
+              required
+              className="col-6 col-md-2"
+            />
 
-            <div className="col-6 col-md-2">
-              <label
-                htmlFor="carbs"
-                className="form-label text-subtle fw-bold small text-uppercase"
-              >
-                Carbs (g)
-              </label>
-              <input
-                type="number"
-                className="form-control dark-input"
-                min="0"
-                step="0.1"
-                value={carbs}
-                onChange={(e) => setCarbs(e.target.value)}
-                id="carbs"
-                placeholder="Carbs"
-              />
-            </div>
+            <NumberInput
+              name="protein"
+              label="Protein (g)"
+              value={protein}
+              onChange={(e) => setProtein(e.target.value)}
+              placeholder="Protein"
+              min={0}
+              className="col-6 col-md-2"
+            />
 
-            <div className="col-6 col-md-2">
-              <label
-                htmlFor="fat"
-                className="form-label text-subtle fw-bold small text-uppercase"
-              >
-                Fat (g)
-              </label>
-              <input
-                type="number"
-                className="form-control dark-input"
-                min="0"
-                step="0.1"
-                value={fat}
-                onChange={(e) => setFat(e.target.value)}
-                id="fat"
-                placeholder="Fat"
-              />
-            </div>
+            <NumberInput
+              name="carbs"
+              label="Carbs (g)"
+              value={carbs}
+              onChange={(e) => setCarbs(e.target.value)}
+              placeholder="Carbs"
+              min={0}
+              className="col-6 col-md-2"
+            />
+
+            <NumberInput
+              name="fat"
+              label="Fat (g)"
+              value={fat}
+              onChange={(e) => setFat(e.target.value)}
+              placeholder="Fat"
+              min={0}
+              className="col-6 col-md-2"
+            />
 
             <div className="col-12 mt-3">
               <button
                 type="submit"
                 className="btn btn-success text-dark fw-bold px-4"
+                disabled={loading}
               >
-                ADD MEAL
+                {loading ? "Adding..." : "ADD MEAL"}
               </button>
             </div>
           </div>
@@ -443,30 +415,21 @@ function Diet() {
       </div>
 
       {/* Filter & Table Section */}
-      {loading ? (
+      {loading && diets.length === 0 ? (
         <Spinner />
       ) : (
         <div className="card dark-card shadow-sm p-3">
           <h5 className="fw-bold mb-3">LOGGED MEALS</h5>
 
           {/* Date Filter Buttons */}
-          <div className="d-flex gap-2 mb-3">
-            {["today", "week", "month", "all"].map((f) => (
-              <button
-                key={f}
-                className={`btn btn-sm ${filter === f ? "btn-primary" : "btn-outline-secondary"}`}
-                onClick={() => setFilter(f)}
-              >
-                {f === "today" ? "Today" : f === "week" ? "This Week" : f === "month" ? "This Month" : "All"}
-              </button>
-            ))}
-          </div>
+          <FilterButtons filter={filter} setFilter={setFilter} />
 
           <div className="table-responsive">
             <table className="table theme-table table-hover align-middle mb-0">
               <thead>
                 <tr>
                   <th className="text-subtle">Food Name</th>
+                  <th className="text-subtle">Date</th>
                   <th className="text-subtle">Calories (kcal)</th>
                   <th className="text-subtle">Protein (g)</th>
                   <th className="text-subtle">Carbs (g)</th>
@@ -477,7 +440,7 @@ function Diet() {
               <tbody>
                 {filteredDiets.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-4 text-subtle">
+                    <td colSpan="7" className="text-center py-4 text-subtle">
                       No food entries found for this filter.
                     </td>
                   </tr>
@@ -487,6 +450,9 @@ function Diet() {
                       {editId === d._id ? (
                         <>
                           <td className="fw-semibold">{d.foodName}</td>
+                          <td className="text-subtle small">
+                            {new Date(d.date || d.createdAt).toLocaleDateString()}
+                          </td>
                           <td>
                             <input
                               type="number"
@@ -500,6 +466,7 @@ function Diet() {
                                   calories: e.target.value,
                                 })
                               }
+                              aria-label="Edit calories"
                             />
                           </td>
                           <td>
@@ -515,6 +482,7 @@ function Diet() {
                                   protein: e.target.value,
                                 })
                               }
+                              aria-label="Edit protein"
                             />
                           </td>
                           <td>
@@ -530,6 +498,7 @@ function Diet() {
                                   carbs: e.target.value,
                                 })
                               }
+                              aria-label="Edit carbs"
                             />
                           </td>
                           <td>
@@ -545,18 +514,21 @@ function Diet() {
                                   fat: e.target.value,
                                 })
                               }
+                              aria-label="Edit fat"
                             />
                           </td>
                           <td>
                             <button
                               className="btn btn-success btn-sm me-1"
                               onClick={() => handleUpdate(d._id)}
+                              aria-label="Save changes"
                             >
                               Save
                             </button>
                             <button
                               className="btn btn-secondary btn-sm"
                               onClick={() => setEditId(null)}
+                              aria-label="Cancel editing"
                             >
                               Cancel
                             </button>
@@ -565,6 +537,9 @@ function Diet() {
                       ) : (
                         <>
                           <td className="fw-semibold">{d.foodName}</td>
+                          <td className="text-subtle small">
+                            {new Date(d.date || d.createdAt).toLocaleDateString()}
+                          </td>
                           <td>{d.calories}</td>
                           <td>{d.protein || 0}</td>
                           <td>{d.carbs || 0}</td>
@@ -573,12 +548,14 @@ function Diet() {
                             <button
                               className="btn btn-warning btn-sm me-1"
                               onClick={() => handleEdit(d)}
+                              aria-label={`Edit ${d.foodName}`}
                             >
                               Edit
                             </button>
                             <button
                               className="btn btn-danger btn-sm"
                               onClick={() => handleDelete(d._id)}
+                              aria-label={`Delete ${d.foodName}`}
                             >
                               Delete
                             </button>

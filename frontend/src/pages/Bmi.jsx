@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useMemo } from "react";
 import Spinner from "../components/Spinner";
+import NumberInput from "../components/NumberInput";
+import FilterButtons from "../components/FilterButtons";
+import StatusBadge from "../components/StatusBadge";
+import { useDateFilter } from "../hooks/useDateFilter";
+import { useAuthFetch } from "../hooks/useAuthFetch";
+import { metersToFeet } from "../hooks/useDateFilter";
 import "../style/Bmi.css";
 
 function Bmi() {
@@ -8,98 +13,35 @@ function Bmi() {
   const [feet, setFeet] = useState("");
   const [inches, setInches] = useState("");
   const [suggestedWorkouts, setSuggestedWorkouts] = useState([]);
-  const [filter, setFilter] = useState("all");
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+ 
   const [bmiResult, setBmiResult] = useState({});
   const [history, setHistory] = useState([]);
+
+  const { loading, error, execute, setError } = useAuthFetch();  
+  const { filter, setFilter, filteredItems: filteredHistory } = useDateFilter(history, "createdAt");
 
   // Calculate height in meters on the fly safely
   const feetNum = parseInt(feet) || 0;
   const inchesNum = parseInt(inches) || 0;
-  const heightInMeters = ((feetNum * 12 + inchesNum) * 0.0254).toFixed(2);
+  const heightInMeters = useMemo(
+    () => ((feetNum * 12 + inchesNum) * 0.0254).toFixed(2),
+    [feetNum, inchesNum]
+  );
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        setLoading(true);
-        const historyRes = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/bmi/history`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setHistory(historyRes.data);
-      } catch (err) {
-        setError("Failed to load BMI history");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchHistory();
   }, []);
 
-  const filterByDate = (items, dateField) => {
-    const now = new Date();
-    return items.filter((item) => {
-      const d = new Date(item[dateField] || item.createdAt);
-      if (filter === "today") {
-        return d.toDateString() === now.toDateString();
-      } else if (filter === "week") {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        return d >= weekAgo;
-      } else if (filter === "month") {
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      }
-      return true; // 'all'
-    });
-  };
-
-  const metersToFeet = (meters) => {
-    if (!meters) return "N/A";
-    const totalInches = meters / 0.0254;
-    const f = Math.floor(totalInches / 12);
-    const i = Math.round(totalInches % 12);
-    return `${f}' ${i}"`;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!weight || (!feet && !inches)) {
-      setError("Please fill in weight and height fields.");
-      return;
-    }
-
+  const fetchHistory = async () => {
     try {
-      setError("");
-      const token = localStorage.getItem("token");
-      setLoading(true);
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/bmi/calculate`,
-        {
-          weight: Number(weight),
-          height: Number(heightInMeters),
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      setBmiResult(res.data);
-      setSuggestedWorkouts(res.data.suggestedWorkouts || []);
-      setHistory([res.data, ...history]);
-      setWeight("");
-      setFeet("");
-      setInches("");
+      const data = await execute({
+        method: 'GET',
+        url: '/api/bmi/history',
+      });
+      setHistory(data);
     } catch (err) {
-      setError("Failed to calculate BMI.");
-    } finally {
-      setLoading(false);
+      // Error handled by useAuthFetch
     }
   };
 
@@ -112,24 +54,42 @@ function Bmi() {
     return Math.min(100, 75 + ((val - 30) / 10) * 25);
   };
 
-  const getBadgeClass = (cat) => {
-    switch (cat) {
-      case "Underweight":
-        return "bg-info bg-opacity-25 text-info border border-info border-opacity-50";
-      case "Normal":
-      case "Normal weight":
-        return "bg-success bg-opacity-25 text-success border border-success border-opacity-50";
-      case "Overweight":
-        return "bg-warning bg-opacity-25 text-warning border border-warning border-opacity-50";
-      case "Obese":
-      case "Obesity":
-        return "bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50";
-      default:
-        return "bg-secondary text-subtle";
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!weight || (!feet && !inches)) {
+      setError("Please fill in weight and height fields.");
+      return;
+    }
+
+    if (Number(weight) <= 0 || Number(heightInMeters) <= 0) {
+      setError("Weight and height must be greater than 0.");
+      return;
+    }
+
+    try {
+      const data = await execute({
+        method: 'POST',
+        url: '/api/bmi/calculate',
+        data: {
+          weight: Number(weight),
+          height: Number(heightInMeters),
+        },
+      });
+
+      setBmiResult(data);
+      setSuggestedWorkouts(data.suggestedWorkouts || []);
+      setHistory([data, ...history]);
+
+      // Reset form
+      setWeight("");
+      setFeet("");
+      setInches("");
+      setError(null);
+    } catch (err) {
+      // Error handled by useAuthFetch
     }
   };
-
-  const filteredHistory = filterByDate(history, "createdAt");
 
   return (
     <div className="container mt-4">
@@ -147,7 +107,7 @@ function Bmi() {
       </div>
 
       {error && (
-        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 mb-4 rounded-3">
+        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border border-danger border-opacity-50 mb-4 rounded-3" role="alert">
           {error}
         </div>
       )}
@@ -157,59 +117,52 @@ function Bmi() {
         <form onSubmit={handleSubmit}>
           <div className="row g-3 align-items-end">
             <div className="col-12 col-md-3">
-              <label htmlFor="weight" className="form-label text-subtle fw-bold small text-uppercase">
-                Weight (KG)
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                id="weight"
-                className="form-control dark-input"
-                onKeyDown={(e) => ["e", "-", "+"].includes(e.key) && e.preventDefault()}
-                placeholder="e.g. 70"
+              <NumberInput
+                name="weight"
+                label="Weight (KG)"
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
+                placeholder="e.g. 70"
+                min={0}
                 required
+                className="mb-0"
               />
             </div>
+
             <div className="col-6 col-md-3">
-              <label htmlFor="feet" className="form-label text-subtle fw-bold small text-uppercase">
-                Height (Feet)
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                id="feet"
-                className="form-control dark-input"
-                onKeyDown={(e) => ["e", "-", "+"].includes(e.key) && e.preventDefault()}
-                placeholder="e.g. 5"
+              <NumberInput
+                name="feet"
+                label="Height (Feet)"
                 value={feet}
                 onChange={(e) => setFeet(e.target.value)}
+                placeholder="e.g. 5"
+                min={0}
                 required
+                className="mb-0"
               />
             </div>
+
             <div className="col-6 col-md-3">
-              <label htmlFor="inches" className="form-label text-subtle fw-bold small text-uppercase">
-                Height (Inches)
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="0.1"
-                id="inches"
-                className="form-control dark-input"
-                onKeyDown={(e) => ["e", "-", "+"].includes(e.key) && e.preventDefault()}
-                placeholder="e.g. 9"
+              <NumberInput
+                name="inches"
+                label="Height (Inches)"
                 value={inches}
                 onChange={(e) => setInches(e.target.value)}
+                placeholder="e.g. 9"
+                min={0}
+                className="mb-0"
               />
             </div>
+
             <div className="col-12 col-md-3">
-              <button type="submit" className="btn btn-neon w-100 py-2 text-uppercase" disabled={loading}>
-                {loading ? "Calculating..." : "Calculate"}
-              </button>
+              <div className="mb-0">
+                <label className="form-label text-subtle fw-bold small text-uppercase" style={{ visibility: 'hidden' }}>
+                  Action
+                </label>
+                <button type="submit" className="btn btn-neon w-100 py-2 text-uppercase" disabled={loading}>
+                  {loading ? "Calculating..." : "Calculate"}
+                </button>
+              </div>
             </div>
           </div>
         </form>
@@ -229,17 +182,16 @@ function Bmi() {
               </div>
             </div>
             <div>
-              <span className={`badge px-3 py-2 rounded-pill fs-6 fw-bold ${getBadgeClass(bmiResult.category)}`}>
-                {bmiResult.category}
-              </span>
+              <StatusBadge status={bmiResult.category} type="bmi" />
             </div>
           </div>
 
           <div className="mt-3 px-2">
-            <div className="bmi-scale-bar">
+            <div className="bmi-scale-bar" role="progressbar" aria-valuenow={bmiResult.bmi} aria-valuemin="0" aria-valuemax="40">
               <div
                 className="bmi-marker"
                 style={{ left: `${getSliderPosition(bmiResult.bmi)}%` }}
+                aria-label={`BMI value: ${bmiResult.bmi}`}
               ></div>
             </div>
             <div className="d-flex justify-content-between text-subtle extra-small mt-3 fw-semibold">
@@ -283,17 +235,7 @@ function Bmi() {
         </h5>
 
         {/* Date Filter Buttons */}
-        <div className="d-flex gap-2 mb-3">
-          {["today", "week", "month", "all"].map((f) => (
-            <button
-              key={f}
-              className={`btn btn-sm ${filter === f ? "btn-primary" : "btn-outline-secondary"}`}
-              onClick={() => setFilter(f)}
-            >
-              {f === "today" ? "Today" : f === "week" ? "This Week" : f === "month" ? "This Month" : "All"}
-            </button>
-          ))}
-        </div>
+        <FilterButtons filter={filter} setFilter={setFilter} />
 
         {loading && history.length === 0 ? (
           <div className="text-center py-4">
@@ -319,9 +261,7 @@ function Bmi() {
                       <td>{metersToFeet(h.height)}</td>
                       <td className="fw-bold">{h.bmi}</td>
                       <td>
-                        <span className={`badge px-2 py-1 rounded-pill small ${getBadgeClass(h.category)}`}>
-                          {h.category}
-                        </span>
+                        <StatusBadge status={h.category} type="bmi" />
                       </td>
                       <td className="text-subtle small">
                         {h.createdAt

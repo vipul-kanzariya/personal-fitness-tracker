@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../components/Spinner";
-import "../style/Profile.css";
+import NumberInput from "../components/NumberInput";
+import { useAuthFetch } from "../hooks/useAuthFetch";
 import { useTheme } from "../context/ThemeContext";
+import { clearAuthData } from "../utils/api";
+import "../style/Profile.css";
 import { toast } from "react-toastify";
+
 function Profile() {
   const [user, setUser] = useState({});
   const [name, setName] = useState("");
@@ -14,82 +17,89 @@ function Profile() {
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  const { loading, error, execute, setError } = useAuthFetch();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        setLoading(true);
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/auth/profile`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setUser(res.data);
-        setName(res.data.name || "");
-        setAge(res.data.age || "");
-        setWeight(res.data.weight || "");
-        setHeight(res.data.height || "");
-      } catch (err) {
-        setError("Failed to load profile.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProfile();
   }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const data = await execute({
+        method: 'GET',
+        url: '/api/auth/profile',
+      });
+      setUser(data);
+      setName(data.name || "");
+      setAge(data.age || "");
+      setWeight(data.weight || "");
+      setHeight(data.height || "");
+    } catch (err) {
+      toast.error("Failed to load profile.");
+    }
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/auth/profile`,
-        { name, age, weight, height },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setUser(res.data);
-      setSuccess("Profile updated successfully!");
+      const data = await execute({
+        method: 'PUT',
+        url: '/api/auth/profile',
+        data: { name, age, weight, height },
+      });
+      setUser(data);
       setError("");
-       toast.success("Profile updated successfully!");
+      toast.success("Profile updated successfully!");
     } catch (err) {
-      setError("Failed to update profile.");
-      setSuccess("");
-       toast.error("Failed to update profile.");
+      toast.error("Failed to update profile.");
     }
   };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
+    setPasswordError("");
+
+    // Validation
+    if (!currentPassword) {
+      setPasswordError("Please enter your current password.");
+      return;
+    }
+    if (!newPassword || newPassword.length < 6) {
+      setPasswordError("New password must be at least 6 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/auth/change-password`,
-        { currentPassword, newPassword },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setSuccess("Password changed successfully!");
-      setError("");
+      await execute({
+        method: 'PUT',
+        url: '/api/auth/change-password',
+        data: { currentPassword, newPassword },
+      });
       setCurrentPassword("");
       setNewPassword("");
-       toast.success("Password changed successfully!");
+      setConfirmPassword("");
+      setPasswordError("");
+      toast.success("Password changed successfully!");
     } catch (err) {
-      const msg = err.response?.data || "Failed to change password.";
-      setError(msg);
-      setSuccess("");
-      toast.error(typeof msg === "string" ? msg : "Failed to change password.");
+      const msg = err.message || "Failed to change password.";
+      setPasswordError(msg);
+      toast.error(msg);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("name");
+    clearAuthData();
+    toast.success("Logged out successfully!");
     navigate("/login");
   };
 
@@ -116,23 +126,19 @@ function Profile() {
             color: "var(--text-primary)",
             backgroundColor: "var(--bg-card)",
           }}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         >
           <span>{theme === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode"}</span>
         </button>
       </div>
 
       {error && (
-        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-0 rounded-4 mb-4 text-center fw-semibold">
+        <div className="alert alert-danger bg-danger bg-opacity-25 text-danger border-0 rounded-4 mb-4 text-center fw-semibold" role="alert">
           {error}
         </div>
       )}
-      {success && (
-        <div className="alert alert-success bg-success bg-opacity-25 text-success border-0 rounded-4 mb-4 text-center fw-semibold">
-          {success}
-        </div>
-      )}
 
-      {loading ? (
+      {loading && !user.email ? (
         <div className="text-center py-5">
           <Spinner />
         </div>
@@ -142,7 +148,7 @@ function Profile() {
           <div className="col-lg-10">
             <div className="card profile-card p-4 d-flex flex-row flex-wrap align-items-center justify-content-between gap-3">
               <div className="d-flex align-items-center gap-3">
-                <div className="avatar-box">
+                <div className="avatar-box" aria-label="User avatar">
                   {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
                 <div>
@@ -212,6 +218,7 @@ function Profile() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required
+                      aria-required="true"
                     />
                   </div>
 
@@ -225,51 +232,38 @@ function Profile() {
                       id="email"
                       value={user.email || ""}
                       disabled
+                      aria-readonly="true"
                     />
                   </div>
 
                   <div className="row g-2 mb-3">
-                    <div className="col-4">
-                      <label htmlFor="age" className="form-label-custom d-block">
-                        Age
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        className="form-control form-control-custom"
-                        id="age"
-                        value={age}
-                        onChange={(e) => setAge(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-4">
-                      <label htmlFor="weight" className="form-label-custom d-block">
-                        Weight (kg)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        className="form-control form-control-custom"
-                        id="weight"
-                        value={weight}
-                        onChange={(e) => setWeight(e.target.value)}
-                      />
-                    </div>
-                    <div className="col-4">
-                      <label htmlFor="height" className="form-label-custom d-block">
-                        Height (cm)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.1"
-                        className="form-control form-control-custom"
-                        id="height"
-                        value={height}
-                        onChange={(e) => setHeight(e.target.value)}
-                      />
-                    </div>
+                    <NumberInput
+                      name="age"
+                      label="Age"
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      min={0}
+                      max={150}
+                      className="col-4 mb-0"
+                    />
+
+                    <NumberInput
+                      name="weight"
+                      label="Weight (kg)"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      min={0}
+                      className="col-4 mb-0"
+                    />
+
+                    <NumberInput
+                      name="height"
+                      label="Height (cm)"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                      min={0}
+                      className="col-4 mb-0"
+                    />
                   </div>
                 </form>
               </div>
@@ -278,8 +272,9 @@ function Profile() {
                 type="submit"
                 form="profileForm"
                 className="btn btn-neon-submit w-100 text-uppercase mt-3"
+                disabled={loading}
               >
-                Save Changes
+                {loading ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -297,6 +292,13 @@ function Profile() {
                 >
                   🔒 Security & Password
                 </h5>
+
+                {passwordError && (
+                  <div className="alert alert-danger alert-sm mb-3" role="alert">
+                    {passwordError}
+                  </div>
+                )}
+
                 <form id="passwordForm" onSubmit={handleChangePassword}>
                   <div className="mb-3">
                     <label htmlFor="currentPassword" className="form-label-custom d-block">
@@ -309,6 +311,7 @@ function Profile() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
+                      aria-required="true"
                     />
                   </div>
 
@@ -324,6 +327,24 @@ function Profile() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={6}
+                      aria-required="true"
+                    />
+                    <small className="form-text text-subtle">Minimum 6 characters</small>
+                  </div>
+
+                  <div className="mb-3">
+                    <label htmlFor="confirmPassword" className="form-label-custom d-block">
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      className="form-control form-control-custom"
+                      id="confirmPassword"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      aria-required="true"
                     />
                   </div>
                 </form>
@@ -333,8 +354,9 @@ function Profile() {
                 type="submit"
                 form="passwordForm"
                 className="btn btn-neon-submit w-100 text-uppercase mt-3"
+                disabled={loading}
               >
-                Update Password
+                {loading ? "Updating..." : "Update Password"}
               </button>
             </div>
           </div>
@@ -344,6 +366,7 @@ function Profile() {
             <button
               onClick={handleLogout}
               className="btn btn-logout-custom px-4 py-2 text-uppercase fw-bold"
+              aria-label="Logout from account"
             >
               Logout Account
             </button>
