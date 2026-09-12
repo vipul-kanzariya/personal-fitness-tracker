@@ -10,6 +10,7 @@ const foodRoutes = require("./routes/food");
 const orderRoutes = require("./routes/order");
 const adminRoutes = require('./routes/admin');
 const workoutTypeRoutes = require('./routes/workoutType');
+const feedbackRoutes = require('./routes/feedback');
 const cors = require("cors");
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/food",foodRoutes);
 app.use("/api/orders",orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/workout-types', workoutTypeRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 const PORT =process.env.PORT || 3000;
 mongoose
