@@ -3,8 +3,12 @@
  * Centralized API URL management
  */
 
-// Get API URL from environment variables
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// Use the configured backend in development and the current origin when the
+// frontend and API are deployed together.
+const configuredApiUrl = import.meta.env.VITE_API_URL?.trim();
+export const API_BASE_URL = (configuredApiUrl || (
+  import.meta.env.DEV ? 'http://localhost:3000' : window.location.origin
+)).replace(/\/+$/, '');
 
 /**
  * Creates axios config with authorization header

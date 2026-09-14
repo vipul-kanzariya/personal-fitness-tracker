@@ -62,11 +62,15 @@ function Home() {
     const loadFeedback = async () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/feedback`);
+        if (!Array.isArray(response.data)) {
+          throw new Error("Community feedback response was invalid.");
+        }
         setFeedbackItems([
           ...response.data,
           ...defaultFeedback.map((message) => ({ message, name: "FitTrack member", rating: 5 })),
         ]);
       } catch (error) {
+        console.error("Unable to load community feedback", error);
         toast.error("Unable to load community feedback.");
       }
     };
@@ -108,7 +112,8 @@ function Home() {
         setFeedback("");
         setFeedbackRating(5);
       } catch (error) {
-        toast.error(error.response?.data || "Unable to submit feedback.");
+        const message = error.response?.data?.message || error.response?.data;
+        toast.error(typeof message === "string" ? message : "Unable to submit feedback.");
       }
     };
     submitFeedback();

@@ -39,7 +39,7 @@ const nutrition = JSON.parse(jsonMatch ? jsonMatch[0] : cleanText);
     res.status(200).json(nutrition);
   } catch(err) {
      console.log('AI ERROR:', err.message);
-    res.status(500).json('Failed to estimate nutrition. Please enter values manually.');
+    res.status(500).json({ message: 'Nutrition estimation is currently unavailable. Please enter values manually.' });
   }
 });
 router.get('/',authMiddleware,async(req,res)=>{

@@ -227,13 +227,13 @@
 .home-feedback-marquee { overflow: hidden; mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent); }
 .home-feedback-track { display: flex; width: max-content; animation: home-scroll-feedback 34s linear infinite; }
 .home-feedback-track:hover { animation-play-state: paused; }
-.home-feedback-track blockquote { display: inline-flex; align-items: flex-start; gap: .7rem; min-width: 330px; min-height: 125px; margin: 0 .6rem; padding: 1.1rem 1.2rem; border: 1px solid var(--home-border); border-radius: 16px; background: var(--home-card); color: var(--home-muted); font-size: .82rem; box-shadow: 0 15px 35px rgba(0,0,0,.12); }
+.home-feedback-track blockquote { display: inline-flex; flex: 0 0 360px; align-items: flex-start; gap: .7rem; min-height: 125px; margin: 0 .6rem; padding: 1.1rem 1.2rem; border: 1px solid var(--home-border); border-radius: 16px; background: var(--home-card); color: var(--home-muted); font-size: .82rem; box-shadow: 0 15px 35px rgba(0,0,0,.12); }
 .home-feedback-track blockquote svg { flex: 0 0 auto; color: #a3e635; }
-.home-feedback-track blockquote span { display: flex; flex-direction: column; gap: .3rem; }
+.home-feedback-track blockquote span { display: flex; min-width: 0; flex-direction: column; gap: .3rem; }
 .home-feedback-track blockquote strong { color: var(--home-ink); font-size: .9rem; }
 .home-feedback-track blockquote small { color: var(--home-accent); letter-spacing: 2px; }
 .home-feedback-track blockquote .home-display-rating { display: inline-flex; flex-direction: row; align-items: center; gap: .08rem; }
-.home-feedback-track blockquote em { color: var(--home-muted); font-style: normal; line-height: 1.5; }
+.home-feedback-track blockquote em { color: var(--home-muted); font-style: normal; line-height: 1.5; overflow-wrap: anywhere; }
 @keyframes home-scroll-feedback { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .home-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.4rem max(2rem, calc((100vw - 1220px) / 2)); border-top: 1px solid var(--home-soft-border); color: var(--home-muted); font-size: .78rem; }.home-footer p { margin: 0; }.home-footer > div { display: flex; gap: 1rem; }.home-footer a { color: var(--home-ink); text-decoration: none; }
 

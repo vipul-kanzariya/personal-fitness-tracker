@@ -1,7 +1,29 @@
+const AI_REQUEST_TIMEOUT_MS = 10000;
+
+async function fetchWithTimeout(url, options) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("AI nutrition request timed out");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // Primary: Gemini (Google AI Studio free tier)
 async function askGemini(prompt) {
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const response = await fetchWithTimeout(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${process.env.GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -22,7 +44,11 @@ async function askGemini(prompt) {
 
 // Fallback: OpenRouter (free model)
 async function askOpenRouter(prompt) {
- const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+ if (!process.env.OPENROUTER_API_KEY) {
+   throw new Error("OPENROUTER_API_KEY is not configured");
+ }
+
+ const response = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
 method: 'POST',
 headers: {
 Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,

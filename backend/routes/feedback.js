@@ -11,7 +11,8 @@ router.get("/", async (req, res) => {
       .select("name message rating createdAt");
     res.status(200).json(feedback);
   } catch (err) {
-    res.status(500).json(err.message);
+    console.error("Unable to load community feedback:", err);
+    res.status(500).json({ message: "Unable to load community feedback." });
   }
 });
 
@@ -19,8 +20,10 @@ router.post("/", async (req, res) => {
   try {
     const { name, message, rating } = req.body;
     const numericRating = Number(rating);
+    const trimmedName = typeof name === "string" ? name.trim() : "";
+    const trimmedMessage = typeof message === "string" ? message.trim() : "";
 
-    if (!name || !message || !Number.isFinite(numericRating)) {
+    if (!trimmedName || !trimmedMessage || !Number.isFinite(numericRating)) {
       return res.status(400).json("Name, feedback, and rating are required");
     }
     if (numericRating < 0.5 || numericRating > 5 || numericRating * 2 !== Math.round(numericRating * 2)) {
@@ -28,13 +31,14 @@ router.post("/", async (req, res) => {
     }
 
     const feedback = await Feedback.create({
-      name: String(name).trim(),
-      message: String(message).trim(),
+      name: trimmedName,
+      message: trimmedMessage,
       rating: numericRating,
     });
     res.status(201).json(feedback);
   } catch (err) {
-    res.status(500).json(err.message);
+    console.error("Unable to save community feedback:", err);
+    res.status(500).json({ message: "Unable to save community feedback." });
   }
 });
 
