@@ -26,6 +26,7 @@ import Profile from './pages/Profile'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Home from './pages/Home'
+import AiCoach from './pages/AiCoach'
 
 function Layout() {
   const location = useLocation();
@@ -112,6 +113,11 @@ function Layout() {
               <Route path='/profile' element={
                 <ErrorBoundary>
                   <Profile />
+                </ErrorBoundary>
+              } />
+              <Route path='/ai-coach' element={
+                <ErrorBoundary>
+                  <AiCoach />
                 </ErrorBoundary>
               } />
             </Route>

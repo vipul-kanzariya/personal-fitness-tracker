@@ -152,6 +152,14 @@ function Navbar() {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/ai-coach" className="nav-link" title="AI Coach">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 2l-1 7h7l-8 13 1-8H5l8-12z" />
+                </svg>
+                <span>AI Coach</span>
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/profile" className="nav-link" title="Profile">
                 <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
