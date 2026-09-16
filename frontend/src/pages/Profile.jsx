@@ -4,7 +4,7 @@ import Spinner from "../components/Spinner";
 import NumberInput from "../components/NumberInput";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { useTheme } from "../context/ThemeContext";
-import { FiLock, FiMoon, FiSettings, FiSun } from "react-icons/fi";
+import { FiLogOut, FiLock, FiMoon, FiSettings, FiSun } from "react-icons/fi";
 import { clearAuthData } from "../utils/api";
 import "../style/Profile.css";
 import { toast } from "react-toastify";
@@ -366,10 +366,11 @@ function Profile() {
           <div className="col-lg-10 text-center mt-4">
             <button
               onClick={handleLogout}
-              className="btn btn-logout-custom px-4 py-2 text-uppercase fw-bold"
+              className="btn btn-logout-custom"
               aria-label="Logout from account"
             >
-              Logout Account
+              <FiLogOut aria-hidden="true" />
+              <span>Log Out</span>
             </button>
           </div>
         </div>
