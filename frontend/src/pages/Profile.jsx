@@ -118,19 +118,23 @@ function Profile() {
         </div>
 
         {/* Theme Toggle Button */}
-        <button
-          onClick={toggleTheme}
-          className="btn btn-outline-secondary d-flex align-items-center gap-2 px-3 py-2"
-          style={{
-            borderRadius: "10px",
-            borderColor: "var(--border-color)",
-            color: "var(--text-primary)",
-            backgroundColor: "var(--bg-card)",
-          }}
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          <span>{theme === "dark" ? <><FiSun aria-hidden="true" /> Light Mode</> : <><FiMoon aria-hidden="true" /> Dark Mode</>}</span>
-        </button>
+        <div className="theme-toggle-wrap">
+          <button
+            onClick={toggleTheme}
+            className={`theme-toggle ${theme === "dark" ? "is-dark" : "is-light"}`}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            aria-pressed={theme === "dark"}
+          >
+            <span className="theme-toggle-track" aria-hidden="true">
+              <span className="theme-toggle-thumb">
+                {theme === "dark" ? <FiMoon /> : <FiSun />}
+              </span>
+            </span>
+          </button>
+          <span className="theme-toggle-label">
+            {theme === "dark" ? "Dark mode" : "Light mode"}
+          </span>
+        </div>
       </div>
 
       {error && (
