@@ -13,11 +13,23 @@ const workoutTypeRoutes = require('./routes/workoutType');
 const feedbackRoutes = require('./routes/feedback');
 const aiRoutes = require('./routes/ai');
 const cors = require("cors");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Origin is not allowed by CORS"));
+  },
+}));
 app.get("/", (req, res) => {
   res.json("Welcome");
 });
@@ -31,6 +43,10 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/workout-types', workoutTypeRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/ai', aiRoutes);
+app.use((req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+app.use(errorHandler);
 
 const PORT =process.env.PORT || 3000;
 mongoose

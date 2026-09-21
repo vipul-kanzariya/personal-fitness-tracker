@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Spinner from "../components/Spinner";
 import NumberInput from "../components/NumberInput";
 import FilterButtons from "../components/FilterButtons";

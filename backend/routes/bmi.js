@@ -7,7 +7,13 @@ const router = express.Router();
 router.post("/calculate", authMiddleware, async (req, res) => {
   try {
     const { weight, height } = req.body;
-    const bmi = (weight / (height * height)).toFixed(2);
+    const numericWeight = Number(weight);
+    const numericHeight = Number(height);
+    if (!Number.isFinite(numericWeight) || numericWeight <= 0 ||
+        !Number.isFinite(numericHeight) || numericHeight <= 0) {
+      return res.status(400).json({ message: "Weight and height must be positive numbers" });
+    }
+    const bmi = (numericWeight / (numericHeight * numericHeight)).toFixed(2);
     let category;
     if (bmi < 18.5) {
       category = "Underweight";
@@ -20,8 +26,8 @@ router.post("/calculate", authMiddleware, async (req, res) => {
     }
     const bmiRecord = await Bmi.create({
       userId: req.user.id,
-      weight,
-      height,
+      weight: numericWeight,
+      height: numericHeight,
       bmi,
       category,
     });

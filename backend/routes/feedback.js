@@ -26,6 +26,9 @@ router.post("/", async (req, res) => {
     if (!trimmedName || !trimmedMessage || !Number.isFinite(numericRating)) {
       return res.status(400).json("Name, feedback, and rating are required");
     }
+    if (trimmedName.length > 100 || trimmedMessage.length > 1000) {
+      return res.status(400).json({ message: "Name or feedback is too long" });
+    }
     if (numericRating < 0.5 || numericRating > 5 || numericRating * 2 !== Math.round(numericRating * 2)) {
       return res.status(400).json("Rating must be between 0.5 and 5 in half-star increments");
     }

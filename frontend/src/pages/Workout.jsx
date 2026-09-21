@@ -1,11 +1,9 @@
-import React, { useEffect, useState, useMemo } from "react";
-import axios from "axios";
+import { useEffect, useState, useMemo } from "react";
 import Spinner from "../components/Spinner";
 import NumberInput from "../components/NumberInput";
 import FilterButtons from "../components/FilterButtons";
 import { useDateFilter } from "../hooks/useDateFilter";
 import { useAuthFetch } from "../hooks/useAuthFetch";
-import { API_BASE_URL } from "../utils/api";
 import "../style/Workout.css";
 import { toast } from "react-toastify";
 import { FiZap } from "react-icons/fi";

@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import Spinner from "../components/Spinner";
@@ -7,7 +6,6 @@ import NumberInput from "../components/NumberInput";
 import FilterButtons from "../components/FilterButtons";
 import { useDateFilter } from "../hooks/useDateFilter";
 import { useAuthFetch } from "../hooks/useAuthFetch";
-import { API_BASE_URL, getAuthConfig } from "../utils/api";
 import { getProgressPercent } from "../utils/formatters";
 import "../style/Diet.css";
 import { toast } from "react-toastify";

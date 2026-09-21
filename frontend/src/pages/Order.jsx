@@ -7,7 +7,7 @@ import { API_BASE_URL, getAuthConfig } from "../utils/api";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import "../style/Order.css";
 import { toast } from "react-toastify";
-import { FiCheckCircle, FiPackage, FiShield } from "react-icons/fi";
+import { FiPackage, FiShield } from "react-icons/fi";
 
 function Order() {
   const [orders, setOrders] = useState([]);

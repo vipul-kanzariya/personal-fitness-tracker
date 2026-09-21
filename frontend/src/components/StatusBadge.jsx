@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * Status badge component with color coding

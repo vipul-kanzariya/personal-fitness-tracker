@@ -1,4 +1,3 @@
-import React from 'react';
 
 /**
  * Reusable filter buttons component
