@@ -113,6 +113,57 @@ function AdminDashboard() {
             </div>
           </div>
 
+          {/* Total Stock Units */}
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">
+                <span aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: '700' }}>#</span>
+              </div>
+
+              <span className="form-label-custom d-block">
+                Total Stock
+              </span>
+
+              <h2 className="fw-bold m-0">
+                {summary.totalStockUnits || 0}
+              </h2>
+            </div>
+          </div>
+
+          {/* Low Stock */}
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">
+                <span aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: '700' }}>!</span>
+              </div>
+
+              <span className="form-label-custom d-block">
+                Low Stock
+              </span>
+
+              <h2 className="fw-bold m-0 text-warning">
+                {summary.lowStockProducts || 0}
+              </h2>
+            </div>
+          </div>
+
+          {/* Out of Stock */}
+          <div className="col-md-3 col-sm-6">
+            <div className="admin-stat-card p-4 text-center">
+              <div className="stat-icon">
+                <span aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: '700' }}>0</span>
+              </div>
+
+              <span className="form-label-custom d-block">
+                Out of Stock
+              </span>
+
+              <h2 className="fw-bold m-0 text-danger">
+                {summary.outOfStockProducts || 0}
+              </h2>
+            </div>
+          </div>
+
           {/* Total Revenue */}
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">

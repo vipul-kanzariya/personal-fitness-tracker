@@ -34,6 +34,14 @@ const OrderSchema = Schema(
     paymentId: {
       type: String,
     },
+    inventoryReserved: {
+      type: Boolean,
+      default: false,
+    },
+    inventoryAdjusted: {
+      type: Boolean,
+      default: false,
+    },
     razorpayOrderId: {
       type: String,
       unique: true,

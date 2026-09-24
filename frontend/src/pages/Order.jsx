@@ -68,6 +68,16 @@ function Order() {
       return;
     }
 
+    const cartHasUnavailableItem = cart.some((item) => {
+      const availableQuantity = Number(item.availableQuantity ?? item.inventory?.availableQuantity ?? 0);
+      return availableQuantity < item.quantity || availableQuantity <= 0;
+    });
+
+    if (cartHasUnavailableItem) {
+      toast.error("One or more items are no longer available in the requested quantity.");
+      return;
+    }
+
     try {
       setOrdering(true);
       const paymentOrder = await axios.post(
@@ -114,7 +124,16 @@ function Order() {
           }
         },
         modal: {
-          ondismiss: () => {
+          ondismiss: async () => {
+            try {
+              await axios.put(
+                `${API_BASE_URL}/api/orders/${paymentOrder.data.orderId}/cancel`,
+                {},
+                getAuthConfig(),
+              );
+            } catch (error) {
+              console.error('Order cancellation after dismiss failed:', error);
+            }
             toast.info("Payment cancelled.");
             setOrdering(false);
           },

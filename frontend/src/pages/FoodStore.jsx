@@ -39,8 +39,23 @@ function FoodStore() {
   }, []);
 
   const addToCart = (item) => {
+    const availableQuantity = Number(item.availableQuantity ?? item.inventory?.availableQuantity ?? 0);
+    const isOutOfStock = availableQuantity <= 0;
+
+    if (isOutOfStock) {
+      toast.error(`${item.name} is currently out of stock.`);
+      return;
+    }
+
     const savedCart = JSON.parse(localStorage.getItem("foodCart") || "[]");
     const existingItem = savedCart.find((cartItem) => cartItem._id === item._id);
+    const currentQty = existingItem ? existingItem.quantity : 0;
+
+    if (currentQty >= availableQuantity) {
+      toast.warning(`Only ${availableQuantity} unit${availableQuantity > 1 ? "s" : ""} available.`);
+      return;
+    }
+
     const updatedCart = existingItem
       ? savedCart.map((cartItem) =>
           cartItem._id === item._id
@@ -90,41 +105,51 @@ function FoodStore() {
               <FiShoppingCart aria-hidden="true" /> AVAILABLE MEALS
             </h5>
             <div className="row g-3">
-              {food.map((f) => (
-                <div className="col-12 col-sm-6 col-md-4" key={f._id}>
-                  <div className="card dark-card food-card p-3 h-100 d-flex flex-column justify-content-between">
-                    <div>
-                      <div className="food-img-container mb-3">
-                        <img
-                          src={f.image || "https://placehold.co/150x150"}
-                          alt={f.name}
-                          className="food-img"
-                        />
-                        <span className="badge category-badge rounded-pill fw-semibold">
-                          {f.category}
-                        </span>
+              {food.map((f) => {
+                const availableQuantity = Number(f.availableQuantity ?? f.inventory?.availableQuantity ?? 0);
+                const isOutOfStock = availableQuantity <= 0;
+
+                return (
+                  <div className="col-12 col-sm-6 col-md-4" key={f._id}>
+                    <div className="card dark-card food-card p-3 h-100 d-flex flex-column justify-content-between">
+                      <div>
+                        <div className="food-img-container mb-3">
+                          <img
+                            src={f.image || "https://placehold.co/150x150"}
+                            alt={f.name}
+                            className="food-img"
+                          />
+                          <span className="badge category-badge rounded-pill fw-semibold">
+                            {f.category}
+                          </span>
+                        </div>
+                        <h6 className="fw-bold food-title mb-1">
+                          {f.name}
+                        </h6>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <span className="text-neon-green fw-bold fs-5">
+                            ₹{f.price}
+                          </span>
+                          <span className="text-subtle small">
+                            <FiActivity aria-hidden="true" /> {f.calories} cal
+                          </span>
+                        </div>
+                        <div className={`small mb-3 ${isOutOfStock ? 'text-danger' : 'text-success'} fw-semibold`}>
+                          {isOutOfStock ? 'Out of Stock' : `Available: ${availableQuantity}`}
+                        </div>
                       </div>
-                      <h6 className="fw-bold food-title mb-1">
-                        {f.name}
-                      </h6>
-                      <div className="d-flex justify-content-between align-items-center mb-3">
-                        <span className="text-neon-green fw-bold fs-5">
-                          ₹{f.price}
-                        </span>
-                        <span className="text-subtle small">
-                          <FiActivity aria-hidden="true" /> {f.calories} cal
-                        </span>
-                      </div>
+                      <button
+                        className="btn btn-neon w-100 py-2 btn-sm text-uppercase"
+                        onClick={() => addToCart(f)}
+                        disabled={isOutOfStock}
+                        style={isOutOfStock ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
+                      >
+                        {isOutOfStock ? 'Out of Stock' : '+ Add To Cart'}
+                      </button>
                     </div>
-                    <button
-                      className="btn btn-neon w-100 py-2 btn-sm text-uppercase"
-                      onClick={() => addToCart(f)}
-                    >
-                      + Add To Cart
-                    </button>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

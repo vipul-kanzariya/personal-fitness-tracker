@@ -16,6 +16,8 @@ function AdminFoodStore() {
   const [protein, setProtein] = useState('');
   const [carbs, setCarbs] = useState('');
   const [fat, setFat] = useState('');
+  const [initialStock, setInitialStock] = useState('');
+  const [lowStockThreshold, setLowStockThreshold] = useState('10');
   const [category, setCategory] = useState('Protein');
   const [imageFile, setImageFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -62,12 +64,32 @@ function AdminFoodStore() {
       }
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/food`,
-        { name, description, price, calories, protein, carbs, fat, category, image: imageUrl },
+        {
+          name,
+          description,
+          price,
+          calories,
+          protein,
+          carbs,
+          fat,
+          category,
+          image: imageUrl,
+          initialStock,
+          lowStockThreshold,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setFoods([res.data, ...foods]);
-      setName(''); setDescription(''); setPrice(''); setCalories('');
-      setProtein(''); setCarbs(''); setFat(''); setImageFile(null);
+      await fetchFoods();
+      setName('');
+      setDescription('');
+      setPrice('');
+      setCalories('');
+      setProtein('');
+      setCarbs('');
+      setFat('');
+      setInitialStock('');
+      setLowStockThreshold('10');
+      setImageFile(null);
       setError('');
     } catch (err) {
       setError("Failed to add food item.");
@@ -152,6 +174,16 @@ function AdminFoodStore() {
             <input type="number" min="0" step="0.1" className="form-control form-control-custom" placeholder="Fat" value={fat}
               onChange={(e) => setFat(e.target.value)} />
           </div>
+          <div className="col-md-2">
+            <label className="form-label-custom">Initial Stock</label>
+            <input type="number" min="0" className="form-control form-control-custom" placeholder="50" value={initialStock}
+              onChange={(e) => setInitialStock(e.target.value)} />
+          </div>
+          <div className="col-md-2">
+            <label className="form-label-custom">Low Stock Threshold</label>
+            <input type="number" min="0" className="form-control form-control-custom" placeholder="10" value={lowStockThreshold}
+              onChange={(e) => setLowStockThreshold(e.target.value)} />
+          </div>
           <div className="col-md-4">
             <label className="form-label-custom">Product Image</label>
             <input type="file" accept="image/*" className="form-control form-control-custom"
@@ -180,8 +212,8 @@ function AdminFoodStore() {
                   <th>Name</th>
                   <th>Price</th>
                   <th>Calories</th>
-                  <th>Category</th>
-                  <th>In Stock</th>
+                  <th>Stock</th>
+                  <th>Status</th>
                   <th className="text-end">Action</th>
                 </tr>
               </thead>
@@ -194,10 +226,13 @@ function AdminFoodStore() {
                     <td className="fw-semibold">{f.name}</td>
                     <td className="text-neon-accent fw-bold">₹ {f.price}</td>
                     <td>{f.calories || '--'} kcal</td>
-                    <td><span className="badge bg-secondary bg-opacity-25 border border-secondary text-subtle">{f.category}</span></td>
                     <td>
-                      <span className={f.inStock ? "badge-neon-success" : "badge-neon-danger"}>
-                        {f.inStock ? 'Yes' : 'No'}
+                      <div>{f.availableQuantity ?? 0} avail</div>
+                      <small className="text-subtle">Threshold: {f.lowStockThreshold ?? 0}</small>
+                    </td>
+                    <td>
+                      <span className={f.stockStatus === 'Out of Stock' ? 'badge-neon-danger' : f.stockStatus === 'Low Stock' ? 'badge-neon-warning' : 'badge-neon-success'}>
+                        {f.stockStatus || (f.inStock ? 'In Stock' : 'Unavailable')}
                       </span>
                     </td>
                     <td className="text-end">

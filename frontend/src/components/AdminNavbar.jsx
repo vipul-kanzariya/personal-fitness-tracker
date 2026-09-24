@@ -170,6 +170,21 @@ function AdminNavbar() {
 
             <li>
               <NavLink
+                to="/admin/inventory"
+                className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
+                onClick={closeMenu}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 7h16v10H4z" />
+                  <path d="M9 3v4M15 3v4" />
+                  <path d="M8 12h8M8 16h5" />
+                </svg>
+                <span>Inventory</span>
+              </NavLink>
+            </li>
+
+            <li>
+              <NavLink
                 to="/admin/workouttypes"
                 className={({ isActive }) => `nav-link ${isActive ? "active" : ""}`}
                 onClick={closeMenu}

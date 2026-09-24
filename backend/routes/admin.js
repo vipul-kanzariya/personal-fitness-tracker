@@ -2,6 +2,7 @@ const express = require('express');
 const User = require('../models/User');
 const Order = require('../models/Order');
 const Food = require('../models/Food');
+const Inventory = require('../models/Inventory');
 const { authMiddleware } = require('../middleware/authMiddleware');
 const { adminMiddleware } = require('../middleware/adminMiddleware');
 
@@ -21,11 +22,30 @@ router.get('/summary', authMiddleware, adminMiddleware, async (req, res) => {
     const totalUsers = await User.countDocuments();
     const totalOrders = await Order.countDocuments();
     const totalFoodItems = await Food.countDocuments();
+    const inventoryItems = await Inventory.find();
+
+    const totalStockUnits = inventoryItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+    const lowStockProducts = inventoryItems.filter((item) => {
+      const available = Math.max(0, (Number(item.quantity) || 0) - (Number(item.reservedQuantity) || 0));
+      return available > 0 && available <= (Number(item.lowStockThreshold) || 0);
+    }).length;
+    const outOfStockProducts = inventoryItems.filter((item) => {
+      const available = Math.max(0, (Number(item.quantity) || 0) - (Number(item.reservedQuantity) || 0));
+      return available <= 0;
+    }).length;
 
     const paidOrders = await Order.find({ paymentStatus: 'Paid' });
     const totalRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
-    res.status(200).json({ totalUsers, totalOrders, totalFoodItems, totalRevenue });
+    res.status(200).json({
+      totalUsers,
+      totalOrders,
+      totalFoodItems,
+      totalRevenue,
+      totalStockUnits,
+      lowStockProducts,
+      outOfStockProducts,
+    });
   } catch (err) {
     res.status(500).json(err.message);
   }

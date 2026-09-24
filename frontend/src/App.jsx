@@ -20,6 +20,7 @@ import AdminDashboard from './admin/AdminDashboard'
 import AdminUsers from './admin/AdminUsers'
 import AdminOrders from './admin/AdminOrders'
 import AdminFoodStore from './admin/AdminFoodStore'
+import AdminInventory from './admin/AdminInventory'
 import AdminWorkoutTypes from './admin/AdminWorkoutTypes'
 import NotFound from './pages/NotFound'
 import Profile from './pages/Profile'
@@ -69,6 +70,11 @@ function Layout() {
               <Route path='/admin/foodstore' element={
                 <ErrorBoundary>
                   <AdminFoodStore />
+                </ErrorBoundary>
+              } />
+              <Route path='/admin/inventory' element={
+                <ErrorBoundary>
+                  <AdminInventory />
                 </ErrorBoundary>
               } />
               <Route path='/admin/workouttypes' element={
