@@ -128,7 +128,7 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
         lowStockThreshold: threshold,
         isActive: true,
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true },
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
     );
 
     const enrichedFood = await injectInventory(food);
@@ -210,7 +210,7 @@ router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     await Inventory.findOneAndUpdate(
       { foodId: id },
       { isActive: false },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     res.status(200).json(food);

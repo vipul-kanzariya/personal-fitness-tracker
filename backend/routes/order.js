@@ -36,7 +36,7 @@ async function reserveInventoryForOrder(items) {
         $expr: { $gte: [{ $subtract: ['$quantity', '$reservedQuantity'] }, quantity] },
       },
       { $inc: { reservedQuantity: quantity } },
-      { new: true },
+      { returnDocument: 'after' },
     );
 
     if (!updatedInventory) {
@@ -57,7 +57,7 @@ async function releaseInventoryReservation(foodId, quantity) {
   await Inventory.findOneAndUpdate(
     { foodId },
     { $inc: { reservedQuantity: -quantity } },
-    { new: true },
+    { returnDocument: 'after' },
   );
 }
 
@@ -69,7 +69,7 @@ async function finalizeInventoryForOrder(items) {
       await Inventory.findOneAndUpdate(
         { foodId: item.foodId },
         { $inc: { quantity: -quantity, reservedQuantity: -quantity } },
-        { new: true },
+        { returnDocument: 'after' },
       );
     }),
   );
@@ -83,7 +83,7 @@ async function restoreOrderInventory(items) {
       await Inventory.findOneAndUpdate(
         { foodId: item.foodId },
         { $inc: { quantity: quantity } },
-        { new: true },
+        { returnDocument: 'after' },
       );
     }),
   );

@@ -100,7 +100,7 @@ if(workoutType.trackingType === 'duration_only'){
         duration: newDuration,
         caloriesBurned,
       },
-      { new: true, runValidators: true },
+      { returnDocument: 'after', runValidators: true },
     ).populate("workoutTypeId", "name category caloriesPerMinute");
     res.status(200).json(workout);
   } catch (err) {
@@ -114,7 +114,7 @@ router.delete("/:id", authMiddleware, async (req, res) => {
     const workout = await Workout.findOneAndUpdate(
       { _id: id, userId: req.user.id },
       { isDeleted: true },
-      { new: true },
+      { returnDocument: 'after' },
     );
     if (!workout) {
       return res.status(404).json("Workout not found");

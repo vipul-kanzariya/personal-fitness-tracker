@@ -76,7 +76,7 @@ router.put('/:id',authMiddleware,async(req,res)=>{
     const diet = await Diet.findOneAndUpdate(
           {_id:id,userId:req.user.id},
           req.body,
-          {new:true, runValidators: true}
+          {returnDocument: 'after', runValidators: true}
         );
      if(!diet){
        return res.status(404).json('Diet entry not found');
@@ -94,7 +94,7 @@ router.delete('/:id',authMiddleware,async(req,res)=>{
     
      const diet = await Diet.findOneAndUpdate({_id:id, userId:req.user.id},
      {isDeleted: true},
-     {new: true});
+     {returnDocument: 'after'});
       if(!diet){
        return res.status(404).json('Diet entry not found');
      }
