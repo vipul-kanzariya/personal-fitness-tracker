@@ -1,141 +1,144 @@
 # Personal Fitness Tracker
 
-A full-stack Personal Fitness Tracker application (Express + MongoDB backend, React + Vite frontend). This repository contains the REST API server (backend/) and the React single-page app (frontend/).
+FitTrack is a full-stack personal fitness tracker built with React, Vite, Express, MongoDB, and Razorpay. It includes authentication, workouts, diet tracking, BMI analytics, food inventory, online ordering, refunds, and admin management.
 
----
+## Features
 
-## Quick overview
-
-- Backend: Node.js, Express, Mongoose (MongoDB).
-  - Features: user auth (JWT), workouts & workout-types, diet logging, BMI calculation, food store + ordering, admin APIs, Cloudinary image upload, AI-based nutrition estimate helper.
-
-- Frontend: React + Vite, Bootstrap, Chart.js.
-  - Uses axios for API calls. Routes and pages under `frontend/src` (Dashboard, Workout, Diet, BMI, FoodStore, Orders, Profile, Admin pages).
-
----
+- User registration, login, profile, password changes, and account blocking
+- Workout logging with editable workout types
+- Diet entries and optional AI nutrition estimates
+- BMI calculation and history
+- Food store with image uploads, inventory, stock thresholds, and availability checks
+- Razorpay checkout, payment verification, order cancellation, and refunds
+- Admin dashboards for users, food, inventory, workout types, and orders
+- Responsive layouts for desktop and mobile
 
 ## Prerequisites
 
-- Node.js (v18+ recommended)
+- Node.js 18 or newer
 - npm
-- MongoDB instance (local or hosted)
-- (Optional) Cloudinary account for image uploads
-- (Optional) API key(s) for AI services if you want diet auto-estimates (Gemini / OpenRouter)
-
----
+- MongoDB (local or hosted)
+- Cloudinary account for food image uploads
+- Razorpay test or live credentials for payments
+- Optional Gemini or OpenRouter credentials for AI estimates
 
 ## Environment variables
 
-Create a `.env` file in the `backend` folder with at least the following values:
+Create `backend/.env`:
 
-```
-# Backend
-MONGO_URL=mongodb+srv://<user>:<pass>@cluster.example.mongodb.net/fitness?retryWrites=true&w=majority
-JWT_SECRET=your_jwt_secret_here
-PORT=3000               # optional, defaults to 3000 if not provided
+```env
+MONGO_URL=mongodb+srv://<user>:<password>@cluster.example.mongodb.net/fitness
+JWT_SECRET=replace_with_a_long_random_secret
+PORT=3000
 
-# Cloudinary (optional, required for image uploads)
 CLOUDINARY_CLOUD_NAME=...
 CLOUDINARY_API_KEY=...
 CLOUDINARY_API_SECRET=...
 
-# AI helpers (optional) - used by diet/estimate
-GEMINI_API_KEY=...              # if using Google Gemini
-OPENROUTER_API_KEY=...         # fallback provider
+GEMINI_API_KEY=...
+OPENROUTER_API_KEY=...
 
-# Razorpay test mode
 RAZORPAY_KEY_ID=rzp_test_...
 RAZORPAY_KEY_SECRET=...
 ```
 
-Frontend needs a Vite environment variable to point to the backend API. Create `.env` in `frontend/` or set in your environment:
+Create `frontend/.env` for local development:
 
-```
+```env
 VITE_API_URL=http://localhost:3000
 ```
 
-Note: Vite requires `VITE_` prefix for env vars used in the client.
+Never commit `.env` files or expose `RAZORPAY_KEY_SECRET`, database credentials, JWT secrets, or Cloudinary secrets in the frontend.
 
-Keep `RAZORPAY_KEY_SECRET` in `backend/.env` only. It must never be exposed
-through frontend environment variables or committed to the repository.
+## Start the application locally
 
----
+Open two PowerShell terminals from `D:\Personal-fitness-tracker`.
 
-## Running locally
+### Terminal 1: backend
 
-1. Backend
-
-```
-cd backend
+```powershell
+cd D:\Personal-fitness-tracker\backend
 npm install
-# ensure backend/.env exists with MONGO_URL and JWT_SECRET
-npm run dev   # runs nodemon server.js (defaults to port 3000)
+npm run dev
 ```
 
-2. Frontend
+The API runs at `http://localhost:3000`. Make sure MongoDB is running and `backend/.env` is configured before starting it.
 
-```
-cd frontend
+### Terminal 2: frontend
+
+```powershell
+cd D:\Personal-fitness-tracker\frontend
 npm install
-# ensure VITE_API_URL points to the running backend, e.g. http://localhost:3000
-npm run dev   # Vite dev server (usually http://localhost:5173)
+npm run dev
 ```
 
-Open the frontend URL printed by Vite (typically http://localhost:5173). Log in / register, then use the app.
+Open the URL printed by Vite, normally `http://localhost:5173`.
 
----
+Vite reads environment variables only when it starts. Restart the frontend after changing `frontend/.env`.
 
-## API base paths (high-level)
+## Useful commands
 
-- /api/auth        — register, login, profile (GET/PUT), change-password
-- /api/workouts    — create/list/update/delete workouts
-- /api/workout-types — admin CRUD for workout types
-- /api/diet        — create/list/update/delete diet entries, /estimate for AI nutrition estimate
-- /api/bmi         — calculate BMI and history
-- /api/food        — list food, admin CRUD, image upload
-- /api/orders      — create/list/get/cancel orders (admin endpoints under /api/admin)
-- /api/admin       — admin-only endpoints: users, orders, summary
+```powershell
+# Frontend lint and production build
+cd D:\Personal-fitness-tracker\frontend
+npm run lint
+npm run build
 
-(See backend/routes/ for exact request shapes and validations implemented in code.)
+# Backend syntax validation
+cd D:\Personal-fitness-tracker\backend
+Get-ChildItem -Path routes,models,middleware,scripts -Recurse -Filter *.js | ForEach-Object { node --check $_.FullName }
 
----
+# Remove deprecated macro fields from existing Food documents
+npm run migrate:remove-food-macros
+```
 
-## Known issues & recommended quick fixes
+The migration command should only be run against the intended MongoDB database.
 
-Status of items observed during code review:
+## Main API paths
 
-1. ✅ **aiHelper.js** — Headers syntax verified correct (uses proper Authorization/Content-Type structure with env vars). No fix needed.
+- `/api/auth` - registration, login, profile, and password operations
+- `/api/workouts` - workout CRUD
+- `/api/workout-types` - admin workout type CRUD
+- `/api/diet` - diet CRUD and estimates
+- `/api/bmi` - BMI calculation and history
+- `/api/food` - food listing and admin food CRUD
+- `/api/inventory` - admin inventory management
+- `/api/orders` - checkout, payment verification, orders, and cancellation
+- `/api/admin` - admin users, orders, and dashboard summary
 
-2. ✅ **authMiddleware.js** — Updated with explicit checks for missing/malformed Authorization header before parsing the token, returning clean 401 responses instead of relying on try/catch to swallow runtime errors.
+## Final verification checklist
 
-3. ⏳ **server.js** — `PORT` should use `process.env.PORT || 3000` to allow deployment platforms (Render, etc.) to assign ports dynamically.
+Before delivery, test with a fresh browser session:
 
-4. ⏳ **backend/package.json** — `nodemon` should be moved to `devDependencies`.
+- Register and log in with two different accounts; verify profiles and histories stay isolated.
+- Create, edit, and delete workouts, diet entries, workout types, and food products.
+- Calculate BMI with valid heights from 1 to 8 feet and 0 to 11 inches; verify invalid values are rejected.
+- Add stock and verify available quantity, threshold status, and out-of-stock behavior.
+- Confirm unavailable products cannot be added to cart or purchased.
+- Complete a Razorpay test payment and verify stock is deducted exactly once.
+- Cancel an unpaid order and verify reserved stock is released.
+- Cancel a paid order and verify the refund succeeds before cancellation is recorded.
+- Confirm cancelled orders cannot be changed back to another status.
+- Confirm cancelled orders are excluded from Admin Dashboard revenue.
+- Check currency, calorie, BMI, and total values for sensible rounding without long floating-point strings.
+- Test the main pages on desktop and mobile widths.
+- Check browser console and network requests for unexpected errors.
 
-5. ℹ️ **Security note**: JWT is stored in frontend `localStorage` for simplicity (acceptable for this project's scope). A production-grade implementation would use HttpOnly secure cookies with a refresh-token flow to mitigate XSS risk — noted as a known trade-off.
+## Deployment notes
 
-6. ℹ️ **CORS**: Currently uses default `cors()` config (allows all origins) — acceptable for development; production deployments should restrict allowed origins.
+The frontend and backend are separate services. For Render:
 
-## Suggestions & next steps
+1. Deploy the backend with its MongoDB, JWT, Cloudinary, AI, and Razorpay environment variables.
+2. Set the backend `FRONTEND_URL` to the exact deployed frontend origin.
+3. Set the frontend `VITE_API_URL` to the deployed backend URL.
+4. Commit and push code to the branch connected to Render.
+5. Wait for deployment to finish, then test the deployed URL.
 
-- Add a root README (this file) — done.
-- Add an OpenAPI/Swagger spec or Postman collection to document the API.
-- Add centralized error-handling middleware for Express and consistent error response shapes.
-- Add axios interceptors in the frontend to handle 401 responses (redirect to /login) and to attach Authorization headers in a single place.
-- Add tests (unit/integration) for auth and critical endpoints.
-- Consider Dockerizing services and adding a `docker-compose` for local development (Mongo + backend + frontend).
+Localhost changes do not update Render, and Render data is separate from a local MongoDB database.
 
----
+## Known production considerations
 
-## Contributing
-
-If you plan to contribute changes or fixes:
-
-- Create a branch for each topic (e.g., `fix/auth-middleware`, `fix/ai-helper-headers`).
-- Run linters and tests (if added) before creating a PR.
-
-Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
-
----
-
-If you'd like, I can also create a small patch that fixes the high-priority issues (authMiddleware, aiHelper header bug, and PORT fallback). Please confirm if you want me to apply those changes now.
+- JWTs are stored in `localStorage` for this student project. A production-grade application should use secure HttpOnly cookies and refresh tokens.
+- Keep CORS restricted with `FRONTEND_URL`.
+- Refunds require valid Razorpay credentials and may take time to appear in a customer bank or UPI account.
+- No automated test suite is configured yet; use the final verification checklist and build/syntax commands above.

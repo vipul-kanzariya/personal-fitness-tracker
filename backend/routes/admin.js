@@ -34,8 +34,13 @@ router.get('/summary', authMiddleware, adminMiddleware, async (req, res) => {
       return available <= 0;
     }).length;
 
-    const paidOrders = await Order.find({ paymentStatus: 'Paid' });
-    const totalRevenue = paidOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+    const paidOrders = await Order.find({
+      paymentStatus: 'Paid',
+      orderStatus: { $ne: 'Cancelled' },
+    });
+    const totalRevenue = Number(
+      paidOrders.reduce((sum, o) => sum + (Number(o.totalAmount) || 0), 0).toFixed(2),
+    );
 
     res.status(200).json({
       totalUsers,

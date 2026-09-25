@@ -312,6 +312,22 @@ router.put("/:id/cancel", authMiddleware, async (req, res) => {
       return res.status(400).json('Order is already cancelled');
     }
 
+    if (order.paymentStatus === 'Paid') {
+      if (!order.paymentId) {
+        return res.status(400).json('Paid order has no payment ID, so it cannot be refunded');
+      }
+
+      try {
+        await razorpay.payments.refund(order.paymentId, {
+          amount: Math.round(order.totalAmount * 100),
+        });
+      } catch (refundError) {
+        return res.status(502).json('Payment refund failed. The order was not cancelled.');
+      }
+
+      order.paymentStatus = 'Refunded';
+    }
+
     if (order.inventoryReserved) {
       await Promise.allSettled(
         order.items.map((item) => releaseInventoryReservation(item.foodId, item.quantity)),
@@ -341,6 +357,26 @@ router.put("/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
 
     if (!order) {
       return res.status(404).json('Order not found');
+    }
+
+    if (order.orderStatus === 'Cancelled' && orderStatus !== 'Cancelled') {
+      return res.status(400).json('Cancelled orders cannot be updated');
+    }
+
+    if (orderStatus === 'Cancelled' && order.paymentStatus === 'Paid') {
+      if (!order.paymentId) {
+        return res.status(400).json('Paid order has no payment ID, so it cannot be refunded');
+      }
+
+      try {
+        await razorpay.payments.refund(order.paymentId, {
+          amount: Math.round(order.totalAmount * 100),
+        });
+      } catch (refundError) {
+        return res.status(502).json('Payment refund failed. The order was not cancelled.');
+      }
+
+      order.paymentStatus = 'Refunded';
     }
 
     if (orderStatus === 'Cancelled' && order.inventoryAdjusted) {

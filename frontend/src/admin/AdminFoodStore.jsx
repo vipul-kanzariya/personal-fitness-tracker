@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Admin.css";
-import { FiPlus } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiX } from "react-icons/fi";
 
 function AdminFoodStore() {
   const [foods, setFoods] = useState([]);
@@ -13,14 +13,13 @@ function AdminFoodStore() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [calories, setCalories] = useState('');
-  const [protein, setProtein] = useState('');
-  const [carbs, setCarbs] = useState('');
-  const [fat, setFat] = useState('');
   const [initialStock, setInitialStock] = useState('');
   const [lowStockThreshold, setLowStockThreshold] = useState('10');
   const [category, setCategory] = useState('Protein');
   const [imageFile, setImageFile] = useState(null);
+  const [currentImage, setCurrentImage] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [editingFoodId, setEditingFoodId] = useState(null);
 
   const fetchFoods = async () => {
     try {
@@ -35,6 +34,34 @@ function AdminFoodStore() {
   };
 
   useEffect(() => { fetchFoods(); }, []);
+
+  const resetForm = () => {
+    setEditingFoodId(null);
+    setName('');
+    setDescription('');
+    setPrice('');
+    setCalories('');
+    setInitialStock('');
+    setLowStockThreshold('10');
+    setCategory('Protein');
+    setImageFile(null);
+    setCurrentImage('');
+  };
+
+  const startEditing = (food) => {
+    setEditingFoodId(food._id);
+    setName(food.name || '');
+    setDescription(food.description || '');
+    setPrice(food.price ?? '');
+    setCalories(food.calories ?? '');
+    setInitialStock(food.inventory?.quantity ?? 0);
+    setLowStockThreshold(food.lowStockThreshold ?? '10');
+    setCategory(food.category || 'Protein');
+    setImageFile(null);
+    setCurrentImage(food.image || '');
+    setError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleImageUpload = async () => {
     if(!imageFile) return null;
@@ -62,34 +89,26 @@ function AdminFoodStore() {
       if(imageFile){
         imageUrl = await handleImageUpload();
       }
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/food`,
+      const method = editingFoodId ? 'put' : 'post';
+      const url = editingFoodId
+        ? `${import.meta.env.VITE_API_URL}/api/food/${editingFoodId}`
+        : `${import.meta.env.VITE_API_URL}/api/food`;
+      await axios[method](
+        url,
         {
           name,
           description,
           price,
           calories,
-          protein,
-          carbs,
-          fat,
           category,
-          image: imageUrl,
+          image: imageUrl || currentImage,
           initialStock,
           lowStockThreshold,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchFoods();
-      setName('');
-      setDescription('');
-      setPrice('');
-      setCalories('');
-      setProtein('');
-      setCarbs('');
-      setFat('');
-      setInitialStock('');
-      setLowStockThreshold('10');
-      setImageFile(null);
+      resetForm();
       setError('');
     } catch (err) {
       setError("Failed to add food item.");
@@ -102,7 +121,8 @@ function AdminFoodStore() {
       await axios.delete(`${import.meta.env.VITE_API_URL}/api/food/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setFoods(foods.filter(f => f._id !== id));
+      setFoods((currentFoods) => currentFoods.filter(f => f._id !== id));
+      if (editingFoodId === id) resetForm();
       setError('');
     } catch (err) {
       setError("Failed to delete food item.");
@@ -126,10 +146,11 @@ function AdminFoodStore() {
 
       {/* Add Item Card */}
       <div className="admin-card p-4 mb-4">
-        <h5 className="fw-bold mb-3 border-bottom border-secondary border-opacity-25 pb-2">
-          <FiPlus aria-hidden="true" /> Add New Item
+        <h5 className="fw-bold mb-3 border-bottom border-secondary border-opacity-25 pb-2 d-flex align-items-center gap-2">
+          {editingFoodId ? <FiEdit2 aria-hidden="true" /> : <FiPlus aria-hidden="true" />}
+          {editingFoodId ? 'Edit Food Item' : 'Add New Item'}
         </h5>
-        <form onSubmit={handleSubmit} className="row g-3">
+        <form onSubmit={handleSubmit} className="row g-3 align-items-end">
           <div className="col-md-3">
             <label className="form-label-custom">Name</label>
             <input className="form-control form-control-custom" placeholder="Item Name" value={name}
@@ -160,21 +181,6 @@ function AdminFoodStore() {
             </select>
           </div>
           <div className="col-md-2">
-            <label className="form-label-custom">Protein (g)</label>
-            <input type="number" min="0" step="0.1" className="form-control form-control-custom" placeholder="Protein" value={protein}
-              onChange={(e) => setProtein(e.target.value)} />
-          </div>
-          <div className="col-md-2">
-            <label className="form-label-custom">Carbs (g)</label>
-            <input type="number" min="0" step="0.1" className="form-control form-control-custom" placeholder="Carbs" value={carbs}
-              onChange={(e) => setCarbs(e.target.value)} />
-          </div>
-          <div className="col-md-2">
-            <label className="form-label-custom">Fat (g)</label>
-            <input type="number" min="0" step="0.1" className="form-control form-control-custom" placeholder="Fat" value={fat}
-              onChange={(e) => setFat(e.target.value)} />
-          </div>
-          <div className="col-md-2">
             <label className="form-label-custom">Initial Stock</label>
             <input type="number" min="0" className="form-control form-control-custom" placeholder="50" value={initialStock}
               onChange={(e) => setInitialStock(e.target.value)} />
@@ -191,9 +197,16 @@ function AdminFoodStore() {
           </div>
           <div className="col-md-2 d-flex align-items-end">
             <button className="btn btn-neon-submit w-100 text-uppercase" type="submit" disabled={uploading}>
-              {uploading ? 'Uploading...' : 'Add Item'}
+              {uploading ? 'Uploading...' : editingFoodId ? 'Update Item' : 'Add Item'}
             </button>
           </div>
+          {editingFoodId && (
+            <div className="col-md-2 d-flex align-items-end">
+              <button className="btn btn-action-warning w-100" type="button" onClick={resetForm}>
+                <FiX aria-hidden="true" /> Cancel
+              </button>
+            </div>
+          )}
         </form>
       </div>
 
@@ -205,7 +218,7 @@ function AdminFoodStore() {
       ) : (
         <div className="admin-table-container">
           <div className="table-responsive">
-            <table className="table admin-table">
+            <table className="table admin-table admin-food-table">
               <thead>
                 <tr>
                   <th>Image</th>
@@ -220,25 +233,30 @@ function AdminFoodStore() {
               <tbody>
                 {foods.map((f) => (
                   <tr key={f._id}>
-                    <td>
+                    <td data-label="Image">
                       <img src={f.image || 'https://placehold.co/50x50'} alt={f.name} width="45" height="45" className="rounded-3" style={{objectFit: 'cover'}}/>
                     </td>
-                    <td className="fw-semibold">{f.name}</td>
-                    <td className="text-neon-accent fw-bold">₹ {f.price}</td>
-                    <td>{f.calories || '--'} kcal</td>
-                    <td>
+                    <td className="fw-semibold" data-label="Name">{f.name}</td>
+                    <td className="text-neon-accent fw-bold" data-label="Price">₹ {f.price}</td>
+                    <td data-label="Calories">{f.calories || '--'} kcal</td>
+                    <td data-label="Stock">
                       <div>{f.availableQuantity ?? 0} avail</div>
                       <small className="text-subtle">Threshold: {f.lowStockThreshold ?? 0}</small>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <span className={f.stockStatus === 'Out of Stock' ? 'badge-neon-danger' : f.stockStatus === 'Low Stock' ? 'badge-neon-warning' : 'badge-neon-success'}>
                         {f.stockStatus || (f.inStock ? 'In Stock' : 'Unavailable')}
                       </span>
                     </td>
-                    <td className="text-end">
-                      <button className="btn btn-action-danger" onClick={() => handleDelete(f._id)}>
-                        Delete
-                      </button>
+                    <td className="text-end" data-label="Action">
+                      <div className="d-flex justify-content-end gap-2 flex-wrap">
+                        <button className="btn btn-action-warning" onClick={() => startEditing(f)}>
+                          <FiEdit2 aria-hidden="true" /> Edit
+                        </button>
+                        <button className="btn btn-action-danger" onClick={() => handleDelete(f._id)}>
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -10,10 +10,14 @@ router.post("/calculate", authMiddleware, async (req, res) => {
     const numericWeight = Number(weight);
     const numericHeight = Number(height);
     if (!Number.isFinite(numericWeight) || numericWeight <= 0 ||
-        !Number.isFinite(numericHeight) || numericHeight <= 0) {
-      return res.status(400).json({ message: "Weight and height must be positive numbers" });
+        !Number.isFinite(numericHeight) ||
+        numericHeight < 0.3048 ||
+        numericHeight > 2.7178) {
+      return res.status(400).json({
+        message: "Weight must be positive and height must be between 1 and 8 feet"
+      });
     }
-    const bmi = (numericWeight / (numericHeight * numericHeight)).toFixed(2);
+    const bmi = Number((numericWeight / (numericHeight * numericHeight)).toFixed(2));
     let category;
     if (bmi < 18.5) {
       category = "Underweight";

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Admin.css";
-import { FiPlus } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiX } from "react-icons/fi";
 
 function AdminWorkoutTypes() {
   const [types, setTypes] = useState([]);
@@ -13,6 +13,7 @@ function AdminWorkoutTypes() {
   const [caloriesPerMinute, setCaloriesPerMinute] = useState("");
   const [category, setCategory] = useState("Strength");
   const [trackingType, setTrackingType] = useState("both");
+  const [editingTypeId, setEditingTypeId] = useState(null);
   const fetchTypes = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -33,22 +34,46 @@ function AdminWorkoutTypes() {
     fetchTypes();
   }, []);
 
+  const resetForm = () => {
+    setEditingTypeId(null);
+    setName("");
+    setCaloriesPerMinute("");
+    setCategory("Strength");
+    setTrackingType("both");
+  };
+
+  const startEditing = (type) => {
+    setEditingTypeId(type._id);
+    setName(type.name || "");
+    setCaloriesPerMinute(type.caloriesPerMinute ?? "");
+    setCategory(type.category || "Strength");
+    setTrackingType(type.trackingType || "both");
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/workout-types`,
+      const method = editingTypeId ? "put" : "post";
+      const url = editingTypeId
+        ? `${import.meta.env.VITE_API_URL}/api/workout-types/${editingTypeId}`
+        : `${import.meta.env.VITE_API_URL}/api/workout-types`;
+      const res = await axios[method](
+        url,
         { name, caloriesPerMinute, category, trackingType },
         { headers: { Authorization: `Bearer ${token}` } },
       );
-      setTypes([res.data, ...types]);
-      setName("");
-      setCaloriesPerMinute("");
-      setTrackingType("both");
+      setTypes(
+        editingTypeId
+          ? types.map((type) => (type._id === editingTypeId ? res.data : type))
+          : [res.data, ...types],
+      );
+      resetForm();
       setError("");
     } catch (err) {
-      setError("Failed to add workout type.");
+      setError(editingTypeId ? "Failed to update workout type." : "Failed to add workout type.");
     }
   };
 
@@ -75,7 +100,7 @@ function AdminWorkoutTypes() {
           WORKOUT <span className="text-neon-accent">TYPES</span>
         </h2>
         <p className="text-subtle small mt-1">
-          Add and delete preset workout categories and calorie burn rates.
+          Add, edit, and delete preset workout categories and calorie burn rates.
         </p>
       </div>
 
@@ -88,7 +113,8 @@ function AdminWorkoutTypes() {
       {/* Add Workout Form */}
       <div className="admin-card p-4 mb-4">
         <h5 className="fw-bold mb-3 border-bottom border-secondary border-opacity-25 pb-2">
-          <FiPlus aria-hidden="true" /> Add Exercise Preset
+          {editingTypeId ? <FiEdit2 aria-hidden="true" /> : <FiPlus aria-hidden="true" />}{" "}
+          {editingTypeId ? "Edit Exercise Preset" : "Add Exercise Preset"}
         </h5>
         <form onSubmit={handleSubmit} className="row g-3">
           <div className="col-md-4">
@@ -147,9 +173,16 @@ function AdminWorkoutTypes() {
               className="btn btn-neon-submit w-100 text-uppercase"
               type="submit"
             >
-              Add
+              {editingTypeId ? "Update" : "Add"}
             </button>
           </div>
+          {editingTypeId && (
+            <div className="col-md-2 d-flex align-items-end">
+              <button className="btn btn-action-warning w-100" type="button" onClick={resetForm}>
+                <FiX aria-hidden="true" /> Cancel
+              </button>
+            </div>
+          )}
         </form>
       </div>
 
@@ -193,6 +226,12 @@ function AdminWorkoutTypes() {
                       </span>
                     </td>
                     <td className="text-end">
+                      <button
+                        className="btn btn-action-warning me-2"
+                        onClick={() => startEditing(t)}
+                      >
+                        <FiEdit2 aria-hidden="true" /> Edit
+                      </button>
                       <button
                         className="btn btn-action-danger"
                         onClick={() => handleDelete(t._id)}

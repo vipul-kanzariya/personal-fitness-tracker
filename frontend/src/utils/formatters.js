@@ -23,7 +23,11 @@ export function formatLabel(str) {
  */
 export function formatNumber(num) {
   if (num === null || num === undefined) return '0';
-  return Number(num).toLocaleString('en-IN');
+  const numericValue = Number(num);
+  if (!Number.isFinite(numericValue)) return '0';
+  return numericValue.toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+  });
 }
 
 /**
@@ -33,7 +37,11 @@ export function formatNumber(num) {
  */
 export function formatCurrency(amount) {
   if (amount === null || amount === undefined) return '₹0';
-  return `₹${formatNumber(amount)}`;
+  const numericAmount = Number(amount);
+  if (!Number.isFinite(numericAmount)) return '₹0';
+  return `₹${numericAmount.toLocaleString('en-IN', {
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 /**

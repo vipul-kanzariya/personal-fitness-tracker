@@ -17,15 +17,6 @@ const FoodSchema = Schema({
     calories:{
         type:Number
     },
-    protein:{
-        type:Number
-    },
-    carbs:{
-        type:Number
-    },
-    fat:{
-        type:Number
-    },
     category:{
         type:String,
         enum:['Protein','LowCalorie','HealthySnack','Supplement']

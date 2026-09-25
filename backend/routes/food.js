@@ -88,9 +88,6 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       description,
       price,
       calories,
-      protein,
-      carbs,
-      fat,
       category,
       image,
       initialStock,
@@ -102,9 +99,6 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
       description,
       price,
       calories,
-      protein,
-      carbs,
-      fat,
       category,
       image,
       inStock: true,
@@ -173,7 +167,7 @@ router.post('/upload-image', authMiddleware, adminMiddleware, upload.single('ima
 router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    const food = await Food.findByIdAndUpdate(id, req.body, { new: true });
+    const food = await Food.findByIdAndUpdate(id, req.body, { returnDocument: 'after' });
 
     if (!food) {
       return res.status(404).json('Food item not found');

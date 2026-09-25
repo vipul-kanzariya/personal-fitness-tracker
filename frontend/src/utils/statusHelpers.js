@@ -40,9 +40,9 @@ export function getOrderStatusBadgeClass(status) {
  * @returns {string} CSS class string
  */
 export function getPaymentBadgeClass(status) {
-  return status === 'Paid'
-    ? 'bg-success bg-opacity-25 text-success'
-    : 'bg-warning bg-opacity-25 text-warning';
+  if (status === 'Paid') return 'bg-success bg-opacity-25 text-success';
+  if (status === 'Refunded') return 'bg-info bg-opacity-25 text-info';
+  return 'bg-warning bg-opacity-25 text-warning';
 }
 
 /**

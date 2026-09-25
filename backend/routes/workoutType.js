@@ -29,7 +29,10 @@ router.post('/', authMiddleware, adminMiddleware, async(req, res) => {
 router.put('/:id', authMiddleware, adminMiddleware, async(req, res) => {
   try{
     const {id} = req.params;
-const type = await WorkoutType.findByIdAndUpdate(id, req.body, {new: true});
+const type = await WorkoutType.findByIdAndUpdate(id, req.body, {
+  returnDocument: 'after',
+  runValidators: true
+});
 res.status(200).json(type);
   }catch(err){
     res.status(500).json(err.message);

@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "echo \"No automated tests configured\"",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate:remove-food-macros": "node scripts/remove-food-macros.js"
   },
   "keywords": [],
   "author": "",

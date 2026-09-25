@@ -2,8 +2,16 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Spinner from '../components/Spinner';
 import '../style/Admin.css';
-import { FiPackage, FiUsers } from 'react-icons/fi';
+import {
+  FiAlertTriangle,
+  FiArchive,
+  FiPackage,
+  FiUsers,
+  FiXCircle,
+} from 'react-icons/fi';
+import { FaRupeeSign } from 'react-icons/fa';
 import { GiMeal } from 'react-icons/gi';
+import { formatCurrency } from '../utils/formatters';
 
 function AdminDashboard() {
   const [summary, setSummary] = useState({});
@@ -117,7 +125,7 @@ function AdminDashboard() {
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">
-                <span aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: '700' }}>#</span>
+                <FiArchive aria-hidden="true" />
               </div>
 
               <span className="form-label-custom d-block">
@@ -134,7 +142,7 @@ function AdminDashboard() {
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">
-                <span aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: '700' }}>!</span>
+                <FiAlertTriangle aria-hidden="true" />
               </div>
 
               <span className="form-label-custom d-block">
@@ -151,7 +159,7 @@ function AdminDashboard() {
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">
-                <span aria-hidden="true" style={{ fontSize: '1.5rem', fontWeight: '700' }}>0</span>
+                <FiXCircle aria-hidden="true" />
               </div>
 
               <span className="form-label-custom d-block">
@@ -168,15 +176,7 @@ function AdminDashboard() {
           <div className="col-md-3 col-sm-6">
             <div className="admin-stat-card p-4 text-center">
               <div className="stat-icon">
-                <span
-                  aria-hidden="true"
-                  style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '700',
-                  }}
-                >
-                  ₹
-                </span>
+                <FaRupeeSign aria-hidden="true" />
               </div>
 
               <span className="form-label-custom d-block">
@@ -184,7 +184,7 @@ function AdminDashboard() {
               </span>
 
               <h2 className="fw-bold m-0 text-neon-accent">
-                ₹ {summary.totalRevenue || 0}
+                {formatCurrency(summary.totalRevenue || 0)}
               </h2>
             </div>
           </div>
@@ -196,4 +196,3 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
-

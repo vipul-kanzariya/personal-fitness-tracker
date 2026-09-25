@@ -26,7 +26,7 @@ function Bmi() {
   const feetNum = parseInt(feet) || 0;
   const inchesNum = parseInt(inches) || 0;
   const heightInMeters = useMemo(
-    () => ((feetNum * 12 + inchesNum) * 0.0254).toFixed(2),
+    () => (feetNum * 12 + inchesNum) * 0.0254,
     [feetNum, inchesNum]
   );
 
@@ -58,13 +58,23 @@ function Bmi() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!weight || (!feet && !inches)) {
+    if (!weight || !feet) {
       setError("Please fill in weight and height fields.");
       return;
     }
 
-    if (Number(weight) <= 0 || Number(heightInMeters) <= 0) {
-      setError("Weight and height must be greater than 0.");
+    const feetValue = Number(feet);
+    const inchesValue = Number(inches || 0);
+    if (
+      Number(weight) <= 0 ||
+      !Number.isInteger(feetValue) ||
+      feetValue < 1 ||
+      feetValue > 8 ||
+      !Number.isInteger(inchesValue) ||
+      inchesValue < 0 ||
+      inchesValue > 11
+    ) {
+      setError("Enter a valid height between 1 and 8 feet, with 0 to 11 inches.");
       return;
     }
 
@@ -137,7 +147,9 @@ function Bmi() {
                 value={feet}
                 onChange={(e) => setFeet(e.target.value)}
                 placeholder="e.g. 5"
-                min={0}
+                min={1}
+                max={8}
+                step={1}
                 required
                 className="mb-0"
               />
@@ -151,6 +163,8 @@ function Bmi() {
                 onChange={(e) => setInches(e.target.value)}
                 placeholder="e.g. 9"
                 min={0}
+                max={11}
+                step={1}
                 className="mb-0"
               />
             </div>

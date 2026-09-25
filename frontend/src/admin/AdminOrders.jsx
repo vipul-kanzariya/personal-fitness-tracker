@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Spinner from "../components/Spinner";
 import "../style/Admin.css";
+import { formatCurrency } from "../utils/formatters";
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -90,9 +91,15 @@ function AdminOrders() {
                         </div>
                       ))}
                     </td>
-                    <td className="fw-bold text-neon-accent">₹ {o.totalAmount}</td>
+                    <td className="fw-bold text-neon-accent">{formatCurrency(o.totalAmount)}</td>
                     <td>
-                      <span className={o.paymentStatus === 'Paid' ? 'badge-neon-success' : 'badge-neon-warning'}>
+                      <span className={
+                        o.paymentStatus === 'Paid'
+                          ? 'badge-neon-success'
+                          : o.paymentStatus === 'Refunded'
+                            ? 'badge-neon-info'
+                            : 'badge-neon-warning'
+                      }>
                         {o.paymentStatus}
                       </span>
                     </td>
@@ -101,6 +108,8 @@ function AdminOrders() {
                         className="form-select form-select-custom form-select-sm"
                         value={o.orderStatus}
                         onChange={(e) => handleStatusChange(o._id, e.target.value)}
+                        disabled={o.orderStatus === 'Cancelled'}
+                        aria-label={`Status for order ${o._id.slice(-6)}`}
                       >
                         <option value="Processing">Processing</option>
                         <option value="Confirmed">Confirmed</option>
