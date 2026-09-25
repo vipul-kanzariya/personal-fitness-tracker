@@ -10,16 +10,21 @@ function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!emailPattern.test(email.trim())) {
+      setError("Please enter a valid email address, such as name@example.com.");
+      return;
+    }
     setLoading(true);
 
     try {
       await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/register`,
-        { name, email, password }
+        { name, email: email.trim().toLowerCase(), password }
       );
       navigate("/login");
     } catch (err) {
@@ -80,6 +85,7 @@ function Register() {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              pattern="[^\s@]+@[^\s@]+\.[^\s@]{2,}"
               required
             />
           </div>

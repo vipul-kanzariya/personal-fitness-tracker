@@ -9,15 +9,20 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!emailPattern.test(email.trim())) {
+      setError("Please enter a valid email address, such as name@example.com.");
+      return;
+    }
     try {
       setLoading(true);
       setError("");
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
-        { email, password }
+        { email: email.trim().toLowerCase(), password }
       );
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
@@ -70,6 +75,7 @@ function Login() {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              pattern="[^\s@]+@[^\s@]+\.[^\s@]{2,}"
               required
             />
           </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { FiActivity, FiArrowRight, FiBarChart2, FiCheckCircle, FiHeart, FiMenu, FiMoon, FiShield, FiSun, FiTarget, FiUsers, FiX } from "react-icons/fi";
+import { FiActivity, FiArrowRight, FiBarChart2, FiCheckCircle, FiHeart, FiMail, FiMenu, FiMoon, FiShield, FiSun, FiTarget, FiUsers, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useTheme } from "../context/ThemeContext";
 import { API_BASE_URL } from "../utils/api";
@@ -185,8 +185,10 @@ function Home() {
 
         <section className="home-feature-section home-reveal" id="features">
           <div className="home-section-heading">
-            <span className="home-eyebrow">Everything in one place</span>
-            <h2>Simple tools.<br /><span>Real momentum.</span></h2>
+            <div className="home-section-heading-main">
+              <span className="home-eyebrow">Everything in one place</span>
+              <h2>Simple tools.<br /><span>Real momentum.</span></h2>
+            </div>
             <p>FitTrack gives you the clarity and structure to turn good intentions into lasting routines.</p>
           </div>
           <div className="home-feature-grid">
@@ -302,9 +304,27 @@ function Home() {
       </main>
 
       <footer className="home-footer">
-        <Link to="/" className="home-brand"><span className="home-brand-mark"><FiActivity /></span><span>Fit<span>Track</span></span></Link>
-        <p>Train smarter. Live stronger.</p>
-        <div><Link to="/login">Log in</Link><Link to="/register">Register</Link><span>© 2026 FitTrack</span></div>
+        <div className="home-footer-brand">
+          <Link to="/" className="home-brand"><span className="home-brand-mark"><FiActivity /></span><span>Fit<span>Track</span></span></Link>
+          <p>Train smarter. Live stronger.</p>
+          <span className="home-footer-copy">A simple space for better daily habits.</span>
+        </div>
+        <div className="home-footer-column">
+          <strong>Explore</strong>
+          <a href="#features">Features</a>
+          <a href="#about">About us</a>
+          <a href="#feedback">Feedback</a>
+        </div>
+        <div className="home-footer-column">
+          <strong>Get started</strong>
+          <Link to="/login">Log in</Link>
+          <Link to="/register">Create account</Link>
+          <a href="mailto:support@fittrack.app"><FiMail aria-hidden="true" /> Contact support</a>
+        </div>
+        <div className="home-footer-bottom">
+          <span>© 2026 FitTrack</span>
+          <span>Built for consistent progress.</span>
+        </div>
       </footer>
     </div>
   );

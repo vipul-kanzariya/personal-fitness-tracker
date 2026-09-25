@@ -6,6 +6,11 @@ const nodemailer = require('nodemailer');
 const User = require('../models/User');
 const { authMiddleware } = require('../middleware/authMiddleware');
 const router = express.Router();
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function normalizeEmail(email) {
+  return typeof email === 'string' ? email.trim().toLowerCase() : '';
+}
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -17,7 +22,11 @@ const transporter = nodemailer.createTransport({
 
 router.post('/register', async(req,res)=>{
   try{
-    const {name,email,password} = req.body;
+    const {name,password} = req.body;
+    const email = normalizeEmail(req.body.email);
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json('Please enter a valid email address');
+    }
     const checkEmail = await User.findOne({email});
     if(checkEmail){
         return res.status(400).json('Email already exists');
@@ -34,7 +43,11 @@ router.post('/register', async(req,res)=>{
 
 router.post('/login', async(req,res)=>{
      try{
-    const {email,password} = req.body;
+    const {password} = req.body;
+    const email = normalizeEmail(req.body.email);
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json('Please enter a valid email address');
+    }
     const checkEmail = await User.findOne({email});
     if(!checkEmail){
         return res.status(400).json('Email Not exists');
@@ -103,7 +116,10 @@ router.put('/change-password', authMiddleware, async(req, res) => {
 
 router.post('/forgot-password', async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = normalizeEmail(req.body.email);
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json('Please enter a valid email address');
+    }
     const user = await User.findOne({ email });
 
     // Security: same generic response chahiye chahe email exist kare ya na kare
